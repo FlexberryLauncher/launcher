@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Launcher</title>
+    <link rel="stylesheet" href="./style/main.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+  <body>
+    <div class="titlebar">
+      <span id="title" class="title">Launcher</span>
+      <span id="close" class="close material-icons">close</span>
+    </div>
+    <div class="content">
+      <input type="checkbox" checked onchange="updateVersions('release', this.checked);">Releases</input>
+      <input type="checkbox" onchange="updateVersions('snapshot', this.checked);">Snapshots</input>
+      <input type="checkbox" onchange="updateVersions('old_alpha', this.checked);">Old</input>
+      <br>
+      <select id="version">
+        <option value="false" data-type="NaV">Loading...</option>
+      </select>
+      <button onclick="install()">submit</button>
+      <br>
+      <span id="data"></span>
+    </div>
+    <script src="./renderer.js"></script>
+  </body>
+</html>
