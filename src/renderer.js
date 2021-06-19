@@ -1,9 +1,9 @@
 const { ipcRenderer } = require('electron')
 
 var options = {
-    release: true,  // releases like 1.17, 1.8 etc.
+    release: true,   // releases like 1.17, 1.8 etc.
     snapshot: false, // snapshots like 21w16a etc.
-    old_alpha: false     // releases like release-candite, infdev etc.
+    old_alpha: false // releases like release-candite, infdev etc.
 }
 
 function get(url, fn) {
