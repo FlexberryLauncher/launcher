@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Launcher</title>
     <link rel="stylesheet" href="./style/main.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/inter-ui@3.11.0/inter.min.css">
   </head>
   <body>
     <div class="titlebar">
@@ -12,9 +12,20 @@
       <span id="close" class="close material-icons">close</span>
     </div>
     <div class="content">
-      <input type="checkbox" checked onchange="updateVersions('release', this.checked);">Releases</input>
-      <input type="checkbox" onchange="updateVersions('snapshot', this.checked);">Snapshots</input>
-      <input type="checkbox" onchange="updateVersions('old_alpha', this.checked);">Old</input>
+      <div class="switches">
+        <div class="checkboxContainer">
+          <label for="release">Show Releases</label>
+          <input id="release" type="checkbox" checked onchange="updateVersions('release', true); this.checked = true">
+        </div>
+        <div class="checkboxContainer">
+          <label for="snapshot">Show Snapshots</label>
+          <input id="snapshot" type="checkbox" onchange="updateVersions('snapshot', this.checked);">
+        </div>
+        <div class="checkboxContainer">
+          <label for="old_alpha">Show Old-Alphas</label>
+          <input id="old_alpha" type="checkbox" onchange="updateVersions('old_alpha', this.checked);">
+        </div>
+      </div>
       <br>
       <select id="version">
         <option value="false" data-type="NaV">Loading...</option>

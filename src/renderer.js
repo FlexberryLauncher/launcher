@@ -1,12 +1,20 @@
 const { ipcRenderer } = require('electron')
 const { getVersions, filterVersions } = require("./scripts/versions.js")
-const versions = getVersions;
 var filteredVersions = new Array();
+var versions;
+getVersions().then(data => {
+    versions = data;
+    updateVersions("release", true);
+});
+require("./scripts/ipc")
 
 var options = {
-    release: true,   // releases like 1.17, 1.8 etc.
-    snapshot: false, // snapshots like 21w16a etc.
-    old_alpha: false // releases like release-candite, infdev etc.
+    versions: {
+        release: false,    // releases like 1.17, 1.8 etc.
+        snapshot: false,  // snapshots like 21w16a etc.
+        old_alpha: false  // releases like release-candite, infdev etc.
+    },
+    lang: process.env.lang // TO-DO // Add language support
 }
 
 /**
@@ -14,23 +22,13 @@ var options = {
  * @param {Boolean} boolean 
  */
 function updateVersions(option, boolean) {
-    if (!Object.keys(options).includes(option))
+    if (!Object.keys(options.versions).includes(option))
         return new Error("Invalid option inputted");
     if (typeof boolean != "boolean")
         return new Error("Parameter 'boolean' must be Boolean");
-    filteredVersions = filterVersions(versions, options);
+    options.versions[option] = boolean;
+    filteredVersions = filterVersions(versions, options.versions);
+    document.getElementById("version").innerHTML = filteredVersions.length > 0 ? filteredVersions.map(ver => {
+        return `<option value="${ver}" data-type="${ver.type}">${ver.id}</option>`
+    }) : `<option value="false" data-type="info">Select version type checkbox</option>`
 }
-
-document.getElementById("version").innerHTML = filteredVersions.map(ver => {
-    return `<option value="${ver}" data-type="${ver.type}">${ver.id}</option>`
-})
-
-// custom close button
-document.getElementById("close").addEventListener("click", function() {
-    ipcRenderer.send('close')
-});
-
-// completely useless theme switch, i guess i'll remove it
-document.getElementById("title").addEventListener("click", function() {
-    ipcRenderer.send("switchTheme")
-})

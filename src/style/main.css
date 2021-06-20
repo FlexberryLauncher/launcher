@@ -1,4 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(../assets/MaterialIcons.woff2) format('woff2');
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+}
 
 * {
     margin: 0;
@@ -6,6 +27,8 @@
 }
 
 body {
+    user-select: none;
+    font-weight: 300;
     font-family: 'Montserrat', sans-serif;
     color: #f2f2f2;
 }
@@ -35,11 +58,85 @@ body {
     border: #f2f2f250 1px solid;
     cursor: pointer;
     transition: .3s;
+    font-weight: 200;
 }
 
 .close:hover {
+    font-weight: 800;
     border: #ff1e1ede 1px solid;
     color: #ff1e1e
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    background: #1a1a1a20;
+    border: #f2f2f250 1px solid;
+    padding: 6px;
+    position: relative;
+    top: 2px;
+    transition: .2s;
+}
+
+input[type="checkbox"]:hover {
+    border: #b3b3b3 1px solid;
+}
+
+input[type="checkbox"]:checked {
+    /* border: 1px solid #1e78ff; */
+    background: #1a1a1a;
+}
+
+@keyframes aftercb {
+    0% {
+        padding: 0px 0px;
+    }
+    100% {
+        padding: 0px 3px;
+    }
+}
+
+@keyframes beforecb {
+    0% {
+        padding: 0px 0px;
+        transform: translateY(3px) translateX(2px);
+        border: none;
+    }
+    70% {
+        padding: 0px 0px;
+        transform: translateY(3px) translateX(2px);
+        border: none;
+    }
+    100% {
+        padding: 0px 5px;
+    }
+}
+
+input[type="checkbox"]:checked::after {
+    opacity: .7;
+    content: '';
+    position: absolute;
+    animation: aftercb .2s;
+    padding: 0px 2.4px;
+    border: white 1px solid;
+    background: white;
+    border-radius: 10px;
+    transform: translateY(1px) translateX(-5px) rotate(50deg);
+}
+
+input[type="checkbox"]:checked::before {
+    opacity: .7;
+    content: '';
+    position: absolute;
+    animation: beforecb .3s;
+    padding: 0px 4px;
+    border: white 1px solid;
+    background: white;
+    border-radius: 10px;
+    transform: translateY(-1px) translateX(-3px) rotate(-70deg);
+}
+
+.checkbox {
+    display: none;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -13,7 +13,7 @@
     "flexberry"
   ],
   "author": "kuzeeeyk",
-  "license": "CC0-1.0",
+  "license": "MIT",
   "devDependencies": {
     "electron-prebuilt-compile": "13.1.2"
   },

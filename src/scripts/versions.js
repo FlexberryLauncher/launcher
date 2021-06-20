@@ -4,13 +4,15 @@ module.exports = {
      * @description Get list of all Minecraft versions with date order.
      * @returns Array of Minecraft versions.
      */
-    getVersions: new Promise ((resolve) => {
-        get('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(
-            data => {
-                resolve(JSON.parse(data))
-            }
-        )
-    }),
+    getVersions: async function() {
+        return new Promise ((resolve) => {
+            get('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(
+                data => {
+                    resolve(JSON.parse(data).versions)
+                }
+            )
+        })
+    },
     /**
      * @description Filters inputted versions by using inputted options
      * @param {Array} versions
