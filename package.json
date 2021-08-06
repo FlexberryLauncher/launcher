@@ -1,12 +1,12 @@
 {
   "name": "flexberry-launcher",
-  "version": "1.0.0",
-  "description": "Lightweight and ultra useful Minecraft launcher",
+  "version": "0.1.0",
+  "description": "Lightweight and useful Minecraft launcher",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/kuzeeeyk/flexberry-launcher",
   "keywords": [
     "Minecraft",
     "launcher",
@@ -14,9 +14,6 @@
   ],
   "author": "kuzeeeyk",
   "license": "MIT",
-  "devDependencies": {
-    "electron-prebuilt-compile": "13.1.2"
-  },
   "dependencies": {
     "electron-acrylic-window": "^0.5.5",
     "request": "^2.88.2"
