@@ -25,7 +25,7 @@
         <img class="sidebarItem sidebarMainItem" alt="Profile"
           src="https://crafatar.com/avatars/7d0278adeaca4ad993104da0ae62e4bd?overlay=true">
         <span class="material-icons sidebarItem cog" onclick="setAsActive(this); tab('settings');">settings</span>
-        <span class="material-icons sidebarItem puzzle" onclick="setAsActive(this); tab('settings');">extension</span>
+        <span class="material-icons sidebarItem puzzle" onclick="setAsActive(this); tab('resources');">extension</span>
       </div>
       <div class="sidebarGroup" style="opacity: 0;">
         •
@@ -67,6 +67,7 @@
     }
 
     function setAsActive(el) {
+      document.querySelectorAll(".active").forEach(e => e.classList.remove("active"));
       el.classList.add("active")
     }
 
@@ -136,8 +137,7 @@
           }, 100)
           info.style.display = "initial";
           tabs[activeTab].style.display = "none"
-          activeTab = "";
-          cache = "";
+          activeTab, cache = "";
         }, 600);
         playSection.style.transition = ".6s";
         playSection.style.transform = "translateY(-158px)";

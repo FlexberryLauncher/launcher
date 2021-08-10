@@ -170,7 +170,11 @@ body {
 }
 
 .puzzle:hover {
-    transform: rotate(12deg);
+    transform: rotate(10deg);
+}
+
+.puzzle.active {
+    transform: rotate(20deg);
 }
 
 .cog:hover {
@@ -189,6 +193,7 @@ body {
     justify-content: space-between;
     top: 0;
     background: #00000050;
+    z-index: 999;
     -webkit-app-region: drag;
     user-select: none;
 }
