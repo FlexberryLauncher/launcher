@@ -1,9 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @font-face {
     font-family: 'Material Icons';
     font-style: normal;
     font-weight: 400;
     src: url(../assets/MaterialIcons.woff2) format('woff2');
+}
+
+@font-face {
+    font-family: 'Minecraft Ten';
+    font-style: normal;
+    font-weight: normal;
+    src: url(../assets/MinecraftTen-VGORe.woff) format('woff');
 }
 
 .material-icons {
@@ -29,18 +36,154 @@
 body {
     user-select: none;
     font-weight: 300;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Poppins', sans-serif!important;
     color: #f2f2f2;
+    background: #00000070;
+    overflow: hidden;
 }
 
 .content {
-    margin-top: 36px;
-    padding: 15px;
+    margin-top: 41px;
+    display: flex;
+
+}
+
+.information {
+    color: #f2f2f280;
+    transition: .2s;
+}
+
+.link {
+    color: #871dff;
+    cursor: pointer;
+    transition: .4s;
+}
+
+.link:hover {
+    text-shadow: 0 0 20px #871dff80;
+    text-decoration: underline;
+}
+
+.playSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: .6s;
+}
+
+.sidebar {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100px;
+    height: calc(100vh - 41px);
+    gap: 32px;
+    background: linear-gradient(90deg, #00000050, #00000020, transparent)
+}
+
+.sidebarGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+}
+
+.main {
+    height: calc(100vh - 41px - 32px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    background: linear-gradient(#00000050, #00000020, transparent);
+}
+
+.tab {
+    transform: translateY(-200px);
+    display: none;
+    transition: .2s;
+}
+
+.tabContent, .tab {
+    display: none;
+}
+
+.play {
+    font-family: "Minecraft Ten";
+    font-size: 30px;
+    background: #00000050;
+    border: #ffffff10 2px solid;
+    padding: 8px 94px 18px 94px;
+    cursor: pointer;
+    transition: .2s;
+    color: #ffffff90;
+}
+
+.play:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px #00000050;
+}
+
+.play:active {
+    border: #a3898960 2px solid;
+}
+
+.sidebarItem {
+    font-size: 24px;
+    width: 24px;
+    color: #b3b3b370;
+    transition: .4s;
+}
+
+.active {
+    color: #f2f2f2!important;
+}
+
+.cog.active  {
+    transform: rotate(120deg)!important;
+}
+
+.sidebarMainItem {
+    filter: grayscale(1);
+    opacity: .6;
+    border-radius: 3px;
+}
+
+.sidebarMainItem:hover {
+    transform: scale(1.1);
+    opacity: 1;
+    filter: none;
+    border-radius: 0;
+}
+
+.sidebarItem:hover {
+    color: #ffffff98;
+    cursor: pointer;
+}
+
+.puzzle {
+    transform-origin: calc(100% + 10px) calc(100% - 3px);
+}
+
+.puzzle:hover {
+    transform: rotate(12deg);
+}
+
+.cog:hover {
+    transform: rotate(60deg);
+}
+
+.main {
+    width: 100%;
 }
 
 .titlebar {
     width: calc(100vw - 30px);
-    padding: 10px 15px;
+    padding: 8px 15px;
     position: fixed;
     display: flex;
     justify-content: space-between;
@@ -54,7 +197,8 @@ body {
     font-size: 18px!important;
     position: absolute;
     right: 15px;
-    top: 9px; /* optical centering */
+    width: 20px;
+    top: 10px; /* optical centering */
     border: #f2f2f250 1px solid;
     cursor: pointer;
     transition: .3s;
@@ -139,18 +283,11 @@ input[type="checkbox"]:checked::before {
     display: none;
 }
 
-@media (prefers-color-scheme: dark) {
-    body {
-        color: #f2f2f2;
-    }
-}
-  
-@media (prefers-color-scheme: light) {
-    body { 
-        color: #ffffff;
-    }
-    .titlebar {
-        color: #f2f2f2;
-        background: #00000020;
-    }
+
+.title {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    -webkit-app-region: drag;
+    color: #f2f2f280;
 }

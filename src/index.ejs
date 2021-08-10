@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Launcher</title>
+  <link rel="stylesheet" href="./style/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/inter-ui@3.11.0/inter.min.css">
+</head>
+
+<body ondragstart="return false">
+  <div class="titlebar">
+    <span id="title" class="title"><img src="assets/logo.png" alt="Logo" width="20"> Flexberry Launcher</span>
+    <svg id="close" xmlns="http://www.w3.org/2000/svg" class="close" fill="none" viewBox="0 0 24 24"
+      stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </div>
+  <div class="content">
+    <div class="sidebar">
+      <div class="sidebarGroup">
+        <span class="material-icons sidebarItem" id="back" style="opacity: 0; cursor: default">arrow_back</span>
+      </div>
+      <div class="sidebarGroup">
+        <img class="sidebarItem sidebarMainItem" alt="Profile"
+          src="https://crafatar.com/avatars/7d0278adeaca4ad993104da0ae62e4bd?overlay=true">
+        <span class="material-icons sidebarItem cog" onclick="setAsActive(this); tab('settings');">settings</span>
+        <span class="material-icons sidebarItem puzzle" onclick="setAsActive(this); tab('settings');">extension</span>
+      </div>
+      <div class="sidebarGroup" style="opacity: 0;">
+        •
+      </div>
+    </div>
+    <div class="main" id="main">
+      <div class="tab" id="tab">
+        <div class="tabContent" id="profiler">
+          <span style="font-family: 'Minecraft Ten'; font-size: xx-large; color: blue;">
+            Profiller falan
+          </span>
+        </div>
+        <div class="tabContent" id="resources">
+          <span style="font-family: 'Minecraft Ten'; font-size: xx-large; color: green;">
+            Icerikler falan
+          </span>
+        </div>
+        <div class="tabContent" id="settings">
+          <span style="font-family: 'Minecraft Ten'; font-size: xx-large; color: red;">
+            Ayarlar falan
+          </span>
+        </div>
+      </div>
+      <div class="playSection" id="playSection">
+        <span class="play">
+          PLAY
+        </span>
+        <span class="information" id="info">fabric-1.17.1 • <span onclick="tab('profiler')" class="link"
+            id="change">change</span></span>
+      </div>
+    </div>
+  </div>
+  <script>
+    function assignOnClick(el, bool) {
+      if (bool)
+        el.onclick = function () { tab() };
+      else
+        el.onclick = function () { };
+    }
+
+    function setAsActive(el) {
+      el.classList.add("active")
+    }
+
+    var isAnyTabActive = false;
+    var activeTab = "";
+    var cache;
+    function tab(opinion) {
+      var playSection = document.getElementById("playSection");
+      var main = document.getElementById("main");
+      var tab = document.getElementById("tab");
+      var info = document.getElementById("info");
+      var back = document.getElementById("back");
+      var tabs = {
+        profiler: document.getElementById("profiler"),
+        settings: document.getElementById("settings"),
+        resources: document.getElementById("resources")
+      }
+      if (tabs[opinion] && isAnyTabActive && activeTab !== opinion) {
+        tabs[activeTab].style.opacity = "0";
+        tabs[activeTab].style.transition = ".3s";
+        setTimeout(function () {
+          tabs[activeTab].style.display = "none";
+          tabs[opinion].style.display = "initial";
+          tabs[opinion].style.opacity = "0";
+          tabs[activeTab].style.opacity = "1";
+          tabs[opinion].style.transition = ".3s";
+          setTimeout(function () {
+            tabs[opinion].style.opacity = "1";
+            tabs[opinion].style.transition = "0";
+            activeTab = opinion;
+            cache = tabs[opinion];
+          }, 300)
+          tabs[activeTab].style.transition = "0";
+        }, 300)
+        return;
+      }
+      if (tabs[opinion] && !isAnyTabActive) {
+        isAnyTabActive = true;
+        activeTab = opinion;
+        cache = tabs[opinion];
+        setTimeout(function () {
+          playSection.style.transition = "0s";
+          playSection.style.transform = "none";
+          main.style.justifyContent = "space-between";
+          tab.style.transform = "translateY(0px)";
+          info.style.display = "none";
+          tab.style.opacity = "1";
+        }, 600);
+        tabs[opinion].style.display = "initial"
+        tab.style.display = "initial";
+        playSection.style.transition = ".6s";
+        playSection.style.transform = "translateY(136px)";
+        info.style.opacity = "0";
+        back.style.opacity = "1";
+        back.style.cursor = "pointer";
+        assignOnClick(back, true)
+      } else {
+        isAnyTabActive = false;
+        document.querySelectorAll(".active").forEach(e => e.classList.remove("active"));
+        setTimeout(function () {
+          playSection.style.transition = "0s";
+          playSection.style.transform = "none";
+          main.style.justifyContent = "center";
+          tab.style.display = "none";
+          setTimeout(function () {
+            info.style.opacity = "1";
+          }, 100)
+          info.style.display = "initial";
+          tabs[activeTab].style.display = "none"
+          activeTab = "";
+          cache = "";
+        }, 600);
+        playSection.style.transition = ".6s";
+        playSection.style.transform = "translateY(-158px)";
+        back.style.opacity = "0";
+        back.style.cursor = "default";
+        tab.style.opacity = ".2";
+        tab.style.transform = "translateY(-200px)";
+        assignOnClick(back, false)
+      }
+    }
+  </script>
+  <script src="./renderer.js"></script>
+</body>
+
+</html>

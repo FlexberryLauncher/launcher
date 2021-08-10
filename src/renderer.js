@@ -1,5 +1,6 @@
 const { ipcRenderer } = require('electron')
 const { getVersions, filterVersions } = require("./scripts/versions.js")
+const launchMinecraft = require("./scripts/launcher.js");
 var filteredVersions = new Array();
 var versions;
 getVersions().then(data => {
@@ -17,6 +18,8 @@ var options = {
     lang: process.env.lang // TO-DO // Add language support
 }
 
+setTimeout(console.clear, 500)
+
 /**
  * @param {String} option 
  * @param {Boolean} boolean 
@@ -28,7 +31,12 @@ function updateVersions(option, boolean) {
         return new Error("Parameter 'boolean' must be Boolean");
     options.versions[option] = boolean;
     filteredVersions = filterVersions(versions, options.versions);
-    document.getElementById("version").innerHTML = filteredVersions.length > 0 ? filteredVersions.map(ver => {
-        return `<option value="${ver}" data-type="${ver.type}">${ver.id}</option>`
-    }) : `<option value="false" data-type="info">Select version type checkbox</option>`
+    // document.getElementById("version").innerHTML = filteredVersions.length > 0 ? filteredVersions.map(ver => {
+        // return `<option value="${ver}" data-type="${ver.type}">${ver.id}</option>`
+    // }) : `<option value="false" data-type="info">Select version type checkbox</option>`
+}
+
+function launch() {
+    const selectedVersion = document.getElementById("version").value;
+    console.log(launchMinecraft(selectedVersion, "2G"))
 }

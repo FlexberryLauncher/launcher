@@ -15,7 +15,12 @@
   "author": "kuzeeeyk",
   "license": "MIT",
   "dependencies": {
+    "ejs-electron": "^2.1.1",
+    "electron": "^13.1.8",
     "electron-acrylic-window": "^0.5.5",
+    "lowdb": "^1.0.0",
+    "minecraft-launcher-core": "^3.16.4",
+    "msmc": "^2.1.3",
     "request": "^2.88.2"
   }
 }

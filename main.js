@@ -1,13 +1,14 @@
-const {app, ipcMain, nativeTheme} = require('electron')
-const {BrowserWindow} = require("electron-acrylic-window");
+const { app, ipcMain } = require('electron')
+const { BrowserWindow } = require("electron-acrylic-window");
 const path = require('path')
+require("ejs-electron");
 
-// TO-DO
-// Add dynamic window scale depends on user's screen size.
-function createWindow () {
+function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 500,
+    width: 720,
+    height: 420,
+    icon: __dirname + '/src/assets/logo.png',
+    shadow: false,
     frame: false,
     resizable: false,
     fullscreenable: false,
@@ -24,32 +25,20 @@ function createWindow () {
       preload: path.join(__dirname, 'src/preload.js')
     },
   })
-  mainWindow.loadFile('src/index.html')
-  var theme = "dark";
-  nativeTheme.themeSource = theme;
-  ipcMain.on('switchTheme', (event) => {
-    theme = (theme == "dark" ? "light" : "dark")
-    nativeTheme.themeSource = theme;
-    mainWindow.setVibrancy({
-      useCustomWindowRefreshMethod: true,
-      maximumRefreshRate: 30,
-      disableOnBlur: false,
-      theme: theme
-    })
-  })  
+  mainWindow.loadFile('src/index.ejs')
 }
 
 app.whenReady().then(() => {
   createWindow();
   app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
   })
 })
 
 ipcMain.on('close', (event) => {
-  BrowserWindow.getFocusedWindow().close()
+  BrowserWindow.getFocusedWindow().close();
 })
 
 app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
+  if (process.platform !== 'darwin') app.quit();
 })
