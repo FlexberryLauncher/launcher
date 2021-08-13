@@ -31,6 +31,7 @@
 * {
     margin: 0;
     -webkit-app-region: no-drag;
+    outline: none!important;
 }
 
 body {
@@ -112,6 +113,48 @@ body {
     display: none;
 }
 
+.btn {
+    background: #00000050;
+    border: #ffffff10 2px solid;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: .2s;
+    color: #ffffff90;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    min-width: 100px;
+    height: 24px;
+    gap: 12px;
+}
+
+.text {
+    font-family: 'Poppins', sans-serif;
+    background: #00000050;
+    border: #ffffff10 2px solid;
+    color: #ffffff90;
+    padding: 8px 16px;
+    height: 24px;
+    transition: .4s;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 12px;
+}
+
+.divider {
+    border-left: #ffffff10 1px solid;
+    height: 20px;
+}
+
+.btn .material-icons {
+    color: #ffffff70; /* optical coloring thing */
+    font-size: 22px;
+}
+
 .play {
     font-family: "Minecraft Ten";
     font-size: 30px;
@@ -123,13 +166,17 @@ body {
     color: #ffffff90;
 }
 
-.play:hover {
-    transform: scale(1.05);
+.play:hover, .btn:hover {
+    transform: scale(1.02);
     box-shadow: 0 10px 20px #00000050;
 }
 
-.play:active {
+.play:active, .btn:active, .text:hover, .text:focus {
     border: #a3898960 2px solid;
+}
+
+.text:focus {
+    box-shadow: 0 10px 20px #00000050;
 }
 
 .sidebarItem {
