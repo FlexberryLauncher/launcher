@@ -1,7 +1,7 @@
 const { Authenticator } = require("minecraft-launcher-core");
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
-const adapter = new FileSync("accounts.json"/*require("path").join(process.env.APPDATA, '.minecraft', 'profiles.json')*/)
+const adapter = new FileSync("accounts.json")
 
 module.exports = {
     /**
