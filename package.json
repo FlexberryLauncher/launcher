@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "pack-linux": "npx electron-packager . flexberry-launcher --overwrite --platform=linux --arch=x64 --icon=src/assets/logo.png --prune=true",
-    "pack": "npx electron-packager . flexberry-launcher --overwrite --icon=src/assets/logo.png --prune=true"
+    "pack-linux": "npx electron-packager . flexberry-launcher --overwrite --platform=linux --arch=x64 --icon=src/assets/logo.ico --prune=true",
+    "pack": "npx electron-packager . flexberry-launcher --overwrite --icon=src/assets/logo.ico --prune=true"
   },
   "repository": "https://github.com/kuzeeeyk/flexberry-launcher",
   "keywords": [
