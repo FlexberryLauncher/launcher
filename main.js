@@ -1,5 +1,4 @@
-const { app, ipcMain } = require('electron')
-const { BrowserWindow } = require("electron-acrylic-window");
+const { app, ipcMain, BrowserWindow } = require('electron')
 const path = require('path')
 require("ejs-electron");
 
@@ -12,12 +11,6 @@ function createWindow() {
     frame: false,
     resizable: false,
     fullscreenable: false,
-    vibrancy: {
-      useCustomWindowRefreshMethod: true,
-      maximumRefreshRate: 30,
-      disableOnBlur: false,
-      theme: "dark"
-    },
     webPreferences: {
       spellcheck: false,
       nodeIntegration: true,
