@@ -24,8 +24,8 @@
       <div class="sidebarGroup">
         <img class="sidebarItem sidebarMainItem" alt="Profile"
           src="https://crafatar.com/avatars/7d0278adeaca4ad993104da0ae62e4bd?overlay=true">
-        <span class="material-icons sidebarItem cog" onclick="setAsActive(this); tab('settings');">settings</span>
-        <span class="material-icons sidebarItem puzzle" onclick="setAsActive(this); tab('resources');">extension</span>
+        <span class="material-icons sidebarItem cog" onclick="tab('settings', this);">settings</span>
+        <span class="material-icons sidebarItem puzzle" onclick="tab('resources', this);">extension</span>
       </div>
       <div class="sidebarGroup" style="opacity: 0;">
         •
@@ -98,7 +98,7 @@
     var isAnyTabActive, alreadyPlaying, pleaseSlowDown = false;
     var activeTab;
     var cache;
-    function tab(opinion) {
+    function tab(opinion, el) {
       if (pleaseSlowDown) return setTimeout(function () {
         pleaseSlowDown = false;
       }, 600);
@@ -108,6 +108,7 @@
       setTimeout(function () {
         alreadyPlaying = false;
       }, 601)
+      setAsActive(el); 
       var playSection = document.getElementById("playSection");
       var main = document.getElementById("main");
       var tab = document.getElementById("tab");
