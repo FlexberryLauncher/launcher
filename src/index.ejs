@@ -108,7 +108,7 @@
       setTimeout(function () {
         alreadyPlaying = false;
       }, 601)
-      setAsActive(el); 
+      el && setAsActive(el); 
       var playSection = document.getElementById("playSection");
       var main = document.getElementById("main");
       var tab = document.getElementById("tab");
