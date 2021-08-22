@@ -1,6 +1,6 @@
 {
   "name": "flexberry-launcher",
-  "version": "0.4.0",
+  "version": "0.4.3",
   "description": "Lightweight and useful Minecraft launcher",
   "main": "main.js",
   "scripts": {
