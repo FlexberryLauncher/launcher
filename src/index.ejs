@@ -39,13 +39,25 @@
             <span class="divider"></span>
             <span class="btn"><span class="material-icons">add</span> Add Profile</span>
           </div>
-          <div class="profiles">
+          <div class="profiles" id="profiles">
             <div class="profile">
-              <span class="profileDetails">
-                fabric-1.17.1
-              </span>
+              <div class="profileDetails">
+                <span class="profileName">Vanilla</span>
+                <span class="profileIdentifier">1.17</span>
+              </div>
               <div class="profileActions">
-                <span class="profileAction material-icons sidebarItem">delete</span>
+                <span class="profileAction material-icons btn sidebarItem">delete</span>
+                <span class="profileAction material-icons btn sidebarItem">more_horiz</span>
+              </div>
+            </div>
+            <div class="profile">
+              <div class="profileDetails">
+                <span class="profileName">Fabric</span>
+                <span class="profileIdentifier">fabric-1.17.1-xy69z</span>
+              </div>
+              <div class="profileActions">
+                <span class="profileAction material-icons btn sidebarItem">delete</span>
+                <span class="profileAction material-icons btn sidebarItem">more_horiz</span>
               </div>
             </div>
           </div>
@@ -71,16 +83,9 @@
     </div>
   </div>
   <script>
-
-    // BRUH wtf is this... 
-    // worst code i have ever seen before vvvv
     function assignOnClick(el, bool) {
-      if (bool)
-        el.onclick = function () { tab() };
-      else
-        el.onclick = function () { };
+      el.onclick = function () { bool ? tab() : "" };
     }
-    //
 
     function setAsActive(el) {
       document.querySelectorAll(".active").forEach(e => e.classList.remove("active"));
@@ -108,7 +113,7 @@
       setTimeout(function () {
         alreadyPlaying = false;
       }, 601)
-      el && setAsActive(el); 
+      el && setAsActive(el);
       var playSection = document.getElementById("playSection");
       var main = document.getElementById("main");
       var tab = document.getElementById("tab");

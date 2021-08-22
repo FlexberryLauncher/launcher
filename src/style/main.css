@@ -138,6 +138,74 @@ body {
     gap: 12px;
 }
 
+*::-webkit-scrollbar {
+  width: 6px;
+  border-radius: 13px;
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  background: #00000010;
+}
+
+*::-webkit-scrollbar-thumb {     
+  border-radius: 13px;
+  box-shadow: inset 0 0 0 10px;
+}
+
+
+.profiles {
+    transition: .2s;
+    padding-right: 8px;
+    overflow: scroll;
+    overflow-x: hidden;
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    height: 84%;
+    flex-direction: column;
+    color: rgba(0, 0, 0, 0)
+}
+
+.profiles:hover {
+    color: #00000050;
+}
+
+.profile {
+    color: #ffffff90;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profileIdentifier {
+    color: #b3b3b350;
+    font-size: small;
+}
+
+.profileDetails {
+    font-size: 14px;
+    padding: 8px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: #00000050;
+    border: #ffffff10 2px solid;
+    width: 62%;
+    height: 24px;
+}
+
+.profileActions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.profileAction {
+    font-size: 20px!important;
+    min-width: 0px;
+    padding: 8px;
+}
+
 .text {
     font-family: 'Poppins', sans-serif;
     background: #00000050;
@@ -264,6 +332,7 @@ body {
     left: 0;
     z-index: -69;
     height: 41px;
+    color: #654321;
     background: linear-gradient(90deg, #00000050, #00000020, transparent);
 }
 
