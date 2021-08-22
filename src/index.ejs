@@ -71,22 +71,43 @@
     </div>
   </div>
   <script>
+
+    // BRUH wtf is this... 
+    // worst code i have ever seen before vvvv
     function assignOnClick(el, bool) {
       if (bool)
         el.onclick = function () { tab() };
       else
         el.onclick = function () { };
     }
+    //
 
     function setAsActive(el) {
       document.querySelectorAll(".active").forEach(e => e.classList.remove("active"));
       el.classList.add("active")
     }
 
-    var isAnyTabActive = false;
+    function playLater(opinion) {
+      pleaseSlowDown = true;
+      setTimeout(function () {
+        tab(opinion)
+        pleaseSlowDown, alreadyPlaying = false;
+      }, 601);
+    }
+
+    var isAnyTabActive, alreadyPlaying, pleaseSlowDown = false;
     var activeTab;
     var cache;
     function tab(opinion) {
+      if (pleaseSlowDown) return setTimeout(function () {
+        pleaseSlowDown = false;
+      }, 600);
+      if (alreadyPlaying)
+        return playLater(opinion);
+      alreadyPlaying = true;
+      setTimeout(function () {
+        alreadyPlaying = false;
+      }, 601)
       var playSection = document.getElementById("playSection");
       var main = document.getElementById("main");
       var tab = document.getElementById("tab");
