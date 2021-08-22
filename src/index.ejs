@@ -3,14 +3,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Launcher</title>
+  <title>Flexberry Launcher</title>
   <link rel="stylesheet" href="./style/main.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/inter-ui@3.11.0/inter.min.css">
 </head>
 
 <body ondragstart="return false">
   <div class="titlebar">
-    <span id="title" class="title"><img src="assets/logo.png" alt="Logo" width="20"> Flexberry Launcher</span>
+    <span id="title" class="title"><img src="assets/logo.ico" alt="Logo" width="20"> Flexberry Launcher</span>
     <svg id="close" xmlns="http://www.w3.org/2000/svg" class="close" fill="none" viewBox="0 0 24 24"
       stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -38,6 +38,16 @@
             <input class="text" placeholder="Search profiles...">
             <span class="divider"></span>
             <span class="btn"><span class="material-icons">add</span> Add Profile</span>
+          </div>
+          <div class="profiles">
+            <div class="profile">
+              <span class="profileDetails">
+                fabric-1.17.1
+              </span>
+              <div class="profileActions">
+                <span class="profileAction material-icons sidebarItem">delete</span>
+              </div>
+            </div>
           </div>
         </div>
         <div class="tabContent" id="resources">
@@ -92,7 +102,7 @@
         tabs[activeTab].style.transition = ".3s";
         setTimeout(function () {
           tabs[activeTab].style.display = "none";
-          tabs[opinion].style.display = "initial";
+          tabs[opinion].style.display = "block";
           tabs[opinion].style.opacity = "0";
           tabs[activeTab].style.opacity = "1";
           tabs[opinion].style.transition = ".3s";
@@ -112,16 +122,17 @@
         cache = tabs[opinion];
         setTimeout(function () {
           playSection.style.transition = "0s";
-          playSection.style.transform = "none";
+          playSection.style.transform = `translateY(286px)`;
           main.style.justifyContent = "space-between";
           tab.style.transform = "translateY(0px)";
           info.style.display = "none";
           tab.style.opacity = "1";
         }, 600);
-        tabs[opinion].style.display = "initial"
-        tab.style.display = "initial";
+        tabs[opinion].style.display = "block"
+        tab.style.display = "block";
         playSection.style.transition = ".6s";
-        playSection.style.transform = "translateY(136px)";
+        playSection.style.position = "absolute";
+        playSection.style.transform = `translateY(156px)`;
         info.style.opacity = "0";
         back.style.opacity = "1";
         back.style.cursor = "pointer";
@@ -137,16 +148,16 @@
           setTimeout(function () {
             info.style.opacity = "1";
           }, 100)
-          info.style.display = "initial";
+          info.style.display = "block";
           tabs[activeTab].style.display = "none"
           activeTab, cache = "";
         }, 600);
         playSection.style.transition = ".6s";
-        playSection.style.transform = "translateY(-158px)";
+        playSection.style.transform = "translateY(130px)";
         back.style.opacity = "0";
         back.style.cursor = "default";
         tab.style.opacity = ".2";
-        tab.style.transform = "translateY(-200px)";
+        tab.style.transform = "translateY(-500px)";
         assignOnClick(back, false)
       }
     }

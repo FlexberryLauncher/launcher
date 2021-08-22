@@ -39,8 +39,13 @@ body {
     font-weight: 300;
     font-family: 'Poppins', sans-serif!important;
     color: #f2f2f2;
-    background: #1f1f1f;
+    background: url(../assets/background.png);
     overflow: hidden;
+}
+
+.debug {
+    border: red 1px solid;
+    background: #0000ff20;
 }
 
 .content {
@@ -82,7 +87,7 @@ body {
     width: 100px;
     height: calc(100vh - 41px);
     gap: 32px;
-    background: linear-gradient(90deg, #00000050, #00000020, transparent)
+    background: linear-gradient(90deg, #00000050, #00000020, transparent);
 }
 
 .sidebarGroup {
@@ -104,9 +109,14 @@ body {
 }
 
 .tab {
-    transform: translateY(-200px);
+    transform: translateY(-500px);
     display: none;
     transition: .2s;
+}
+
+#profiler {
+    height: 256px;
+    padding: 0px 16px 16px 16px;
 }
 
 .tabContent, .tab {
@@ -147,11 +157,11 @@ body {
 
 .divider {
     border-left: #ffffff10 1px solid;
-    height: 20px;
+    height: 24px;
 }
 
 .btn .material-icons {
-    color: #ffffff70; /* optical coloring thing */
+    color: #ffffff70;
     font-size: 22px;
 }
 
@@ -245,12 +255,24 @@ body {
     user-select: none;
 }
 
+/* fix: gradient of sidebar was makes titlebar look weird, so i added same gradient to titlebar. */
+.titlebar::before {
+    content: '';
+    position: absolute;
+    width: 100px;
+    top: 0;
+    left: 0;
+    z-index: -69;
+    height: 41px;
+    background: linear-gradient(90deg, #00000050, #00000020, transparent);
+}
+
 .close {
     font-size: 18px!important;
     position: absolute;
     right: 15px;
     width: 20px;
-    top: 10px; /* optical centering */
+    top: 10px; /* optical align */
     border: #f2f2f250 1px solid;
     cursor: pointer;
     transition: .3s;

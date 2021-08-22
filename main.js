@@ -6,8 +6,7 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 720,
     height: 420,
-    icon: __dirname + '/src/assets/logo.png',
-    shadow: false,
+    icon: __dirname + '/src/assets/logo.ico',
     frame: false,
     resizable: false,
     fullscreenable: false,
