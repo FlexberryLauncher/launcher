@@ -190,7 +190,7 @@ body {
     align-items: center;
     background: #00000050;
     border: #ffffff10 2px solid;
-    width: 62%;
+    width: calc(61% + 2px);
     height: 24px;
 }
 
