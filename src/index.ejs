@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/inter-ui@3.11.0/inter.min.css">
 </head>
 
-<body ondragstart="return false">
+<body ondragstart="return false" id="body">
   <div class="titlebar">
     <span id="title" class="title"><img src="assets/logo.ico" alt="Logo" width="20"> Flexberry Launcher</span>
     <svg id="close" xmlns="http://www.w3.org/2000/svg" class="close" fill="none" viewBox="0 0 24 24"
@@ -16,6 +16,7 @@
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
     </svg>
   </div>
+  <span class="tooltip" id="tooltip"></span>
   <div class="content">
     <div class="sidebar">
       <div class="sidebarGroup">
@@ -40,26 +41,6 @@
             <span class="btn"><span class="material-icons">add</span> Add Profile</span>
           </div>
           <div class="profiles" id="profiles">
-            <div class="profile">
-              <div class="profileDetails">
-                <span class="profileName">Vanilla</span>
-                <span class="profileIdentifier">1.17</span>
-              </div>
-              <div class="profileActions">
-                <span class="profileAction material-icons btn sidebarItem">delete</span>
-                <span class="profileAction material-icons btn sidebarItem">more_horiz</span>
-              </div>
-            </div>
-            <div class="profile">
-              <div class="profileDetails">
-                <span class="profileName">Fabric</span>
-                <span class="profileIdentifier">fabric-1.17.1-xy69z</span>
-              </div>
-              <div class="profileActions">
-                <span class="profileAction material-icons btn sidebarItem">delete</span>
-                <span class="profileAction material-icons btn sidebarItem">more_horiz</span>
-              </div>
-            </div>
           </div>
         </div>
         <div class="tabContent" id="resources">
@@ -77,12 +58,56 @@
         <span class="play">
           PLAY
         </span>
-        <span class="information" id="info">fabric-1.17.1 • <span onclick="tab('profiler')" class="link"
-            id="change">change</span></span>
+        <span class="information" id="info"></span>
       </div>
     </div>
   </div>
   <script>
+    var hovering = "";
+
+    function getOffset(el) {
+      const rect = el.getBoundingClientRect();
+      return {
+        left: rect.left + window.scrollX,
+        top: rect.top + window.scrollY
+      };
+    }
+
+    function tooltip(el, text, state) {
+      var tooltip = document.getElementById("tooltip");
+      var bodyBounds = document.getElementById("body").getBoundingClientRect()
+      if (!state) {
+        tooltip.style.transition = ".4s";
+        tooltip.style.opacity = "0"
+        tooltip.style.zIndex = "-69"
+        tooltip.style.transition = "0";
+        return;
+      }
+      tooltip.innerHTML = text;
+      tooltip.style.top = getOffset(el).top + 8 + "px";
+      tooltip.style.left = getOffset(el).left + 52 + "px";
+      setTimeout(function () {
+        tooltip.style.transition = ".4s";
+        tooltip.style.opacity = "1"
+        tooltip.style.zIndex = "69"
+        tooltip.style.transition = "0";
+      }, 200);
+      console.log(getOffset(el))
+    }
+
+    function hoverCheck(el, text) {
+      if (hovering == el.id) {
+        hovering = "";
+        tooltip(el, text, false);
+        clearTimeout(timeout);
+        return
+      }
+      hovering = el.id;
+      var timeout = setTimeout(function () {
+        hovering == el.id && tooltip(el, text, true);
+      }, 200);
+    }
+
     function assignOnClick(el, bool) {
       el.onclick = function () { bool ? tab() : "" };
     }

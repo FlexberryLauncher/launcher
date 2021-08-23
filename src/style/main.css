@@ -194,6 +194,18 @@ body {
     height: 24px;
 }
 
+.tooltip {
+    opacity: 0;
+    position: absolute;
+    z-index: 69;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #00000080;
+    color: white;
+    font-size: small;
+    box-shadow: 0 4px 16px #00000050;
+}
+
 .profileActions {
     display: flex;
     justify-content: space-between;
