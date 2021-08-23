@@ -175,6 +175,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: .2s;
 }
 
 .profileIdentifier {

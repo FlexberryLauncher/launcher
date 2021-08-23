@@ -36,7 +36,8 @@
       <div class="tab" id="tab">
         <div class="tabContent" id="profiler">
           <div class="actions">
-            <input class="text" placeholder="Search profiles...">
+            <input class="text" oninput="search(this.value);" onemptied="search(this.value);" id="search"
+              placeholder="Search profiles...">
             <span class="divider"></span>
             <span class="btn"><span class="material-icons">add</span> Add Profile</span>
           </div>
@@ -63,15 +64,39 @@
     </div>
   </div>
   <script>
-    var hovering = "";
+    // setInterval(function () {
+    //   var param = document.getElementById("search").value;
+    //   if (!param)
+    //     return search("")
+    // }, 512)
+
+    function search(parameter) {
+      document.querySelectorAll(".profile").forEach(pEl => {
+        if (!pEl.id.toLowerCase().includes(parameter.toLowerCase())) {
+          setTimeout(function () {
+            pEl.style.display = "none";
+          }, 200)
+          pEl.style.transform = "translateY(-64px)"
+          pEl.style.opacity = "0"
+        } else {
+          setTimeout(function () {
+            pEl.style.opacity = "1"
+            pEl.style.transform = "translateY(0px)"
+          }, 200)
+          pEl.style.display = "flex";
+        }
+      })
+    }
 
     function getOffset(el) {
       const rect = el.getBoundingClientRect();
       return {
         left: rect.left + window.scrollX,
         top: rect.top + window.scrollY
-      };
+      }
     }
+
+    var hovering = "";
 
     function tooltip(el, text, state) {
       var tooltip = document.getElementById("tooltip");

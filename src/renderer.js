@@ -36,7 +36,7 @@ async function loadProfiles() {
     profilesArray.forEach(profile => {
         console.log(profile)
         profilesEl.innerHTML += `
-        <div class="profile">
+        <div class="profile" id="${profile.name} ${profile.version}">
             <div class="profileDetails">
                 <span class="profileName">${profile.name}</span>
                 <span class="profileIdentifier">${profile.version}</span>
