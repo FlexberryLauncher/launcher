@@ -11,7 +11,8 @@ module.exports = {
             version: version,
             allocatedMemory: allocatedMemory,
             width: width,
-            height: height
+            height: height,
+            selected: false
         };
         versions.defaults({ versions: [] })
             .write();

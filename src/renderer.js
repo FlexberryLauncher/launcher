@@ -15,11 +15,25 @@ var options = {
     }
 }
 
+async function select() {
+    var info = document.getElementById("info");
+    var profiles = low(profilesAdapter);
+    var selectedVersion = (profiles.get('versions')
+        .filter({ selected: true })
+        .write())[0];
+    console.log(selectedVersion);
+    info.innerHTML = `
+    <span class="information" id="info">
+        ${selectedVersion.name} • <span onclick="tab('profiler')" class="link" id="change">change</span>
+    </span>`
+}
+
 async function loadProfiles() {
     var profilesEl = document.getElementById("profiles");
     var profiles = low(profilesAdapter);
+    var profilesArray = await profiles.get("versions").write();
     profilesEl.innerHTML = "";
-    (await profiles.get("versions").write()).forEach(profile => {
+    profilesArray.forEach(profile => {
         console.log(profile)
         profilesEl.innerHTML += `
         <div class="profile">
@@ -35,3 +49,4 @@ async function loadProfiles() {
     });
 };
 loadProfiles();
+select();
