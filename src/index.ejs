@@ -67,16 +67,14 @@
     function search(parameter) {
       document.querySelectorAll(".profile").forEach(pEl => {
         if (!pEl.id.toLowerCase().includes(parameter.toLowerCase())) {
-          setTimeout(function () {
-            pEl.style.display = "none";
-          }, 200)
-          pEl.style.transform = "translateY(-64px)"
-          pEl.style.opacity = "0"
+          // setTimeout(function () {
+          pEl.style.display = "none";
+          // }, 200)
+          // pEl.style.opacity = "0"
         } else {
-          setTimeout(function () {
-            pEl.style.opacity = "1"
-            pEl.style.transform = "translateY(0px)"
-          }, 200)
+          // setTimeout(function () {
+          //   pEl.style.opacity = "1"
+          // }, 200)
           pEl.style.display = "flex";
         }
       })
