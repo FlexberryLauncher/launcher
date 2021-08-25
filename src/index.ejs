@@ -66,17 +66,9 @@
   <script>
     function search(parameter) {
       document.querySelectorAll(".profile").forEach(pEl => {
-        if (!pEl.id.toLowerCase().includes(parameter.toLowerCase())) {
-          // setTimeout(function () {
-          pEl.style.display = "none";
-          // }, 200)
-          // pEl.style.opacity = "0"
-        } else {
-          // setTimeout(function () {
-          //   pEl.style.opacity = "1"
-          // }, 200)
-          pEl.style.display = "flex";
-        }
+        if (!pEl.id.toLowerCase().includes(parameter.toLowerCase()))
+          return pEl.style.display = "none";
+        return pEl.style.display = "flex";
       })
     }
 
@@ -89,8 +81,25 @@
     }
 
     var hovering = "";
+    var handBrake = false;
+
+    function iHateTooltipsHurb() {
+      handBrake = true;
+      setTimeout(() => {
+        var tooltip = document.getElementById("tooltip");
+        tooltip.style.transition = ".4s";
+        tooltip.style.opacity = "0"
+        tooltip.style.zIndex = "-69"
+        tooltip.style.transition = "0";
+        setTimeout(function () {
+          handBrake = false;
+          return;
+        }, 1000)
+      }, 200);
+    }
 
     function tooltip(el, text, state) {
+      if (handBrake) return;
       var tooltip = document.getElementById("tooltip");
       var bodyBounds = document.getElementById("body").getBoundingClientRect()
       if (!state) {
@@ -104,11 +113,12 @@
       tooltip.style.top = getOffset(el).top + 8 + "px";
       tooltip.style.left = getOffset(el).left + 52 + "px";
       setTimeout(function () {
+        if (handBrake) return;
         tooltip.style.transition = ".4s";
         tooltip.style.opacity = "1"
         tooltip.style.zIndex = "69"
         tooltip.style.transition = "0";
-      }, 200);
+      }, 500);
       console.log(getOffset(el))
     }
 
