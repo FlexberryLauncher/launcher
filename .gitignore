@@ -2,6 +2,9 @@
 node_modules/
 package-lock.json
 
+# electron forge build
+out/
+
 # launcher files
 accounts.json
 profiles.json
