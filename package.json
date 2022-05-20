@@ -21,9 +21,7 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {
-        "icon": "./src/assets/images/flexberry-launcher-icon.png"
-      },
+      "packagerConfig": {},
       "makers": [
         {
           "name": "@electron-forge/maker-rpm",
@@ -37,7 +35,8 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "flexberry_launcher"
+            "name": "flexberry_launcher",
+            "icon": "./src/assets/images/flexberry-launcher-icon.png"
           }
         },
         {
