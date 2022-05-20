@@ -1,5 +1,4 @@
-# Flexberry Launcher
-### This project is under development.
-- After a long time, i decided to continue the development of the Flexberry Launcher.
-1. Why UI has been changed?
-- Before archiving the project, i messed up the launcher by accident.
+<p align="center"><img src="./src/assets/images/flexberry-launcher.png" height="150px" alt="flexberry launcher"></p>
+---
+### This project is under development
+I decided to continue development of Flexberry Launcher after months.
