@@ -1,6 +1,6 @@
 {
-  "name": "minecraft-launcher",
-  "productName": "minecraft-launcher",
+  "name": "flexberry-launcher",
+  "productName": "flexberry-launcher",
   "version": "0.1.0",
   "description": "Lightweight and customizable launcher for Minecraft",
   "main": "src/index.js",
@@ -8,6 +8,8 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "make-mac": "electron-forge make --platform darwin",
+    "make-linux": "electron-forge make --platform linux",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""
   },
@@ -19,12 +21,23 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "./src/assets/images/flexberry-launcher-icon.png"
+      },
       "makers": [
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {
+            "name": "flexberry_launcher"
+          },
+          "platforms": [
+            "linux"
+          ]
+        },
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "minecraft_launcher"
+            "name": "flexberry_launcher"
           }
         },
         {
@@ -35,10 +48,6 @@
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
           "config": {}
         }
       ]
