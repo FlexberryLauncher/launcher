@@ -1,28 +1,60 @@
 {
-  "name": "flexberry-launcher",
-  "version": "0.4.4",
-  "description": "Lightweight and useful Minecraft launcher",
-  "main": "main.js",
+  "name": "minecraft-launcher",
+  "productName": "minecraft-launcher",
+  "version": "0.1.0",
+  "description": "Lightweight and customizable launcher for Minecraft",
+  "main": "src/index.js",
   "scripts": {
-    "start": "electron .",
-    "pack-linux": "npx electron-packager . flexberry-launcher --overwrite --platform=linux --arch=x64 --icon=src/assets/logo.ico --prune=true",
-    "pack": "npx electron-packager . flexberry-launcher --overwrite --icon=src/assets/logo.ico --prune=true"
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
   },
-  "repository": "https://github.com/kuzeeeyk/flexberry-launcher",
-  "keywords": [
-    "Minecraft",
-    "launcher",
-    "flexberry"
-  ],
-  "author": "kuzeeeyk",
+  "keywords": [],
+  "author": {
+    "name": "Kuzey Kurtuluş",
+    "email": "kuzeeeyk@gmail.com"
+  },
   "license": "MIT",
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "minecraft_launcher"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  },
   "dependencies": {
-    "ejs-electron": "^2.1.1",
+    "electron-squirrel-startup": "^1.0.0",
     "lowdb": "^1.0.0",
-    "minecraft-launcher-core": "^3.16.4"
+    "msmc": "^3.1.0"
   },
   "devDependencies": {
-    "electron": "^13.1.8",
-    "electron-packager": "^15.3.0"
+    "@electron-forge/cli": "^6.0.0-beta.63",
+    "@electron-forge/maker-deb": "^6.0.0-beta.63",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.63",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
+    "@electron-forge/maker-zip": "^6.0.0-beta.63",
+    "electron": "18.2.3"
   }
 }

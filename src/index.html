@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Flexberry Launcher</title>
+  <link rel="stylesheet" href="style/style.css" />
+</head>
+
+<body>
+  <div class="titleHolder">
+    <img class="titleAlt" src="assets/images/flexberry-launcher.png" alt="flexberry-launcher" />
+  </div>
+  <div class="content">
+    <div class="topBar">
+      <!--
+      <span class="close" onclick="window.close()">x</span>
+      -->
+      <div class="close" onclick="window.close()" id="close">
+        <div class="scene">
+          <div class="cube" id="closeCube">
+            <div class="cube__face cube__face--front">x</div>
+            <div class="cube__face cube__face--back"></div>
+            <div class="cube__face cube__face--right"></div>
+            <div class="cube__face cube__face--left"></div>
+            <div class="cube__face cube__face--top"><img class="cube__image" src="assets/images/tnt.png" alt="flexberry-launcher" /></div>
+            <div class="cube__face cube__face--bottom"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settingTab tab" id="settings">
+      <span class="tabTitle">Settings</span>
+    </div>
+
+    <div class="accountsTab tab" id="accounts">
+      <div class="tabTop">
+        <span class="tabClose" onclick="toggleTab()">
+          <img src="assets/icons/arrow-left.png" alt="close" class="tabCloseIcon" />
+        </span>
+        <span class="tabTitle">Accounts</span>
+        <span class="tabExternal"></span>
+      </div>
+      <div class="accountList">
+
+        <div class="account">
+          <div class="accountMain">
+            <img class="accountImage" src="https://visage.surgeplay.com/face/44/f46bda8f2b144b6cb48b34ffc96fc28a">
+            <div class="accountInfo">
+              <span class="accountUsername">kuzeykekw</span>
+              <span class="accountMail">kuzeykurtulus6@gmail.com</span>
+            </div>
+          </div>
+          <div class="deleteAccount"></div>
+        </div>
+        <div class="account">
+          <div class="accountMain">
+            <img class="accountImage" src="https://visage.surgeplay.com/face/44/6a085b2c19fb4986b453231aa942bbec">
+            <div class="accountInfo">
+              <span class="accountUsername">LadyAgnes</span>
+              <span class="accountMail">ladyagnes@mojang.com</span>
+            </div>
+          </div>
+          <div class="deleteAccount"></div>
+        </div>
+        <div class="account">
+          <div class="accountMain">
+            <img class="accountImage" src="https://visage.surgeplay.com/face/44/65d4ad89bb674e5495e64580c547d02f">
+            <div class="accountInfo">
+              <span class="accountUsername">kuzeeeyk</span>
+              <span class="accountMail">kuzeeeyk@gmail.com</span>
+            </div>
+          </div>
+          <div class="deleteAccount"></div>
+        </div>
+
+        <div class="addAccount account">
+          <img class="addAccountIcon" src="assets/images/microsoft.png">
+          <span class="addAccountTitle">Login with Microsoft</span>
+        </div>
+        
+      </div>
+    </div>
+    <div class="bottomBar">
+      <span class="username barContainer" id="username">Not logged in</span>
+      <div class="buttons">
+        <div class="button iconButton" onclick="toggleTab('accounts')" id="accountsToggler">
+          <img class="icon" src="assets/icons/user.png" alt="user" />
+        </div>
+        <div class="button playButton">
+          <span class="playButtonTitle">Play</span>
+          <span class="playButtonSubtitle">Release 1.18.1</span>
+        </div>
+        <div class="button iconButton" onclick="toggleTab('settings')" id="settingsToggler">
+          <img class="icon" src="assets/icons/cog.png" alt="settings" />
+        </div>
+      </div>
+      <span class="info barContainer"></span>
+    </div>
+  </div>
+</body>
+<script>
+
+let toggledTabs = [];
+
+function toggleTab(tabName) {
+  if (!tabName) 
+    tabName = toggledTabs[0];
+  if (!toggledTabs[0]) {
+    document.getElementById(tabName).classList.add("visibleTab");
+    document.getElementById(tabName + "Toggler").classList.add("toggledButton");
+    toggledTabs.push(tabName);
+  } else if (toggledTabs[0] == tabName) {
+    document.getElementById(tabName).classList.remove("visibleTab");
+    document.getElementById(tabName + "Toggler").classList.remove("toggledButton");
+    toggledTabs.shift();
+  } else {
+    document.getElementById(toggledTabs[0]).classList.remove("visibleTab");
+    document.getElementById(toggledTabs[0] + "Toggler").classList.remove("toggledButton");
+    document.getElementById(tabName).classList.add("visibleTab");
+    document.getElementById(tabName + "Toggler").classList.add("toggledButton");
+    toggledTabs[0] = tabName;
+  }
+}
+
+</script>
+
+</html>
