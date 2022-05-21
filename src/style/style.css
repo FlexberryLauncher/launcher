@@ -232,7 +232,7 @@ body::before {
   background: #1aa030;
 }
 
-.button:focus, .toggledButton {
+.button:active, .toggledButton {
   border-bottom: none;
   height: calc(12px * 3 + 38px - 6px);
   transform: translateY(6px);
@@ -397,7 +397,14 @@ body::before {
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
-  font-family: "Minecraft";
+  font-family: "Minecrafter";
+  font-size: 14px;
+  transition: .2s;
+}
+
+.addAccount:hover {
+  cursor: pointer;
+  background: #157c26;
 }
 
 .addAccountTitle {
