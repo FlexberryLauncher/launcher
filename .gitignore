@@ -7,4 +7,6 @@ out/
 
 # launcher files
 accounts.json
-profiles.json
+
+# github
+.github/
