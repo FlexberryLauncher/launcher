@@ -1,8 +1,9 @@
 const { ipcMain } = require('electron');
 const msmc = require("msmc");
+const path = require('path');
+
 const low = require("lowdb");
 const FileSync = require('lowdb/adapters/FileSync')
- 
 const adapter = new FileSync('accounts.json')
 const db = low(adapter)
 
@@ -13,6 +14,14 @@ ipcMain.on("addAccount", (event) => {
   msmc.fastLaunch("electron",
     (update) => {
       console.log((update.percent || 0) + "% - Logging in...");
+    }, undefined, {
+      resizable: false,
+      fullscreenable: false,
+      width: 520,
+      height: 700,
+      titleBarStyle: 'hidden',
+      skipTaskbar: true,
+      icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.png"),
     }).then(async result => {
       //If the login works
       if (msmc.errorCheck(result)) {

@@ -1,0 +1,20 @@
+:root {
+  --main-color-lighter:        #4fff6c;
+  --main-color-light:          #37f556;
+  --main-color-slightly-light: #23da41;
+  --main-color:                #17B430;
+  --main-color-slightly-dark:  #129127;
+  --main-color-dark:           #0A7D1E;
+  --main-color-darker:         #0D5B19;
+  --main-color-halfly-visible: #17B43050;
+  --white:                     #f2f2f2;
+  --danger:                    #DB2B2B;
+  --shadow:                    #00000040;
+}
+
+body::after {
+  background: url("../../assets/backgrounds/village.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}

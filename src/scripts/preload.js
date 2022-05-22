@@ -1,5 +1,5 @@
 const { ipcRenderer } = require("electron");
-const msmc = require("msmc");
+const fs = require("fs");
 
 function addEvent(element, event, ...params) {
   document.querySelector(element).addEventListener("click", () => {
@@ -8,10 +8,22 @@ function addEvent(element, event, ...params) {
 } 
 
 window.addEventListener("DOMContentLoaded", () => {
-  //addEvent("#minimize", ipcRenderer.send, "minimize");
   addEvent("#login", ipcRenderer.send, "addAccount");
-  //addEvent("#login", setLoading, "#username", "text");
   ipcRenderer.send("getAccounts");
+
+  fs.readdir("./src/style/themes", (err, files) => {
+    if (err) return console.error(err);
+    const themes = files.filter(file => file.endsWith(".css"));
+    console.log(themes);
+    // get random theme
+    const theme = themes[Math.floor(Math.random() * themes.length)];
+    // create style element
+    const style = document.createElement("link");
+    style.setAttribute("rel", "stylesheet");
+    style.setAttribute("type", "text/css");
+    style.setAttribute("href", `style/themes/${theme}`);
+    document.head.appendChild(style);
+  })
 });
 
 ipcRenderer.on("loginResult", (event, arg) => {

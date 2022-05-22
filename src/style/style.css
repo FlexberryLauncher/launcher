@@ -20,7 +20,7 @@
 * {
   margin: 0;
   padding: 0;
-  text-shadow: #00000040 0 4px 0;
+  text-shadow: var(--shadow) 0 4px 0;
   box-sizing: border-box;
   transform-style: preserve-3d;
   -webkit-user-drag: none;
@@ -28,18 +28,18 @@
 
 ::-webkit-scrollbar {
   width: 8px;
-  background: #0D5B19;
+  background: var(--main-color-darker);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #17B43050;
+  background: var(--main-color-halfly-visible);
 
 }
 
 body {
   user-select: none;
   font-family: "Minercraftory", sans-serif;
-  color: #f2f2f2;
+  color: var(--white);
   height: 100vh;
   overflow: hidden;
   border-radius: 10px;
@@ -48,11 +48,6 @@ body {
 body::after {
   opacity: 0;
   animation: 1s fadeIn forwards;
-  animation-delay: .2s;
-  background: url("../assets/backgrounds/lake.png");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
   z-index: -2000;
   content: "";
   position: absolute;
@@ -61,7 +56,7 @@ body::after {
   width: 830px;
   height: 490px;
   border-radius: 16px;
-  transition: .2s;
+  transition: .2s background-image;
 }
 
 body::before {
@@ -185,7 +180,7 @@ body::before {
 
 .button .icon {
   width: 38px;
-  filter: drop-shadow(#00000040 0 4px 0);
+  filter: drop-shadow(var(--shadow) 0 4px 0);
 }
 
 .buttons {
@@ -199,8 +194,8 @@ body::before {
   transition: .2s background;
   cursor: pointer;
   height: calc(12px * 3 + 38px);
-  background: #17B430;
-  border-bottom: 6px solid #0D5B19;
+  background: var(--main-color);
+  border-bottom: 6px solid var(--main-color-darker);
   padding: 12px;
 }
 
@@ -212,14 +207,8 @@ body::before {
   justify-content: center;
 }
 
-.buttons .iconButton {
-  opacity: 0;
-  animation: 1s fadeIn forwards;
-  animation-delay: 1s;
-}
-
 .playButton {
-  animation: .5s fadeIn forwards;
+  animation: .5s levitateIn forwards;
   animation-delay: 1s;
   padding: 12px 64px;
   display: flex;
@@ -229,13 +218,13 @@ body::before {
 }
 
 .button:hover {
-  background: #1aa030;
+  background: var(--main-color-slightly-dark);
 }
 
 .button:active, .toggledButton {
   border-bottom: none;
   height: calc(12px * 3 + 38px - 6px);
-  transform: translateY(6px);
+  transform: translateY(6px)!important;
 }
 
 .playButtonTitle {
@@ -286,7 +275,7 @@ body::before {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #DB2B2B;
+  background: var(--danger);
   position: absolute;
   width: 30px;
   height: 30px;
@@ -317,8 +306,8 @@ body::before {
 .tab {
   margin: 0 24.8%;
   height: 60%;
-  background: #17B430;
-  border-bottom: #0D5B19 6px solid;
+  background: var(--main-color);
+  border-bottom: var(--main-color-darker) 6px solid;
   padding: 12px;
   display: none;
   opacity: 0;
@@ -360,11 +349,11 @@ body::before {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #0D5B19;
+  background: var(--main-color-dark);
 }
 
 .tabClose:hover {
-  background: #157c26;
+  background: var(--main-color-darker);
 }
 
 .tabCloseIcon {
@@ -387,8 +376,10 @@ body::before {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  background: #0D5B19;
+  background: var(--main-color-dark);
   width: calc(100% - 8px);
+  transition: .2s;
+  cursor: pointer;
 }
 
 .addAccount {
@@ -399,12 +390,10 @@ body::before {
   justify-content: space-between;
   font-family: "Minecrafter";
   font-size: 14px;
-  transition: .2s;
 }
 
-.addAccount:hover {
-  cursor: pointer;
-  background: #157c26;
+.account:hover {
+  background: var(--main-color-darker);
 }
 
 .addAccountTitle {
@@ -419,7 +408,7 @@ body::before {
 
 .addAccountIcon {
   width: 24px;
-  filter: drop-shadow(#00000040 0 4px 0);
+  filter: drop-shadow(var(--shadow) 0 4px 0);
 }
 
 .accountImage {
@@ -447,14 +436,14 @@ body::before {
 .deleteAccount {
   width: 44px;
   height: 44px;
-  background: #17B430;
+  background: var(--main-color);
   z-index: 100;
   cursor: pointer;
   transition: .2s;
 }
 
 .deleteAccount:hover {
-  background: #1aa030;
+  background: var(--main-color-dark);
 }
 
 .deleteAccount::after {
