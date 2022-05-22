@@ -169,6 +169,12 @@ body::before {
   border-radius: 0 0 14px 14px;
 }
 
+.bottomBar .button:not(.playButton) {
+  transform: translateY(20px);
+  animation: 1s levitateIn forwards;
+  animation-delay: .8s;
+}
+
 .barContainer {
   width: 20%;
 }
@@ -208,8 +214,6 @@ body::before {
 }
 
 .playButton {
-  animation: .5s levitateIn forwards;
-  animation-delay: 1s;
   padding: 12px 64px;
   display: flex;
   flex-direction: column;
