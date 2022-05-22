@@ -21,9 +21,9 @@ ipcMain.on("addAccount", (event) => {
       height: 700,
       titleBarStyle: 'hidden',
       skipTaskbar: true,
+      alwaysOnTop: true,
       icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.png"),
     }).then(async result => {
-      //If the login works
       if (msmc.errorCheck(result)) {
         console.log("Error logging in:", result.reason);
         event.reply("loginResult", JSON.stringify({ status: "error", error: result.reason}));
@@ -51,6 +51,12 @@ ipcMain.on("addAccount", (event) => {
     })
 });
 
+/*
+ipcMain.on("verifyAccount", (event, uuid) => {
+  // verify if the account is valid with msmc
+})
+*/
+
 ipcMain.on("getAccounts", async (event) => {
   let accs = await db.get("accounts").value();
   event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs)}));
@@ -59,6 +65,5 @@ ipcMain.on("getAccounts", async (event) => {
 ipcMain.on("deleteAccount", async (event, data) => {
   await db.get("accounts").remove({ uuid: data }).write();
   let accs = await db.get("accounts").value();
-  console.log(accs);
   event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs)}));
 });

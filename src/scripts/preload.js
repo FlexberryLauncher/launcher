@@ -15,9 +15,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (err) return console.error(err);
     const themes = files.filter(file => file.endsWith(".css"));
     console.log(themes);
-    // get random theme
     const theme = themes[Math.floor(Math.random() * themes.length)];
-    // create style element
     const style = document.createElement("link");
     style.setAttribute("rel", "stylesheet");
     style.setAttribute("type", "text/css");
