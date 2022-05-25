@@ -1,16 +1,20 @@
-const { ipcRenderer } = require("electron");
+const { ipcRenderer, contextBridge } = require("electron");
 const fs = require("fs");
 
-function addEvent(element, event, ...params) {
-  document.querySelector(element).addEventListener("click", () => {
+function addEvent(type, element, event, ...params) {
+  if (type == "id") { 
+    el = document.getElementById(element);
+  } else {
+    el = document.querySelector(element);
+  }
+  el.addEventListener("click", () => {
     event(...params);
   });
 } 
 
 window.addEventListener("DOMContentLoaded", () => {
-  addEvent("#login", ipcRenderer.send, "addAccount");
+  addEvent("id", "login", ipcRenderer.send, "addAccount");
   ipcRenderer.send("getAccounts");
-
   fs.readdir("./src/style/themes", (err, files) => {
     if (err) return console.error(err);
     const themes = files.filter(file => file.endsWith(".css"));
@@ -24,17 +28,47 @@ window.addEventListener("DOMContentLoaded", () => {
   })
 });
 
+let selectedAccount = {};
+let toggledTabs = [];
+
 ipcRenderer.on("loginResult", (event, arg) => {
   if (arg.status == "error") {
     // TO-DO - add error handling (maybe a pop-up?)
     console.error(arg);
   } else {
     const accounts = JSON.parse(JSON.parse(arg).accounts); // yes, i hate processing JSON datas...
-    createList(accounts);
+    createList(accounts, arg.haveSelected);
   }
 });
 
-function createList(accounts) {
+ipcRenderer.on("verifyAccountResult", (event, arg) => {
+  arg = JSON.parse(arg);
+  if (arg.error) {
+    // TO-DO - add error handling (maybe a pop-up?)
+    return console.error(arg);
+  } 
+  if (!arg.valid) {
+    console.log("[DEBUG] Refreshing account " + arg.uuid);
+    ipcRenderer.send("refreshAccount", arg.uuid);
+    return;
+  }
+  ipcRenderer.send("setSelected", arg.uuid);
+  toggleTab();
+});
+
+ipcRenderer.on("refreshAccountResult", (event, arg) => {
+  arg = JSON.parse(arg);
+  if (arg.error || !arg.accounts) {
+    // TO-DO - add error handling (maybe a pop-up?)
+    return console.error(arg);
+  }
+  ipcRenderer.send("setSelected", arg.uuid);
+  toggleTab();
+})
+
+function createList(accounts, selected) {
+  let tbs = [];
+  console.log("[DEBUG] Creating account list");
   const listEl = document.querySelector("#accountList");
   listEl.innerHTML = "";
   const loginEl = document.createElement("div");
@@ -50,11 +84,13 @@ function createList(accounts) {
   loginEl.appendChild(loginIconEl);
   loginEl.appendChild(loginTitleEl);
   listEl.appendChild(loginEl);
-  addEvent("#login", ipcRenderer.send, "addAccount");
+  addEvent("id", "login", ipcRenderer.send, "addAccount");
   accounts.forEach(account => {
     console.log(account.profile.name);
     const accountEl = document.createElement("div");
     accountEl.classList.add("account");
+    account.isSelected && accountEl.classList.add("selectedAccount");
+    account.isSelected && (selectedAccount = account);
     accountEl.setAttribute("id", account.uuid);
     const accountMainEl = document.createElement("div");
     accountMainEl.classList.add("accountMain");
@@ -79,11 +115,42 @@ function createList(accounts) {
     deleteAccountEl.setAttribute("id", "trash-" + account.uuid);
     accountEl.appendChild(deleteAccountEl);
     listEl.appendChild(accountEl);
-    addEvent("#trash-"+account.uuid, ipcRenderer.send, "deleteAccount", account.uuid);
+    !account.isSelected && addEvent("id", account.uuid, ipcRenderer.send, "verifyAccount", account.uuid);
+    addEvent("id", "trash-"+account.uuid, ipcRenderer.send, "deleteAccount", account.uuid);
+    account.isSelected && tbs.push(account);
   });
-} 
-
-function setLoading(element, type) {
-  if (type == "text")
-    return document.querySelector(element).innerHTML = "Loading...";
+  if (selected)
+    tbs = [];
+  console.log(tbs, "^^^^^^")
+  setSelectedAccount(tbs[0]);
 }
+
+function setSelectedAccount(account) {
+  selectedAccount = {};
+  if (account)
+    selectedAccount = account;
+  let toBePlaced = account ? account.profile.name : "Not logged in";
+  document.getElementById("username").innerHTML = toBePlaced;
+}
+
+function toggleTab(tabName) {
+  if (!tabName) 
+    tabName = toggledTabs[0];
+  if (!toggledTabs[0]) {
+    document.getElementById(tabName).classList.add("visibleTab");
+    document.getElementById(tabName + "Toggler").classList.add("toggledButton");
+    toggledTabs.push(tabName);
+  } else if (toggledTabs[0] == tabName) {
+    document.getElementById(tabName).classList.remove("visibleTab");
+    document.getElementById(tabName + "Toggler").classList.remove("toggledButton");
+    toggledTabs.shift();
+  } else {
+    document.getElementById(toggledTabs[0]).classList.remove("visibleTab");
+    document.getElementById(toggledTabs[0] + "Toggler").classList.remove("toggledButton");
+    document.getElementById(tabName).classList.add("visibleTab");
+    document.getElementById(tabName + "Toggler").classList.add("toggledButton");
+    toggledTabs[0] = tabName;
+  }
+}
+
+contextBridge.exposeInMainWorld("toggleTab", toggleTab);

@@ -13,9 +13,6 @@
   </div>
   <div class="content">
     <div class="topBar">
-      <!--
-      <span class="close" onclick="window.close()">x</span>
-      -->
       <div class="close" onclick="window.close()" id="close">
         <div class="scene">
           <div class="cube" id="closeCube">
@@ -69,30 +66,4 @@
     </div>
   </div>
 </body>
-<script>
-
-let toggledTabs = [];
-
-function toggleTab(tabName) {
-  if (!tabName) 
-    tabName = toggledTabs[0];
-  if (!toggledTabs[0]) {
-    document.getElementById(tabName).classList.add("visibleTab");
-    document.getElementById(tabName + "Toggler").classList.add("toggledButton");
-    toggledTabs.push(tabName);
-  } else if (toggledTabs[0] == tabName) {
-    document.getElementById(tabName).classList.remove("visibleTab");
-    document.getElementById(tabName + "Toggler").classList.remove("toggledButton");
-    toggledTabs.shift();
-  } else {
-    document.getElementById(toggledTabs[0]).classList.remove("visibleTab");
-    document.getElementById(toggledTabs[0] + "Toggler").classList.remove("toggledButton");
-    document.getElementById(tabName).classList.add("visibleTab");
-    document.getElementById(tabName + "Toggler").classList.add("toggledButton");
-    toggledTabs[0] = tabName;
-  }
-}
-
-</script>
-
 </html>

@@ -39,11 +39,11 @@ ipcMain.on("addAccount", (event) => {
           uuid: result.profile.id,
           access_token: result.access_token,
           profile: result.profile,
-          xbox: xbox
+          xbox: xbox,
+          isSelected: false
         }
-
         let accs = await db.get("accounts").push(newData).write();
-        event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs)}));
+        event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
       }
     }).catch(reason => {
       console.log("Error logging in:", reason);
@@ -51,19 +51,55 @@ ipcMain.on("addAccount", (event) => {
     })
 });
 
-/*
-ipcMain.on("verifyAccount", (event, uuid) => {
-  // verify if the account is valid with msmc
+
+ipcMain.on("verifyAccount", async (event, uuid) => {
+  console.log("[IPC] verifyAccount");
+  let profileObject = db.get("accounts").find({ uuid: uuid }).value();
+  if (!profileObject)
+    return event.reply("verifyAccountResult", JSON.stringify({ status: "error", error: "Account not found"}));
+  let isValid = msmc.validate(profileObject.profile);
+  event.reply("verifyAccountResult", JSON.stringify({ status: "success", valid: isValid, uuid}));
+  console.log("[IPC] |-> " + isValid);
+});
+
+ipcMain.on("setSelected", async (event, uuid) => {
+  console.log("[IPC] setSelected");
+  await db.get("accounts").find({ isSelected: true}).assign({ isSelected: false }).write();
+  await db.get("accounts").find({ uuid: uuid }).assign({ isSelected: true }).write();
+  let accs = await db.get("accounts").value();
+  event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
+});
+
+ipcMain.on("refreshAccount", async (event, uuid) => {
+  console.log("[IPC] refreshAccount");
+  let profileObject = db.get("accounts").find({ uuid: uuid }).value();
+  if (!profileObject)
+    return event.reply("refreshAccountResult", JSON.stringify({ status: "error", error: "Account not found"}));
+  msmc.refresh(profileObject.profile).then(async result => {
+    let profile = result.profile;
+    await db.get("accounts").find({ uuid: uuid }).assign({ profile }).write();
+    let accounts = await db.get("accounts").value();
+    return event.reply("refreshAccountResult", JSON.stringify({ status: "success", valid: false, uuid, accounts }));
+  }).catch(reason => {
+    return event.reply("refreshAccountResult", JSON.stringify({ status: "error", error: reason}));
+  });
 })
-*/
 
 ipcMain.on("getAccounts", async (event) => {
   let accs = await db.get("accounts").value();
-  event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs)}));
+  event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
 });
 
 ipcMain.on("deleteAccount", async (event, data) => {
-  await db.get("accounts").remove({ uuid: data }).write();
   let accs = await db.get("accounts").value();
-  event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs)}));
+  if ((await db.get("accounts").find({ uuid: data }).value()).isSelected) {
+    await db.get("accounts").remove({ uuid: data }).write();
+    if (accs[0])
+    await db.get("accounts").first().assign({ isSelected: true }).write();
+    else {
+      console.log("DELETE [ELSE] >> No accounts left");
+      return event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs), haveSelected: false }));
+    }
+  }
+  event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs), haveSelected: true }));
 });

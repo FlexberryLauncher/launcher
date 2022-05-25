@@ -437,6 +437,11 @@ body::before {
   text-shadow: none;
 }
 
+.selectedAccount {
+  cursor: default;
+  background: var(--main-color-darker);
+}
+
 .deleteAccount {
   width: 44px;
   height: 44px;
