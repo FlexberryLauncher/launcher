@@ -1,5 +1,29 @@
 const { ipcRenderer, contextBridge } = require("electron");
 const fs = require("fs");
+const DiscordRPC = require("discord-rpc");
+
+DiscordRPC.register("935845425599094824");
+
+const rpc = new DiscordRPC.Client({ transport: 'ipc' });
+const startTimestamp = new Date();
+
+function setActivity() {
+  rpc.setActivity({
+    details: 'In main window',
+    startTimestamp,
+    largeImageKey: 'flexberry_logo',
+    largeImageText: 'Flexberry Launcher',
+    instance: false,
+  });
+
+  rpc.on('ready', () => {
+    setActivity();
+    console.log("[DEBUG] Discord RPC ready");
+    setInterval(() => {
+      setActivity();
+    }, 15e3);
+  });
+}
 
 function addEvent(type, element, event, loading, ...params) {
   if (type == "id") { 
@@ -22,6 +46,7 @@ function toggleLoading(tab, forceClose) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  setActivity();
   addEvent("id", "login", ipcRenderer.send, true, "addAccount");
   ipcRenderer.send("getAccounts");
   fs.readdir("./src/style/themes", (err, files) => {
@@ -36,6 +61,8 @@ window.addEventListener("DOMContentLoaded", () => {
     document.head.appendChild(style);
   })
 });
+
+rpc.login({ "clientId": "935845425599094824" }).catch(console.error);
 
 let selectedAccount = {};
 let toggledTabs = [];
@@ -160,6 +187,13 @@ function toggleTab(tabName) {
     document.getElementById(tabName + "Toggler").classList.add("toggledButton");
     toggledTabs[0] = tabName;
   }
+  rpc.setActivity({
+    details: 'In ' + (toggledTabs[0] ? (tabName + ' tab') : 'the main menu'),
+    startTimestamp,
+    largeImageKey: 'flexberry_logo',
+    largeImageText: 'Flexberry Launcher',
+    instance: false,
+  });
 }
 
 contextBridge.exposeInMainWorld("toggleTab", toggleTab);
