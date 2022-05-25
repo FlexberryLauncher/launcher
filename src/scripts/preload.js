@@ -1,11 +1,14 @@
 const { ipcRenderer, contextBridge } = require("electron");
 const fs = require("fs");
+const path = require("path");
 const DiscordRPC = require("discord-rpc");
 
 DiscordRPC.register("935845425599094824");
 
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 const startTimestamp = new Date();
+
+let mainDir = (__dirname).split("\\scripts")[0];
 
 function setActivity() {
   rpc.setActivity({
@@ -49,7 +52,8 @@ window.addEventListener("DOMContentLoaded", () => {
   setActivity();
   addEvent("id", "login", ipcRenderer.send, true, "addAccount");
   ipcRenderer.send("getAccounts");
-  fs.readdir("./src/style/themes", (err, files) => {
+  console.log(path.join(mainDir, "style", "themes"));
+  fs.readdir(path.join(mainDir, "style", "themes"), (err, files) => {
     if (err) return console.error(err);
     const themes = files.filter(file => file.endsWith(".css"));
     console.log(themes);
