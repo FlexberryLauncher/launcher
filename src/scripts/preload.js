@@ -53,7 +53,6 @@ ipcRenderer.on("verifyAccountResult", (event, arg) => {
     return;
   }
   ipcRenderer.send("setSelected", arg.uuid);
-  toggleTab();
 });
 
 ipcRenderer.on("refreshAccountResult", (event, arg) => {
@@ -63,7 +62,6 @@ ipcRenderer.on("refreshAccountResult", (event, arg) => {
     return console.error(arg);
   }
   ipcRenderer.send("setSelected", arg.uuid);
-  toggleTab();
 })
 
 function createList(accounts, selected) {
@@ -121,7 +119,6 @@ function createList(accounts, selected) {
   });
   if (selected)
     tbs = [];
-  console.log(tbs, "^^^^^^")
   setSelectedAccount(tbs[0]);
 }
 

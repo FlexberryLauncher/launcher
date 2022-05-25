@@ -139,6 +139,15 @@ body::before {
   justify-content: space-between;
 }
 
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -154,6 +163,15 @@ body::before {
   }
   to {
     transform: translateY(0px);
+  }
+}
+
+@keyframes levitateOut {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(20px);
   }
 }
 
@@ -310,19 +328,22 @@ body::before {
 .tab {
   margin: 0 24.8%;
   height: 60%;
+  width: 50%;
   background: var(--main-color);
   border-bottom: var(--main-color-darker) 6px solid;
   padding: 12px;
-  display: none;
+  display: flex;
   opacity: 0;
   flex-direction: column;
   align-items: center;
-  transform: translateY(50%);
-  transition: .8s;
+  transform: translateY(5%);
+  position: absolute;
+  top: 80px;
+  transition: .2s ease-in-out;
 }
 
 .visibleTab {
-  animation: .2s fadeIn forwards, .4s levitateIn forwards;
+  opacity: 1;
   display: flex;
   transform: none;
 }
@@ -371,6 +392,7 @@ body::before {
   width: 100%;
   overflow-y: scroll;
   height: 100%;
+  transition: .2s;
 }
 
 .account {
