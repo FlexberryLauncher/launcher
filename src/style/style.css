@@ -336,10 +336,10 @@ body::before {
   opacity: 0;
   flex-direction: column;
   align-items: center;
-  transform: translateY(5%);
+  transform: translateY(200%);
   position: absolute;
   top: 80px;
-  transition: .2s ease-in-out;
+  transition: .2s ease-in-out opacity, .5s ease-in-out transform;
 }
 
 .visibleTab {
