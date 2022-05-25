@@ -16,7 +16,7 @@ const createWindow = () => {
     titleBarStyle: 'hidden',
     fullscreenable: false,
     resizable: false,
-    icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.png"),
+    icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.ico"),
     transparent: true,
     webPreferences: {
       preload: path.join(__dirname, "scripts", "preload.js"),
