@@ -68,10 +68,9 @@ let selectedAccount = {};
 let toggledTabs = [];
 
 ipcRenderer.on("loginResult", (event, arg) => {
-  if (arg.status == "error") {
+  if (JSON.parse(arg).status == "error") {
     // TO-DO - add error handling (maybe a pop-up?)
     toggleLoading("accounts", true);
-    console.error(arg);
   } else {
     const accounts = JSON.parse(JSON.parse(arg).accounts); // yes, i hate processing JSON datas...
     createList(accounts, arg.haveSelected);

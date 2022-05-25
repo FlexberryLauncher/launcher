@@ -35,8 +35,10 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "flexberry_launcher",
-            "icon": "./src/assets/images/flexberry-launcher-icon.png"
+            "name": "Flexberry Launcher",
+            "iconUrl": "./src/assets/images/flexberry-launcher-icon.ico",
+            "setupIcon": "./src/assets/images/flexberry-launcher-icon.ico",
+            "setupExe": "Flexberry Launcher Installer"
           }
         },
         {
