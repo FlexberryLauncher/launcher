@@ -10,6 +10,7 @@
   --white:                     #f2f2f2;
   --danger:                    #DB2B2B;
   --shadow:                    #030e1b40;
+  --darker-shadow:             #030e1b70;
 }
 
 body::after {

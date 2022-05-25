@@ -1,19 +1,28 @@
 const { ipcRenderer, contextBridge } = require("electron");
 const fs = require("fs");
 
-function addEvent(type, element, event, ...params) {
+function addEvent(type, element, event, loading, ...params) {
   if (type == "id") { 
     el = document.getElementById(element);
   } else {
     el = document.querySelector(element);
   }
   el.addEventListener("click", () => {
+    if (loading)
+      toggleLoading("accounts");
     event(...params);
   });
-} 
+}
+
+function toggleLoading(tab, forceClose) {
+  let tabEl = document.getElementById(tab);
+  if (forceClose)
+    return tabEl.classList.remove("tabLoading");
+  tabEl.classList.toggle("tabLoading");
+}
 
 window.addEventListener("DOMContentLoaded", () => {
-  addEvent("id", "login", ipcRenderer.send, "addAccount");
+  addEvent("id", "login", ipcRenderer.send, true, "addAccount");
   ipcRenderer.send("getAccounts");
   fs.readdir("./src/style/themes", (err, files) => {
     if (err) return console.error(err);
@@ -34,6 +43,7 @@ let toggledTabs = [];
 ipcRenderer.on("loginResult", (event, arg) => {
   if (arg.status == "error") {
     // TO-DO - add error handling (maybe a pop-up?)
+    toggleLoading("accounts", true);
     console.error(arg);
   } else {
     const accounts = JSON.parse(JSON.parse(arg).accounts); // yes, i hate processing JSON datas...
@@ -45,10 +55,10 @@ ipcRenderer.on("verifyAccountResult", (event, arg) => {
   arg = JSON.parse(arg);
   if (arg.error) {
     // TO-DO - add error handling (maybe a pop-up?)
+    toggleLoading("accounts", true);
     return console.error(arg);
   } 
   if (!arg.valid) {
-    console.log("[DEBUG] Refreshing account " + arg.uuid);
     ipcRenderer.send("refreshAccount", arg.uuid);
     return;
   }
@@ -56,6 +66,7 @@ ipcRenderer.on("verifyAccountResult", (event, arg) => {
 });
 
 ipcRenderer.on("refreshAccountResult", (event, arg) => {
+  toggleLoading("accounts");
   arg = JSON.parse(arg);
   if (arg.error || !arg.accounts) {
     // TO-DO - add error handling (maybe a pop-up?)
@@ -82,7 +93,7 @@ function createList(accounts, selected) {
   loginEl.appendChild(loginIconEl);
   loginEl.appendChild(loginTitleEl);
   listEl.appendChild(loginEl);
-  addEvent("id", "login", ipcRenderer.send, "addAccount");
+  addEvent("id", "login", ipcRenderer.send, true, "addAccount");
   accounts.forEach(account => {
     console.log(account.profile.name);
     const accountEl = document.createElement("div");
@@ -113,16 +124,17 @@ function createList(accounts, selected) {
     deleteAccountEl.setAttribute("id", "trash-" + account.uuid);
     accountEl.appendChild(deleteAccountEl);
     listEl.appendChild(accountEl);
-    !account.isSelected && addEvent("id", account.uuid, ipcRenderer.send, "verifyAccount", account.uuid);
-    addEvent("id", "trash-"+account.uuid, ipcRenderer.send, "deleteAccount", account.uuid);
+    !account.isSelected && addEvent("id", account.uuid, ipcRenderer.send, true, "verifyAccount", account.uuid);
+    addEvent("id", "trash-"+account.uuid, ipcRenderer.send, true, "deleteAccount", account.uuid);
     account.isSelected && tbs.push(account);
   });
   if (selected)
-    tbs = [];
+  tbs = [];
   setSelectedAccount(tbs[0]);
 }
 
 function setSelectedAccount(account) {
+  toggleLoading("accounts", true);
   selectedAccount = {};
   if (account)
     selectedAccount = account;

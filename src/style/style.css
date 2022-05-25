@@ -395,6 +395,33 @@ body::before {
   transition: .2s;
 }
 
+.tabLoading::after {
+  content: "";
+  background: var(--darker-shadow);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  transition: .2s;
+}
+
+.tabLoading::before {
+  z-index: 1000;
+  content: "";
+  background: url("../assets/icons/loading.gif");
+  background-size: cover;
+  width: 48px;
+  height: 48px;
+  top: calc(50% - 24px);
+  bottom: calc(50% - 24px);
+  position: absolute;
+  transition: .2s;
+}
+
+.tabLoading {
+  transition: .2s;
+}
+
 .account {
   padding: 8px;
   display: flex;
