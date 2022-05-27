@@ -12,14 +12,16 @@ const createWindow = () => {
     title: 'Flexberry Launcher',
     fullscreenable: false,
     resizable: false,
-    icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.png"),
+    icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.ico"),
     transparent: true,
     webPreferences: {
       preload: path.join(__dirname, "scripts", "preload.js"),
-    },
+    }
   });
+  if (process.platform === 'darwin') {
+    mainWindow.setTrafficLightPosition({x: 999, y: 999}); // i'm sorry macOS users, i had to do it...
+  }
   mainWindow.loadFile(path.join(__dirname, "index.html"));
-  mainWindow.setTrafficLightPosition({x: 999, y: 999}); // i'm sorry macOS users, i had to do it...
   ipcMain.on("minimize", () => mainWindow.minimize());
 };
 
