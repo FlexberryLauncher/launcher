@@ -10,3 +10,6 @@ accounts.json
 
 # github
 .github/
+
+# shittyOS
+.DS_Store

@@ -9,6 +9,7 @@ const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 const startTimestamp = new Date();
 
 let mainDir = (__dirname).split("\\scripts")[0];
+mainDir = mainDir.includes("/scripts") ? mainDir.split("/scripts")[0] : mainDir;
 
 function setActivity() {
   rpc.setActivity({
@@ -52,7 +53,6 @@ window.addEventListener("DOMContentLoaded", () => {
   setActivity();
   addEvent("id", "login", ipcRenderer.send, true, "addAccount");
   ipcRenderer.send("getAccounts");
-  console.log(path.join(mainDir, "style", "themes"));
   fs.readdir(path.join(mainDir, "style", "themes"), (err, files) => {
     if (err) return console.error(err);
     const themes = files.filter(file => file.endsWith(".css"));

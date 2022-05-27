@@ -3,26 +3,23 @@ const path = require('path');
 const msmc = require("msmc");
 require("./modules/accountManager");
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-  // eslint-disable-line global-require
-  app.quit();
-}
-
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 830,
     height: 566,
     titleBarStyle: 'hidden',
+    menuBarVisible: false,
+    title: 'Flexberry Launcher',
     fullscreenable: false,
     resizable: false,
-    icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.ico"),
+    icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.png"),
     transparent: true,
     webPreferences: {
       preload: path.join(__dirname, "scripts", "preload.js"),
     },
   });
   mainWindow.loadFile(path.join(__dirname, "index.html"));
+  mainWindow.setTrafficLightPosition({x: 999, y: 999}); // i'm sorry macOS users, i had to do it...
   ipcMain.on("minimize", () => mainWindow.minimize());
 };
 
