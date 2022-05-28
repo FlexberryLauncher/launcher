@@ -3,12 +3,20 @@ const msmc = require("msmc");
 const path = require('path');
 
 const low = require("lowdb");
-const FileSync = require('lowdb/adapters/FileSync')
+const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('accounts.json')
 const db = low(adapter)
 
-db.defaults({ accounts: [] })
-  .write()
+async function setup() {
+  await db.defaults({ accounts: [] }).write()
+  let selectedAccount = await db.get('accounts').find({ isSelected: true }).value();
+  if (selectedAccount && !msmc.validate(selectedAccount.profile)) {
+    console.log("[MANAGERS => ACCOUNT MANAGER] Deselecting selected account, because it's expired.");
+    db.get('accounts').find({ isSelected: true }).assign({ isSelected: false }).write();
+  }
+}
+
+setup();
 
 ipcMain.on("addAccount", (event) => {
   msmc.fastLaunch("electron",
@@ -95,7 +103,7 @@ ipcMain.on("deleteAccount", async (event, data) => {
   if ((await db.get("accounts").find({ uuid: data }).value()).isSelected) {
     await db.get("accounts").remove({ uuid: data }).write();
     if (accs[0])
-    await db.get("accounts").first().assign({ isSelected: true }).write();
+      await db.get("accounts").first().assign({ isSelected: true }).write();
     else {
       console.log("DELETE [ELSE] >> No accounts left");
       return event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs), haveSelected: false }));
