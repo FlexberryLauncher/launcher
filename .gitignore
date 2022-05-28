@@ -1,11 +1,10 @@
 # npm files
 node_modules/
-package-lock.json
 
-# electron forge build
-out/
+# packaged files
+build/
 
-# launcher files
+# data storages
 accounts.json
 
 # github
