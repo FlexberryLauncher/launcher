@@ -9,20 +9,23 @@ const createWindow = () => {
     height: 566,
     titleBarStyle: 'hidden',
     menuBarVisible: false,
+    skipTaskbar: true,
     title: 'Flexberry Launcher',
     fullscreenable: false,
     resizable: false,
     icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.ico"),
     transparent: true,
     webPreferences: {
+      spellcheck: false,
       preload: path.join(__dirname, "scripts", "preload.js"),
     }
   });
   if (process.platform === 'darwin') {
-    mainWindow.setTrafficLightPosition({x: 999, y: 999}); // i'm sorry macOS users, i had to do it...
+    win.setWindowButtonVisibility(false); // i'm sorry macOS users, i had to do it...
   }
   mainWindow.loadFile(path.join(__dirname, "index.html"));
   ipcMain.on("minimize", () => mainWindow.minimize());
+  ipcMain.on("loaded", () => mainWindow.setSkipTaskbar(false));
 };
 
 app.on('ready', createWindow);

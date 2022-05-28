@@ -51,6 +51,7 @@ function toggleLoading(tab, forceClose) {
 
 window.addEventListener("DOMContentLoaded", () => {
   setActivity();
+  ipcRenderer.send("loaded");
   addEvent("id", "login", ipcRenderer.send, true, "addAccount");
   ipcRenderer.send("getAccounts");
   fs.readdir(path.join(mainDir, "style", "themes"), (err, files) => {
