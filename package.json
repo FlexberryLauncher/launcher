@@ -7,6 +7,7 @@
   "scripts": {
     "start": "electron-forge start --inspect-electron",
     "package-windows": "node builder/windows.js",
+    "package-linux": "node builder/linux.js",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""

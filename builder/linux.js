@@ -11,7 +11,7 @@ bundle(
     dir: './',
     name: 'flexberry-launcher',
     arch: 'x64',
-    platform: 'win32',
+    platform: 'linux',
     out: './build',
     overwrite: false,
     asar: false,
