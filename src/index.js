@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const msmc = require("msmc");
 require("./modules/accountManager");
-
+require("./modules/versionManager");
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 830,

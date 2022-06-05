@@ -7,6 +7,8 @@ const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('accounts.json')
 const db = low(adapter)
 
+// TO-DO - PLEASE SOMEBODY CLEAN THIS CODE. PLEASE.
+
 async function setup() {
   await db.defaults({ accounts: [] }).write()
   let selectedAccount = await db.get('accounts').find({ isSelected: true }).value();
