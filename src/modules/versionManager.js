@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const fetch = require("node-fetch");
+const { ipcMain } = require("electron");
 
 const low = require("lowdb");
 const FileSync = require("lowdb/adapters/FileSync");
@@ -19,25 +20,52 @@ class VersionManager {
     this.latest = {};
     this.selectedVersion = null;
     this.selectedProfile = null;
+    this.doesExist = false;
   }
 
   async init() {
+    if (fs.existsSync(versionsDir) || fs.existsSync(minecraftDir))
+      this.doesExist = false;
     await this.loadVersions();
     await this.loadProfiles();
-    main();
+    ipcManager();
   }
 
   async loadVersions() {
     let apiVersions = await this.getVersionFromAPI();
-    let versionFolders = await fs.readdirSync(versionsDir);
-    let versions = await Promise.all(versionFolders.map(async (versionFolder) => {
-      let stats = await fs.statSync(path.join(versionsDir, versionFolder));
+    let versionFolders = [];
+    let versions = [];
+    fs.readdir(versionsDir, (err, files) => {
+      if (err)
+        return console.error(err);
+      files.forEach(file => {
+        if (fs.lstatSync(path.join(versionsDir, file)).isDirectory())
+          versionFolders.push(file);
+      });
+    });
+    await Promise.all(versionFolders.map(async (versionFolder) => {
+      let stats = null;
+      fs.stat(path.join(versionsDir, versionFolder), (err, stats) => {
+        if (err)
+          return console.error(err);
+        stats = stats;
+      });
       if (!stats.isDirectory())
         return;
       if (versionFolder.startsWith("."))
         return;
-      let versionDir = fs.readdirSync(path.join(versionsDir, versionFolder));
-      let versionData = JSON.parse(fs.readFileSync(path.join(versionsDir, versionFolder, versionFolder + ".json")));
+      let versionDir = [];
+      fs.readdir(path.join(versionsDir, versionFolder), (err, files) => {
+        if (err)
+          return console.error(err);
+        versionDir = files;
+      });
+      let versionData = null;
+      fs.readFile(path.join(versionsDir, versionFolder, versionFolder + ".json"), (err, data) => {
+        if (err)
+          return console.error(err);
+        versionData = JSON.parse(data);
+      });
       if (!(versionDir.includes(versionFolder + ".json") && versionDir.includes(versionFolder + ".jar")))
         return;
       return {
@@ -94,12 +122,20 @@ class VersionManager {
   }
 
   async deleteProfile(profileName) {
-    let profiles = await db.get("profiles").remove({
+    let profiles = db.get("profiles");
+    let profile = await profiles.find({
+      appearance: {
+        name: profileName
+      }
+    }).value();
+    if (!profile)
+      return { status: "error", message: "Profile does not exist" };
+    await profiles.remove({
       appearance: {
         name: profileName
       }
     }).write();
-    this.profiles = profiles;
+    this.profiles = await profiles.value();
     return this.profiles;
   }
 
@@ -139,15 +175,39 @@ class VersionManager {
 const versionManager = new VersionManager();
 versionManager.init();
 
-async function main() {
-  let randomVersion = versionManager.getVersions()[Math.floor(Math.random() * versionManager.getVersions().length)];
-  let profile = await versionManager.addProfile({
-    appearance: {
-      name: "adem",
-      icon: "obsidian"
-    },
-    version: randomVersion.id,
-    type: randomVersion.type,
+async function ipcManager() {
+  // profile = selected version, not account!
+
+  ipcMain.on("getVersions", async (event) => {
+    let versions = await versionManager.getVersions();
+    event.sender.send("getVersions", versions);
   });
-  console.log(profile);
+
+  ipcMain.on("getProfiles", async (event) => {
+    let profiles = await versionManager.getProfiles();
+    event.sender.send("getProfiles", profiles);
+  });
+
+  ipcMain.on("getLatestVersion", async (event) => {
+    let latest = await versionManager.getLatestVersion();
+    event.sender.send("getLatestVersion", latest);
+  });
+
+  ipcMain.on("addProfile", async (event, profile) => {
+    let addedProfile = await versionManager.addProfile(profile);
+    event.sender.send("addProfile", addedProfile);
+  });
+
+  ipcMain.on("deleteProfile", async (event, profileName) => {
+    let deletedProfile = await versionManager.deleteProfile(profileName);
+    event.sender.send("deleteProfile", deletedProfile);
+  });
+
+  ipcMain.on("setSelectedVersion", async (event, version) => {
+    versionManager.selectedVersion = version;
+  });
+
+  ipcMain.on("setSelectedProfile", async (event, profile) => {
+    versionManager.selectedProfile = profile;
+  });
 }

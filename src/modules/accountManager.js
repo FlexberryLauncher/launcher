@@ -7,7 +7,7 @@ const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('accounts.json')
 const db = low(adapter)
 
-// TO-DO - PLEASE SOMEBODY CLEAN THIS CODE. PLEASE.
+// TO-DO - C L E A N     T H I S     C O D E
 
 async function setup() {
   await db.defaults({ accounts: [] }).write()
@@ -72,7 +72,7 @@ ipcMain.on("verifyAccount", async (event, uuid) => {
   console.log("[IPC] |-> " + isValid);
 });
 
-ipcMain.on("setSelected", async (event, uuid) => {
+ipcMain.on("setSelectedAccount", async (event, uuid) => {
   console.log("[IPC] setSelected");
   await db.get("accounts").find({ isSelected: true}).assign({ isSelected: false }).write();
   await db.get("accounts").find({ uuid: uuid }).assign({ isSelected: true }).write();

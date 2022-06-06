@@ -64,12 +64,12 @@ window.addEventListener("DOMContentLoaded", () => {
     style.setAttribute("type", "text/css");
     style.setAttribute("href", `style/themes/${theme}`);
     document.head.appendChild(style);
-  })
+  });
 });
 
 rpc.login({ "clientId": "935845425599094824" }).catch(console.error);
 
-let selectedAccount = {};
+let toggledSubTabs = [];
 let toggledTabs = [];
 
 ipcRenderer.on("loginResult", (event, arg) => {
@@ -93,7 +93,7 @@ ipcRenderer.on("verifyAccountResult", (event, arg) => {
     ipcRenderer.send("refreshAccount", arg.uuid);
     return;
   }
-  ipcRenderer.send("setSelected", arg.uuid);
+  ipcRenderer.send("setSelectedAccount", arg.uuid);
 });
 
 ipcRenderer.on("refreshAccountResult", (event, arg) => {
@@ -103,7 +103,7 @@ ipcRenderer.on("refreshAccountResult", (event, arg) => {
     // TO-DO - add error handling (maybe a pop-up?)
     return console.error(arg);
   }
-  ipcRenderer.send("setSelected", arg.uuid);
+  ipcRenderer.send("setSelectedAccount", arg.uuid);
 })
 
 function createList(accounts, selected) {
@@ -136,6 +136,7 @@ function createList(accounts, selected) {
     accountMainEl.classList.add("accountMain");
     const accountImageEl = document.createElement("img");
     accountImageEl.classList.add("accountImage");
+    // TO-DO - change image provider, this one has caching issues
     accountImageEl.setAttribute("src", `https://visage.surgeplay.com/face/44/${account.profile.id}`);
     const accountInfoEl = document.createElement("div");
     accountInfoEl.classList.add("accountInfo");
@@ -200,4 +201,25 @@ function toggleTab(tabName) {
   });
 }
 
+function toggleSubTab(tabName) {
+  if (!tabName)
+    tabName = toggledSubTabs[0];
+  if (!toggledSubTabs[0]) {
+    document.getElementById(tabName).classList.add("visibleSubTab");
+    document.getElementById(tabName + "Toggler").classList.add("toggledTabToggler");
+    toggledSubTabs.push(tabName);
+  } else if (toggledSubTabs[0] == tabName) {
+    return
+  } else {
+    document.getElementById(toggledSubTabs[0]).classList.remove("visibleSubTab");
+    document.getElementById(toggledSubTabs[0] + "Toggler").classList.remove("toggledTabToggler");
+    document.getElementById(tabName).classList.add("visibleSubTab");
+    document.getElementById(tabName + "Toggler").classList.add("toggledTabToggler");
+    toggledSubTabs[0] = tabName;
+  }
+}
+
+contextBridge.exposeInMainWorld("toggleSubTab", toggleSubTab);
 contextBridge.exposeInMainWorld("toggleTab", toggleTab);
+
+// version mgmt

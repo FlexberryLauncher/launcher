@@ -13,7 +13,7 @@ const createWindow = () => {
     title: 'Flexberry Launcher',
     fullscreenable: false,
     resizable: false,
-    icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.ico"),
+    icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.png"),
     transparent: true,
     webPreferences: {
       spellcheck: false,

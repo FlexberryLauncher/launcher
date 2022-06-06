@@ -28,7 +28,25 @@
     </div>
 
     <div class="settingTab tab" id="settings">
-      <span class="tabTitle">Settings</span>
+      <div class="tabTop">
+        <span class="tabClose" onclick="toggleTab()">
+          <img src="assets/icons/arrow-left.png" alt="close" class="tabCloseIcon" />
+        </span>
+        <span class="tabTitle">Settings</span>
+        <span class="tabExternal"></span>
+      </div>
+      <div class="subTabTogglers">
+        <span class="subTabToggler" onclick="toggleSubTab('versionSettings')" id="versionSettingsToggler">Versions</span>
+        <span class="subTabToggler" onclick="toggleSubTab('otherSettings')" id="otherSettingsToggler">Other</span>
+      </div>
+      <div class="subTabs">
+        <div class="subTab" id="versionSettings">
+          
+        </div>
+        <div class="subTab" id="otherSettings">
+
+        </div>
+      </div>
     </div>
 
     <div class="accountsTab tab tabLoading" id="accounts">
@@ -66,4 +84,8 @@
     </div>
   </div>
 </body>
+<script>
+  // initial scripts :)
+  toggleSubTab("versionSettings");
+</script>
 </html>
