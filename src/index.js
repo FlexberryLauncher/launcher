@@ -21,7 +21,7 @@ const createWindow = () => {
     }
   });
   if (process.platform === 'darwin') {
-    win.setWindowButtonVisibility(false); // i'm sorry macOS users, i had to do it...
+    mainWindow.setWindowButtonVisibility(false); // i'm sorry macOS users, i had to do it...
   }
   mainWindow.loadFile(path.join(__dirname, "index.html"));
   ipcMain.on("minimize", () => mainWindow.minimize());
