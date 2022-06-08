@@ -98,7 +98,7 @@ body::before {
   flex-direction: column;
   align-items: center;
   width: 60%;
-  margin: 3% 20%;
+  margin: -2% 20%;
   height: 20%;
   background: url("../assets/images/minecraft.png");
   background-size: 390px;
@@ -127,7 +127,7 @@ body::before {
 .content {
   position: absolute;
   width: calc(100%);
-  height: calc(100% - 78px);
+  height: calc(100% - 32px);
   bottom: 0;
   border-radius: 14px;
   display: flex;
