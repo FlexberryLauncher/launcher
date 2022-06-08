@@ -13,9 +13,9 @@ bundle(
     arch: 'x64',
     platform: 'win32',
     out: './build',
-    overwrite: false,
+    overwrite: true,
     asar: false,
-    icon: './icon.ico',
+    icon: './builder/assets/icons/icon.ico',
     ignore: [
       /^.*(accounts\.json|\.github|\.gitignore|LICENSE|README\.md)$/,
       /^.*(builder)$/

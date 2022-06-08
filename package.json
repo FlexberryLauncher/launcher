@@ -7,7 +7,8 @@
   "scripts": {
     "start": "electron-forge start --inspect-electron",
     "package-windows": "node builder/windows.js",
-    "package-linux": "node builder/linux.js"
+    "package-linux": "node builder/linux.js",
+    "package-macos": "node builder/darwin.js"
   },
   "keywords": [],
   "author": {

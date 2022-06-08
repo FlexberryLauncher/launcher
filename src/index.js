@@ -3,8 +3,11 @@ const path = require('path');
 const msmc = require("msmc");
 require("./modules/accountManager");
 require("./modules/versionManager");
+
+let mainWindow;
+
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 830,
     height: 566,
     titleBarStyle: 'hidden',
@@ -20,13 +23,13 @@ const createWindow = () => {
       preload: path.join(__dirname, "scripts", "preload.js"),
     }
   });
-  if (process.platform === 'darwin') {
-    mainWindow.setWindowButtonVisibility(false); // i'm sorry macOS users, i had to do it...
-  }
   mainWindow.loadFile(path.join(__dirname, "index.html"));
-  ipcMain.on("minimize", () => mainWindow.minimize());
-  ipcMain.on("loaded", () => mainWindow.setSkipTaskbar(false));
+  if (process.platform === 'darwin')
+    mainWindow.setWindowButtonVisibility(false);
 };
+
+ipcMain.on("minimize", () => mainWindow.minimize());
+ipcMain.on("loaded", () => mainWindow.setSkipTaskbar(false));
 
 app.on('ready', createWindow);
 

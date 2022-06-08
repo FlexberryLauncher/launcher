@@ -15,7 +15,7 @@ function setActivity() {
   rpc.setActivity({
     details: 'In main window',
     startTimestamp,
-    largeImageKey: 'flexberry_logo',
+    largeImageKey: 'overhauled_logo',
     largeImageText: 'Flexberry Launcher',
     instance: false,
   });

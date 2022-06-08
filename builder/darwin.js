@@ -9,13 +9,13 @@ async function bundle(options) {
 bundle(
   {
     dir: './',
-    name: 'flexberry-launcher',
+    name: 'Flexberry Launcher',
     arch: 'x64',
-    platform: 'linux',
+    platform: 'darwin',
     out: './build',
     overwrite: true,
     asar: false,
-    icon: './builder/assets/icons/icon.png',
+    icon: './builder/assets/icons/icon.icns',
     ignore: [
       /^.*(accounts\.json|\.github|\.gitignore|LICENSE|README\.md)$/,
       /^.*(builder)$/

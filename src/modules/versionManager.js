@@ -5,14 +5,42 @@ const { ipcMain } = require("electron");
 
 const low = require("lowdb");
 const FileSync = require("lowdb/adapters/FileSync");
-const adapter = new FileSync("profiles.json");
-const db = low(adapter);
+
+let pth = null;
+
+if (process.platform == "win32") {
+  pth = (path.join(process.env.APPDATA, "flexberry-launcher", "profiles.json"));
+} else if (process.platform == "darwin") {
+  pth = (path.join(process.env.HOME, "Library", "Application Support", "flexberry-launcher", "profiles.json"));
+} else if (process.platform == "linux") {
+  pth = (path.join(process.env.HOME, ".flexberry-launcher", "profiles.json"));
+}
+
+!fs.existsSync(pth) && fs.openSync(pth, "w") && console.log("Not found " + pth + "\nCreating it!");
+
+const adapter = new FileSync(pth);
+const db = low(adapter)
 
 db.defaults({ profiles: [] }).write();
 
-const appData = process.env.APPDATA;
-const minecraftDir = path.join(appData, ".minecraft");
-const versionsDir = path.join(minecraftDir, "versions");
+let [appData, minecraftDir, versionsDir] = [];
+
+if (process.platform == "win32") {
+  appData = process.env.APPDATA;
+  minecraftDir = path.join(appData, ".minecraft");
+  versionsDir = path.join(minecraftDir, "versions");
+} else if (process.platform == "darwin") {
+  appData = process.env.HOME;
+  minecraftDir = path.join(appData, "Library", "Application Support", "minecraft");
+  versionsDir = path.join(minecraftDir, "versions");
+} else if (process.platform == "linux") {
+  appData = process.env.HOME;
+  minecraftDir = path.join(appData, ".minecraft");
+  versionsDir = path.join(minecraftDir, "versions");
+} else {
+  // TO-DO - add popup for error
+  throw new Error("Unsupported platform");
+}
 
 class VersionManager {
   constructor() {
