@@ -17,7 +17,7 @@ bundle(
     asar: false,
     icon: './builder/assets/icons/icon.png',
     ignore: [
-      /^.*(accounts\.json|\.github|\.gitignore|LICENSE|README\.md)$/,
+      /^.*(\.github|\.gitignore|LICENSE|README\.md)$/,
       /^.*(builder)$/
     ],
     prune: true
