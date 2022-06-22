@@ -27,6 +27,53 @@
       </div>
     </div>
 
+    <div class="modalWrapper" id="versionSelectWrapper">
+      <div class="versionSelect modal tab" id="versionSelect">
+        <div class="tabTop">
+          <span class="tabClose" onclick="closeVersionSelect()">
+            <img src="assets/icons/arrow-left.png" alt="close" class="tabCloseIcon" />
+          </span>
+          <span class="tabTitle">Add Version</span>
+          <span class="tabExternal">
+          </span>
+        </div>
+
+        <div class="wizard subTabs" id="wizard">
+          <div class="wizardContent subTab">
+            <div class="input">
+              <label for="profileName">Profile Name</label>
+              <input type="text" id="profileName" placeholder="Survival with Bois">
+            </div>
+            <div class="selector">
+              <label for="versionSelect">Profile Icon</label>
+              <div class="blocks">
+                <img onclick="selectIcon(this.id)" class="block" id="glass" src="assets/blocks/glass.png">
+                <img onclick="selectIcon(this.id)" class="block" id="grass_block" src="assets/blocks/grass_block.png">
+                <img onclick="selectIcon(this.id)" class="block" id="diamond_block" src="assets/blocks/diamond_block.png">
+                <img onclick="selectIcon(this.id)" class="block" id="bedrock" src="assets/blocks/bedrock.png">
+                <img onclick="selectIcon(this.id)" class="block" id="cobblestone" src="assets/blocks/cobblestone.png">
+                <img onclick="selectIcon(this.id)" class="block" id="crying_obsidian" src="assets/blocks/crying_obsidian.png">
+                <img onclick="selectIcon(this.id)" class="block selectedBlock" id="netherrack" src="assets/blocks/netherrack.png">
+                <img onclick="selectIcon(this.id)" class="block" id="oak_log" src="assets/blocks/oak_log.png">
+                <img onclick="selectIcon(this.id)" class="block" id="spruce_planks" src="assets/blocks/spruce_planks.png">
+                <img onclick="selectIcon(this.id)" class="block" id="copper_block" src="assets/blocks/copper_block.png">
+                <img onclick="selectIcon(this.id)" class="block" id="redstone_ore" src="assets/blocks/redstone_ore.png">
+                <img onclick="selectIcon(this.id)" class="block" id="andesite" src="assets/blocks/andesite.png">
+                
+              </div>
+            </div>
+          </div>
+          <div class="wizardContent subTab">2</div>
+          <div class="wizardContent subTab">3</div>
+          <div class="wizardContent subTab">4</div>
+        </div>
+        <div class="wizardActions">
+            <span class="wizardAction" onclick="wizardCycle()">Next</span>
+        </div>
+
+      </div>
+    </div>
+
     <div class="settingTab tab" id="settings">
       <div class="tabTop">
         <span class="tabClose" onclick="toggleTab()">
@@ -41,7 +88,14 @@
       </div>
       <div class="subTabs">
         <div class="subTab" id="versionSettings">
-          
+          <div class="versionList" id="versionList">
+
+            <div class="addVersion version" id="addVersion">
+              <span class="addVersionIcon">+</span>
+              <span class="addVersionText">Add version</span>
+            </div>
+
+          </div>
         </div>
         <div class="subTab" id="otherSettings">
 

@@ -13,6 +13,12 @@
   src: url("../assets/typefaces/Minecraft.ttf");
 }
 
+@font-face {
+  font-family: "Minecraft Turkish";
+  src: url("../assets/typefaces/Minecraft-Turkish.ttf");
+}
+
+
 * {
   margin: 0;
   padding: 0;
@@ -20,6 +26,7 @@
   box-sizing: border-box;
   transform-style: preserve-3d;
   -webkit-user-drag: none;
+  outline: none;
 }
 
 ::-webkit-scrollbar {
@@ -43,7 +50,7 @@ body {
 
 body::after {
   opacity: 0;
-  animation: 1s fadeIn forwards;
+  animation: 2s fadeIn forwards;
   z-index: -2000;
   content: "";
   position: absolute;
@@ -52,12 +59,12 @@ body::after {
   width: 830px;
   height: 490px;
   border-radius: 16px;
-  transition: .2s background-image;
+  transition: 1s background-image;
 }
 
 body::before {
   opacity: 0;
-  animation: .6s fadeIn forwards;
+  animation: .2s fadeIn forwards;
   animation-delay: 1.2s;
   z-index: -1000;
   content: "";
@@ -92,7 +99,7 @@ body::before {
   opacity: 0;
   transform: translateY(190%);
   animation: .5s titleStartUp forwards ease-out;
-  z-index: -500;
+  z-index: 100000;
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -127,7 +134,7 @@ body::before {
 .content {
   position: absolute;
   width: calc(100%);
-  height: calc(100% - 32px);
+  height: calc(100% - 30px);
   bottom: 0;
   border-radius: 14px;
   display: flex;
@@ -265,6 +272,7 @@ body::before {
   width: 100%;
   display: flex;
   justify-content: flex-end;
+  z-index: 150000;
 }
 
 .close {
@@ -339,6 +347,39 @@ body::before {
   transition: opacity .4s ease-in-out, transform .2s ease-in-out;
 }
 
+.modalWrapper {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 0;
+  z-index: -500;
+  border-radius: 16px;
+  opacity: 0;
+  transition: .2s;
+}
+
+.visibleModalWrapper {
+  opacity: 1;
+  height: 100%;
+  top: 0;
+  z-index: 500;
+  backdrop-filter: blur(40px);
+  background: linear-gradient(to bottom, transparent, #00000050, transparent);
+}
+
+.visibleModal {
+  opacity: 1;
+}
+
+.modal {
+  z-index: 1000;
+  height: 76%;
+  transform: none!important;
+  transition: .4s;
+}
+
 .visibleTab {
   opacity: 1;
   display: flex;
@@ -382,7 +423,7 @@ body::before {
   width: 100%;
 }
 
-.accountList {
+.accountList, .versionList {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -419,7 +460,7 @@ body::before {
   transition: .2s;
 }
 
-.account {
+.account, .version {
   padding: 8px;
   display: flex;
   flex-direction: row;
@@ -432,7 +473,7 @@ body::before {
   cursor: pointer;
 }
 
-.addAccount {
+.addAccount, .addVersion {
   padding: 8px 32px;
   min-height: 52px;
   display: flex;
@@ -442,48 +483,54 @@ body::before {
   font-size: 14px;
 }
 
-.account:hover {
+.account:hover, .version:hover {
   background: var(--main-color-darker);
 }
 
-.addAccountTitle {
+.addAccountTitle, .addVersionTitle {
   text-shadow: none;
 }
 
-.accountMain {
+.accountMain, .versionMain {
   display: flex;
   flex-direction: row;
   gap: 16px;
 }
 
-.addAccountIcon {
+.addAccountIcon, .addVersionIcon {
+  font-family: "Minecraft";
+  color: white;
   width: 24px;
+  font-size: 24px;
+  text-shadow: none;
   filter: drop-shadow(var(--shadow) 0 4px 0);
 }
 
-.accountImage {
+.accountImage, .versionImage {
   height: 44px;
 }
 
-.accountInfo {
+.accountInfo, .versionInfo {
   display: flex;
-  gap: 4px;
   flex-direction: column;
+  gap: 4px;
   justify-content: center;
 }
 
-.accountUsername {
+.accountUsername, .versionName {
   font-family: "Minecraft";
+  font-size: 16px;
   text-shadow: none;
 }
 
-.accountMail {
+.accountMail, .versionVersion {
   font-family: "Minecraft";
   font-size: 14px;
+  line-height: 8px;
   text-shadow: none;
 }
 
-.selectedAccount {
+.selectedAccount, .selectedVersion {
   cursor: default;
   background: var(--main-color-darker);
 }
@@ -518,7 +565,8 @@ body::before {
   display: flex;
   flex-direction: row;
   gap: 8px;
-  width: 100%;
+  width: calc(100% - 16px);
+  margin-right: 16px;
   justify-content: space-between;
 }
 
@@ -554,8 +602,9 @@ body::before {
 
 .subTab {
   position: absolute;
-  transition: .2s;
+  transition: ease-in-out .3s;
   width: 100%;
+  height: 100%;
   transform: translateX(110%);
 }
 
@@ -569,4 +618,110 @@ body::before {
 
 .visibleSubTab {
   transform: none!important;
+}
+
+.wizard {
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 100% 100% 100% 100%;
+  flex-direction: row;
+  width: 100%;
+  gap: 16px;
+  scroll-behavior: smooth;
+}
+
+.wizardContent:nth-child(n) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--main-color-dark); 
+  padding: 16px;
+  width: 100%;
+  height: 100%;
+  transform: none;
+  gap: 16px;
+}
+
+.wizardActions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.wizardAction {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  font-family: "Minecrafter";
+  font-size: 16px;
+  cursor: pointer;
+  transition: .2s;
+  background: var(--main-color-dark);
+  width: 100%;
+}
+
+.input {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px;
+}
+
+label {
+  font-family: "Minecrafter";
+  font-size: 14px;
+  text-shadow: none;
+  color: var(--main-color-lightest);
+}
+
+.input input {
+  font-family: "Minecraft Turkish";
+  font-size: 14px;
+  color: var(--main-color-lightest);
+  width: 100%;
+  padding: 8px;
+  border: none;
+  text-shadow: none;
+  background: var(--main-color);
+  border: none;
+  transition: .2s;
+}
+
+.input input::placeholder {
+  color: var(--main-color-lightest);
+  opacity: .6;
+}
+
+.blocks {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 12px;
+}
+
+.block {
+  width: calc((100% - 12px * 5) / 6);
+  position: relative;
+  transition: .2s;
+  cursor: pointer;
+}
+
+.blocks:hover > .block:not(:hover) {
+  filter: blur(1px);
+  transform: scale(.9);
+}
+
+.block:hover {
+  transform: scale(1.05);
+}
+
+.selectedBlock {
+  transform: scale(1.2);
+  border: 4px solid var(--main-color-darkest);
 }

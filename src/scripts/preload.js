@@ -1,3 +1,5 @@
+// TO-DO - organize this file
+
 const { ipcRenderer, contextBridge } = require("electron");
 const fs = require("fs");
 const path = require("path");
@@ -7,6 +9,8 @@ DiscordRPC.register("935845425599094824");
 
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 const startTimestamp = new Date();
+
+rpc.setMaxListeners(0);
 
 let mainDir = (__dirname).split("\\scripts")[0];
 mainDir = mainDir.includes("/scripts") ? mainDir.split("/scripts")[0] : mainDir;
@@ -30,16 +34,20 @@ function setActivity() {
 }
 
 function addEvent(type, element, event, loading, ...params) {
-  if (type == "id") { 
-    el = document.getElementById(element);
-  } else {
-    el = document.querySelector(element);
+  try {
+    if (type == "id") { 
+      el = document.getElementById(element);
+    } else {
+      el = document.querySelector(element);
+    }
+    el.addEventListener("click", () => {
+      if (loading)
+        toggleLoading("accounts");
+      event(...params);
+    });
+  } catch {
+    return;
   }
-  el.addEventListener("click", () => {
-    if (loading)
-      toggleLoading("accounts");
-    event(...params);
-  });
 }
 
 function toggleLoading(tab, forceClose) {
@@ -49,15 +57,20 @@ function toggleLoading(tab, forceClose) {
   tabEl.classList.toggle("tabLoading");
 }
 
+let wiz;
+
 window.addEventListener("DOMContentLoaded", () => {
+  wiz = document.getElementById("wizard").outerHTML.toString();
+  console.log(wiz);
+  openVersionSelect()
   setActivity();
   ipcRenderer.send("loaded");
   addEvent("id", "login", ipcRenderer.send, true, "addAccount");
   ipcRenderer.send("getAccounts");
+  ipcRenderer.send("getProfiles");
   fs.readdir(path.join(mainDir, "style", "themes"), (err, files) => {
     if (err) return console.error(err);
     const themes = files.filter(file => file.endsWith(".css"));
-    console.log(themes);
     const theme = themes[Math.floor(Math.random() * themes.length)];
     const style = document.createElement("link");
     style.setAttribute("rel", "stylesheet");
@@ -78,7 +91,7 @@ ipcRenderer.on("loginResult", (event, arg) => {
     toggleLoading("accounts", true);
   } else {
     const accounts = JSON.parse(JSON.parse(arg).accounts); // yes, i hate processing JSON datas...
-    createList(accounts, arg.haveSelected);
+    createAccountList(accounts, arg.haveSelected);
   }
 });
 
@@ -106,99 +119,110 @@ ipcRenderer.on("refreshAccountResult", (event, arg) => {
   ipcRenderer.send("setSelectedAccount", arg.uuid);
 })
 
-function createList(accounts, selected) {
-  let tbs = [];
-  console.log("[DEBUG] Creating account list");
-  const listEl = document.querySelector("#accountList");
-  listEl.innerHTML = "";
-  const loginEl = document.createElement("div");
-  loginEl.classList.add("addAccount");
-  loginEl.classList.add("account");
-  loginEl.setAttribute("id", "login");
-  const loginIconEl = document.createElement("img");
-  loginIconEl.classList.add("addAccountIcon");
-  loginIconEl.setAttribute("src", "assets/images/microsoft.png");
-  const loginTitleEl = document.createElement("span");
-  loginTitleEl.classList.add("addAccountTitle");
-  loginTitleEl.innerHTML = "Login with Microsoft";
-  loginEl.appendChild(loginIconEl);
-  loginEl.appendChild(loginTitleEl);
-  listEl.appendChild(loginEl);
-  addEvent("id", "login", ipcRenderer.send, true, "addAccount");
-  accounts.forEach(account => {
-    console.log(account.profile.name);
-    const accountEl = document.createElement("div");
-    accountEl.classList.add("account");
-    account.isSelected && accountEl.classList.add("selectedAccount");
-    account.isSelected && (selectedAccount = account);
-    accountEl.setAttribute("id", account.uuid);
-    const accountMainEl = document.createElement("div");
-    accountMainEl.classList.add("accountMain");
-    const accountImageEl = document.createElement("img");
-    accountImageEl.classList.add("accountImage");
-    // TO-DO - change image provider, this one has caching issues
-    accountImageEl.setAttribute("src", `https://visage.surgeplay.com/face/44/${account.profile.id}`);
-    const accountInfoEl = document.createElement("div");
-    accountInfoEl.classList.add("accountInfo");
-    const accountUsernameEl = document.createElement("span");
-    accountUsernameEl.classList.add("accountUsername");
-    accountUsernameEl.innerHTML = account.profile.name;
-    const accountMailEl = document.createElement("span");
-    accountMailEl.classList.add("accountMail");
-    accountMailEl.innerHTML = account.xbox.name + " on Xbox ";
-    accountInfoEl.appendChild(accountUsernameEl);
-    accountInfoEl.appendChild(accountMailEl);
-    accountMainEl.appendChild(accountImageEl);
-    accountMainEl.appendChild(accountInfoEl);
-    accountEl.appendChild(accountMainEl);
-    const deleteAccountEl = document.createElement("div");
-    deleteAccountEl.classList.add("deleteAccount");
-    deleteAccountEl.setAttribute("id", "trash-" + account.uuid);
-    accountEl.appendChild(deleteAccountEl);
-    listEl.appendChild(accountEl);
-    !account.isSelected && addEvent("id", account.uuid, ipcRenderer.send, true, "verifyAccount", account.uuid);
-    addEvent("id", "trash-"+account.uuid, ipcRenderer.send, true, "deleteAccount", account.uuid);
-    account.isSelected && tbs.push(account);
-  });
-  if (selected)
-  tbs = [];
-  setSelectedAccount(tbs[0]);
+function createAccountList(accounts, selected) {
+  try {
+    let tbs = [];
+    console.log("[DEBUG] Creating account list");
+    const listEl = document.querySelector("#accountList");
+    listEl.innerHTML = "";
+    const loginEl = document.createElement("div");
+    loginEl.classList.add("addAccount");
+    loginEl.classList.add("account");
+    loginEl.setAttribute("id", "login");
+    const loginIconEl = document.createElement("img");
+    loginIconEl.classList.add("addAccountIcon");
+    loginIconEl.setAttribute("src", "assets/images/microsoft.png");
+    const loginTitleEl = document.createElement("span");
+    loginTitleEl.classList.add("addAccountTitle");
+    loginTitleEl.innerHTML = "Login with Microsoft";
+    loginEl.appendChild(loginIconEl);
+    loginEl.appendChild(loginTitleEl);
+    listEl.appendChild(loginEl);
+    addEvent("id", "login", ipcRenderer.send, true, "addAccount");
+    accounts.forEach(account => {
+      const accountEl = document.createElement("div");
+      accountEl.classList.add("account");
+      account.isSelected && accountEl.classList.add("selectedAccount");
+      account.isSelected && (selectedAccount = account);
+      accountEl.setAttribute("id", account.uuid);
+      const accountMainEl = document.createElement("div");
+      accountMainEl.classList.add("accountMain");
+      const accountImageEl = document.createElement("img");
+      accountImageEl.classList.add("accountImage");
+      // TO-DO - change image provider, this one has caching issues
+      accountImageEl.setAttribute("src", `https://visage.surgeplay.com/face/44/${account.profile.id}`);
+      const accountInfoEl = document.createElement("div");
+      accountInfoEl.classList.add("accountInfo");
+      const accountUsernameEl = document.createElement("span");
+      accountUsernameEl.classList.add("accountUsername");
+      accountUsernameEl.innerHTML = account.profile.name;
+      const accountMailEl = document.createElement("span");
+      accountMailEl.classList.add("accountMail");
+      accountMailEl.innerHTML = account.xbox.name + " on Xbox ";
+      accountInfoEl.appendChild(accountUsernameEl);
+      accountInfoEl.appendChild(accountMailEl);
+      accountMainEl.appendChild(accountImageEl);
+      accountMainEl.appendChild(accountInfoEl);
+      accountEl.appendChild(accountMainEl);
+      const deleteAccountEl = document.createElement("div");
+      deleteAccountEl.classList.add("deleteAccount");
+      deleteAccountEl.setAttribute("id", "trash-" + account.uuid);
+      accountEl.appendChild(deleteAccountEl);
+      listEl.appendChild(accountEl);
+      !account.isSelected && addEvent("id", account.uuid, ipcRenderer.send, true, "verifyAccount", account.uuid);
+      addEvent("id", "trash-"+account.uuid, ipcRenderer.send, true, "deleteAccount", account.uuid);
+      account.isSelected && tbs.push(account);
+    });
+    if (selected)
+    tbs = [];
+    setSelectedAccount(tbs[0]);
+  } catch {
+    return;
+  }
 }
 
 function setSelectedAccount(account) {
-  toggleLoading("accounts", true);
-  selectedAccount = {};
-  if (account)
-    selectedAccount = account;
-  let toBePlaced = account ? account.profile.name : "Not logged in";
-  document.getElementById("username").innerHTML = toBePlaced;
+  try {
+    toggleLoading("accounts", true);
+    selectedAccount = {};
+    if (account)
+      selectedAccount = account;
+    let toBePlaced = account ? account.profile.name : "Not logged in";
+    document.getElementById("username").innerHTML = toBePlaced;
+  } catch {
+    return;
+  }
 }
 
-function toggleTab(tabName) {
+function toggleTab(tabName, stayOnCurrent) {
   if (!tabName) 
     tabName = toggledTabs[0];
+  let toggler1 = !stayOnCurrent ? document.getElementById(tabName + "Toggler") : undefined;
+  let toggler2 = !stayOnCurrent ? document.getElementById(toggledTabs[0] + "Toggler") : undefined;
   if (!toggledTabs[0]) {
     document.getElementById(tabName).classList.add("visibleTab");
-    document.getElementById(tabName + "Toggler").classList.add("toggledButton");
+    toggler1 && toggler1.classList.add("toggledButton");
     toggledTabs.push(tabName);
   } else if (toggledTabs[0] == tabName) {
     document.getElementById(tabName).classList.remove("visibleTab");
-    document.getElementById(tabName + "Toggler").classList.remove("toggledButton");
+    toggler1 && toggler1.classList.remove("toggledButton");
     toggledTabs.shift();
   } else {
     document.getElementById(toggledTabs[0]).classList.remove("visibleTab");
-    document.getElementById(toggledTabs[0] + "Toggler").classList.remove("toggledButton");
+    toggler2 && toggler2.classList.remove("toggledButton");
     document.getElementById(tabName).classList.add("visibleTab");
-    document.getElementById(tabName + "Toggler").classList.add("toggledButton");
-    toggledTabs[0] = tabName;
+    toggler1 && toggler1.classList.add("toggledButton");
+    if (!stayOnCurrent)
+      toggledTabs[0] = tabName;
   }
-  rpc.setActivity({
-    details: 'In ' + (toggledTabs[0] ? (tabName + ' tab') : 'the main menu'),
-    startTimestamp,
-    largeImageKey: 'flexberry_logo',
-    largeImageText: 'Flexberry Launcher',
-    instance: false,
-  });
+  if (!stayOnCurrent)
+    rpc.setActivity({
+      details: 'In ' + (toggledTabs[0] ? (tabName + ' tab') : 'the main menu'),
+      startTimestamp,
+      largeImageKey: 'overhauled_logo',
+      largeImageText: 'Flexberry Launcher',
+      instance: false,
+    });
 }
 
 function toggleSubTab(tabName) {
@@ -219,7 +243,96 @@ function toggleSubTab(tabName) {
   }
 }
 
-contextBridge.exposeInMainWorld("toggleSubTab", toggleSubTab);
-contextBridge.exposeInMainWorld("toggleTab", toggleTab);
-
 // version mgmt
+function openVersionSelect() {
+  document.getElementById("versionSelect").classList.add("visibleModal");
+  document.getElementById("versionSelectWrapper").classList.add("visibleModalWrapper");
+  document.getElementById("wizard").outerHTML = wiz;
+}
+
+function closeVersionSelect() {
+  document.getElementById("versionSelect").classList.remove("visibleModal");
+  document.getElementById("versionSelectWrapper").classList.remove("visibleModalWrapper");
+}
+
+function createProfileList(profiles) {
+  try {
+    let tbs = [];
+    console.log("[DEBUG] Creating profile list");
+    const listEl = document.querySelector("#versionList");
+    listEl.innerHTML = "";
+    const loginEl = document.createElement("div");
+    loginEl.classList.add("addVersion");
+    loginEl.classList.add("version");
+    loginEl.setAttribute("id", "addVersion");
+    const loginIconEl = document.createElement("span");
+    loginIconEl.classList.add("addVersionIcon");
+    loginIconEl.innerHTML = "+";
+    const loginTitleEl = document.createElement("span");
+    loginTitleEl.classList.add("addVersionTitle");
+    loginTitleEl.innerHTML = "Add version";
+    loginEl.appendChild(loginIconEl);
+    loginEl.appendChild(loginTitleEl);
+    listEl.appendChild(loginEl);
+    addEvent("id", "addVersion", openVersionSelect, false);
+    profiles.forEach(account => {
+      const accountEl = document.createElement("div");
+      accountEl.classList.add("version");
+      account.isSelected && accountEl.classList.add("selectedVersion");
+      account.isSelected && (selectedAccount = account);
+      accountEl.setAttribute("id", account.acronym);
+      const accountMainEl = document.createElement("div");
+      accountMainEl.classList.add("versionMain");
+      const accountImageEl = document.createElement("img");
+      accountImageEl.classList.add("versionImage");
+      accountImageEl.setAttribute("src", `https://static.wikia.nocookie.net/minecraft_gamepedia/images/3/3e/Glass_JE4_BE2.png/revision/latest?cb=20200925033414`);
+      const accountInfoEl = document.createElement("div");
+      accountInfoEl.classList.add("versionInfo");
+      const accountUsernameEl = document.createElement("span");
+      accountUsernameEl.classList.add("versionName");
+      accountUsernameEl.innerHTML = account.appearance.name;
+      const accountMailEl = document.createElement("span");
+      accountMailEl.classList.add("versionVersion");
+      accountMailEl.innerHTML = account.version;
+      accountInfoEl.appendChild(accountUsernameEl);
+      accountInfoEl.appendChild(accountMailEl);
+      accountMainEl.appendChild(accountImageEl);
+      accountMainEl.appendChild(accountInfoEl);
+      accountEl.appendChild(accountMainEl);
+      const deleteAccountEl = document.createElement("div");
+      deleteAccountEl.classList.add("deleteVersion");
+      deleteAccountEl.setAttribute("id", "trash-" + account.acronym);
+      accountEl.appendChild(deleteAccountEl);
+      listEl.appendChild(accountEl);
+      !account.isSelected && addEvent("id", account.acronym, ipcRenderer.send, false, "selectProfile", account.appearance.name);
+      addEvent("id", "trash-"+account.acronym, ipcRenderer.send, false, "deleteProfile", account.appearance.name);
+      account.isSelected && tbs.push(account);
+    });
+    if (selected)
+      tbs = [];
+    setSelectedVersion(tbs[0]);
+  } catch {
+    return;
+  }
+}
+
+let alreadyCycling = false;
+
+function wizardCycle() {
+  if (alreadyCycling) return;
+  const wizard = document.getElementById("wizard");
+  wizard.scrollBy(wizard.offsetWidth + 17, 0);
+  alreadyCycling = true;
+  setTimeout(() => {
+    alreadyCycling = false;
+  }, 400);
+}
+
+ipcRenderer.on("profiles", (event, arg) => {
+  createProfileList(arg);
+});
+
+contextBridge.exposeInMainWorld("toggleSubTab", toggleSubTab);
+contextBridge.exposeInMainWorld("wizardCycle", wizardCycle);
+contextBridge.exposeInMainWorld("toggleTab", toggleTab);
+contextBridge.exposeInMainWorld("closeVersionSelect", closeVersionSelect);

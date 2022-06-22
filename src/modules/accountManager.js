@@ -16,7 +16,10 @@ if (process.platform == "win32") {
   pth = (path.join(process.env.HOME, ".flexberry-launcher", "accounts.json"));
 }
 
-!fs.existsSync(pth) && fs.openSync(pth, "w") && console.log("Not found " + pth + "\nCreating it!");
+let dir = path.dirname(pth);
+
+!fs.existsSync(dir) && fs.mkdirSync(dir) && console.log("Not found " + dir + " -- Creating it!");
+!fs.existsSync(pth) && fs.openSync(pth, "w") && console.log("Not found " + pth + " -- Creating it!");
 
 const adapter = new FileSync(pth);
 const db = low(adapter)

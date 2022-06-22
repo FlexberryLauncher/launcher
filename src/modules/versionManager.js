@@ -16,7 +16,10 @@ if (process.platform == "win32") {
   pth = (path.join(process.env.HOME, ".flexberry-launcher", "profiles.json"));
 }
 
-!fs.existsSync(pth) && fs.openSync(pth, "w") && console.log("Not found " + pth + "\nCreating it!");
+let dir = path.dirname(pth);
+
+!fs.existsSync(dir) && fs.mkdirSync(dir) && console.log("Not found " + dir + " -- Creating it!");
+!fs.existsSync(pth) && fs.openSync(pth, "w") && console.log("Not found " + pth + " -- Creating it!");
 
 const adapter = new FileSync(pth);
 const db = low(adapter)
@@ -122,7 +125,7 @@ class VersionManager {
     this.profiles = profiles;
   }
 
-  async addProfile(profile) {
+  async addProfile(profile = {}) {
     profile.version = profile.version || this.latest.release;
     profile.type = profile.type || "release";
     profile.memory = profile.memory || 2048;
@@ -134,18 +137,36 @@ class VersionManager {
       icon: "glass",
       name: "Latest Release",
     };
-    // check if profile already exists
+    profile.isSelected = false;
+    profile.acronym = profile.appearance.name.replace(/\s/g, "").toLowerCase();
     let profileExists = await db.get("profiles").find({
-      appearance: {
-        name: profile.appearance.name
-      }
+      acronym: profile.appearance.name.replace(/\s/g, "").toLowerCase()
     }).value();
     if (profileExists)
       return { status: "error", message: "Profile already exists" };
-    // add profile
     let newProfiles = await db.get("profiles").push(profile).write();
-    console.log(newProfiles)
     this.profiles = newProfiles;
+    return this.profiles;
+  }
+
+  async selectProfile(profileName) {
+    let ifExists = await db.get("profiles").find({
+      appearance: {
+        name: profileName
+      }
+    }).value();
+    if (!ifExists)
+      return { status: "error", message: "Profile not found" };
+    console.log("[IPC] setSelected");
+    await db.get("profiles").find({ isSelected: true}).assign({ isSelected: false }).write();
+    await db.get("profiles").find({
+      appearance: {
+        name: profileName
+      }
+    }).assign({ isSelected: true }).write();
+    let prfs = await db.get("profiles").value();
+    this.profiles = prfs;
+    this.selectedProfile = profileName;
     return this.profiles;
   }
 
@@ -206,36 +227,46 @@ versionManager.init();
 async function ipcManager() {
   // profile = selected version, not account!
 
-  ipcMain.on("getVersions", async (event) => {
-    let versions = await versionManager.getVersions();
-    event.sender.send("getVersions", versions);
+  ipcMain.on("getProfiles", (event, arg) => {
+    event.reply("profiles", versionManager.getProfiles());
   });
 
-  ipcMain.on("getProfiles", async (event) => {
-    let profiles = await versionManager.getProfiles();
-    event.sender.send("getProfiles", profiles);
+  ipcMain.on("getVersions", (event, arg) => {
+    event.reply("versions", versionManager.getVersions());
   });
 
-  ipcMain.on("getLatestVersion", async (event) => {
-    let latest = await versionManager.getLatestVersion();
-    event.sender.send("getLatestVersion", latest);
+  ipcMain.on("getSelectedVersion", (event, arg) => {
+    event.reply("selectedVersion", versionManager.getSelectedVersion());
   });
 
-  ipcMain.on("addProfile", async (event, profile) => {
-    let addedProfile = await versionManager.addProfile(profile);
-    event.sender.send("addProfile", addedProfile);
+  ipcMain.on("getSelectedProfile", (event, arg) => {
+    event.reply("selectedProfile", versionManager.getSelectedProfile());
   });
 
-  ipcMain.on("deleteProfile", async (event, profileName) => {
-    let deletedProfile = await versionManager.deleteProfile(profileName);
-    event.sender.send("deleteProfile", deletedProfile);
+  ipcMain.on("getLatestVersion", (event, arg) => {
+    event.reply("latestVersion", versionManager.getLatestVersion());
   });
 
-  ipcMain.on("setSelectedVersion", async (event, version) => {
-    versionManager.selectedVersion = version;
+  ipcMain.on("addProfile", async (event, arg) => {
+    event.reply("profiles", (await versionManager.addProfile(arg)));
   });
 
-  ipcMain.on("setSelectedProfile", async (event, profile) => {
-    versionManager.selectedProfile = profile;
+  ipcMain.on("selectProfile", async (event, arg) => {
+    event.reply("profiles", (await versionManager.selectProfile(arg)));
   });
+
+  ipcMain.on("deleteProfile", async (event, arg) => {
+    event.reply("profiles", (await versionManager.deleteProfile(arg)));
+  });
+
+  /*
+  let random = versionManager.getVersions()[Math.floor(Math.random() * versionManager.getVersions().length)]
+  versionManager.addProfile({
+    version: random.id,
+    type: random.type,
+    appearance: {
+      name: Math.random().toString(36).substring(2, 8)
+    }
+  });
+  */
 }
