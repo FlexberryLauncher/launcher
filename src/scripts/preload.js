@@ -317,6 +317,12 @@ function createProfileList(profiles) {
 }
 
 let alreadyCycling = false;
+let wizard = {
+  appearance: {
+    name: "",
+    icon: "",
+  }
+}
 
 function wizardCycle() {
   if (alreadyCycling) return;
@@ -332,7 +338,18 @@ ipcRenderer.on("profiles", (event, arg) => {
   createProfileList(arg);
 });
 
+function selectIcon(id) {
+  const icon = document.getElementById(id);
+  // remove selectedBlock class if some element has it
+  const blocks = document.querySelectorAll(".selectedBlock");
+  for (let i = 0; i < blocks.length; i++) {
+    blocks[i].classList.remove("selectedBlock");
+  }
+  icon.classList.add("selectedBlock");
+}
+
 contextBridge.exposeInMainWorld("toggleSubTab", toggleSubTab);
 contextBridge.exposeInMainWorld("wizardCycle", wizardCycle);
+contextBridge.exposeInMainWorld("selectIcon", selectIcon);
 contextBridge.exposeInMainWorld("toggleTab", toggleTab);
 contextBridge.exposeInMainWorld("closeVersionSelect", closeVersionSelect);
