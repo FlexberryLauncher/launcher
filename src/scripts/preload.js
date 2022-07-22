@@ -61,7 +61,6 @@ let wiz;
 
 window.addEventListener("DOMContentLoaded", () => {
   wiz = document.getElementById("wizard").outerHTML.toString();
-  console.log(wiz);
   openVersionSelect()
   setActivity();
   ipcRenderer.send("loaded");
@@ -245,6 +244,7 @@ function toggleSubTab(tabName) {
 
 // version mgmt
 function openVersionSelect() {
+  clearObject(wizard);
   document.getElementById("versionSelect").classList.add("visibleModal");
   document.getElementById("versionSelectWrapper").classList.add("visibleModalWrapper");
   document.getElementById("wizard").outerHTML = wiz;
@@ -319,16 +319,36 @@ function createProfileList(profiles) {
 let alreadyCycling = false;
 let wizard = {
   appearance: {
-    name: "",
-    icon: "",
+    name: "asd",
+    icon: "fxghfgh",
   }
 }
 
+function clearObject(object) {
+  let temp = {};
+  for (let key in object) {
+     if (object.hasOwnProperty(key)) {
+        if (typeof object[key] === "object") {
+           temp[key] = clearObject(object[key]);
+        } else {
+           temp[key] = null;
+        }
+     }
+  }
+  return temp;
+};
+
 function wizardCycle() {
   if (alreadyCycling) return;
-  const wizard = document.getElementById("wizard");
-  wizard.scrollBy(wizard.offsetWidth + 17, 0);
+  const wizardEl = document.getElementById("wizard");
+  wizardEl.scrollBy(wizardEl.offsetWidth + 17, 0);
   alreadyCycling = true;
+  let page = Math.round((wizardEl.scrollLeft - 17 * Math.floor(wizardEl.scrollLeft / wizardEl.offsetWidth)) / wizardEl.offsetWidth) + 1;
+  switch (page) {
+    case 1:
+      wizard.appearance.name = document.getElementById("profileName").value || "Unnamed Profile";
+  }
+  console.log(wizard)
   setTimeout(() => {
     alreadyCycling = false;
   }, 400);
@@ -339,8 +359,8 @@ ipcRenderer.on("profiles", (event, arg) => {
 });
 
 function selectIcon(id) {
+  wizard.appearance.icon = id;
   const icon = document.getElementById(id);
-  // remove selectedBlock class if some element has it
   const blocks = document.querySelectorAll(".selectedBlock");
   for (let i = 0; i < blocks.length; i++) {
     blocks[i].classList.remove("selectedBlock");

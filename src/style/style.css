@@ -36,7 +36,6 @@
 
 ::-webkit-scrollbar-thumb {
   background: var(--main-color-halfly-visible);
-
 }
 
 body {
@@ -51,6 +50,7 @@ body {
 body::after {
   opacity: 0;
   animation: 2s fadeIn forwards;
+  animation-delay: .3s;
   z-index: -2000;
   content: "";
   position: absolute;
@@ -59,20 +59,21 @@ body::after {
   width: 830px;
   height: 490px;
   border-radius: 16px;
+  transform: translateZ(30deg);
   transition: 1s background-image;
 }
 
 body::before {
   opacity: 0;
-  animation: .2s fadeIn forwards;
-  animation-delay: 1.2s;
+  animation: 1s fadeIn forwards;
+  animation-delay: .7s;
   z-index: -1000;
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 50%;
+  height: 30%;
   mask: none;
   -webkit-mask: linear-gradient(
     to bottom,
@@ -365,18 +366,19 @@ body::before {
   height: 100%;
   top: 0;
   z-index: 500;
-  backdrop-filter: blur(40px);
+  backdrop-filter: blur(10px);
   background: linear-gradient(to bottom, transparent, #00000050, transparent);
 }
 
 .visibleModal {
   opacity: 1;
+  box-shadow: var(--main-color-darkest) 0 0 40px;
+  transform: none!important;
 }
 
 .modal {
   z-index: 1000;
   height: 76%;
-  transform: none!important;
   transition: .4s;
 }
 
