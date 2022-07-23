@@ -61,7 +61,6 @@ let wiz;
 
 window.addEventListener("DOMContentLoaded", () => {
   wiz = document.getElementById("wizard").outerHTML.toString();
-  openVersionSelect()
   setActivity();
   ipcRenderer.send("loaded");
   addEvent("id", "login", ipcRenderer.send, true, "addAccount");

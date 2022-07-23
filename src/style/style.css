@@ -117,7 +117,7 @@ body::before {
 
 @keyframes titleAltStartUp {
   from {
-    transform: translateY(128px);
+    transform: translateY(100px);
   }
   to {
     transform: translateY(76px);
@@ -125,9 +125,8 @@ body::before {
 }
 
 .titleAlt {
-  /*opacity: 0;
-  animation: .5s fadeIn forwards, .75s titleAltStartUp forwards;
-  animation-delay: 1s;*/
+  opacity: 0;
+  animation: .2s fadeIn forwards, .8s titleAltStartUp forwards;
   transform: translateY(76px);
   width: 280px;
 }
