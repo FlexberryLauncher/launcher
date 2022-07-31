@@ -64,49 +64,29 @@ class VersionManager {
 
   async loadVersions() {
     let apiVersions = await this.getVersionFromAPI();
-    let versionFolders = [];
+    let versionFolders = fs.readdirSync(versionsDir);
     let versions = [];
-    fs.readdir(versionsDir, (err, files) => {
-      if (err)
-        return console.error(err);
-      files.forEach(file => {
-        if (fs.lstatSync(path.join(versionsDir, file)).isDirectory())
-          versionFolders.push(file);
-      });
-    });
-    await Promise.all(versionFolders.map(async (versionFolder) => {
-      let stats = null;
-      fs.stat(path.join(versionsDir, versionFolder), (err, stats) => {
-        if (err)
-          return console.error(err);
-        stats = stats;
-      });
-      if (!stats.isDirectory())
-        return;
+
+    versionFolders.forEach((versionFolder) => {
+      let stats = fs.statSync(path.join(versionsDir, versionFolder));
       if (versionFolder.startsWith("."))
         return;
-      let versionDir = [];
-      fs.readdir(path.join(versionsDir, versionFolder), (err, files) => {
-        if (err)
-          return console.error(err);
-        versionDir = files;
-      });
-      let versionData = null;
-      fs.readFile(path.join(versionsDir, versionFolder, versionFolder + ".json"), (err, data) => {
-        if (err)
-          return console.error(err);
-        versionData = JSON.parse(data);
-      });
+      if (!stats.isDirectory())
+        return;
+      let versionDir = fs.readdirSync(path.join(versionsDir, versionFolder));
       if (!(versionDir.includes(versionFolder + ".json") && versionDir.includes(versionFolder + ".jar")))
         return;
-      return {
+      let versionData = JSON.parse(fs.readFileSync(path.join(versionsDir, versionFolder, versionFolder + ".json")));
+      if (apiVersions.versions.map(v => v.id).includes(versionFolder))
+        return;
+      versions.push({
         id: versionData.id,
         java: versionData.javaVersion ? versionData.javaVersion.majorVersion : 16,
         releaseTime: versionData.inheritsFrom ? apiVersions.versions.filter(version => version.id ==  versionData.inheritsFrom)[0].releaseTime : versionData.releaseTime,
         actualReleaseTime: versionData.releaseTime,
         type: versionData.type,
-      };
-    }));
+      });
+    });
     versions = versions.concat(apiVersions.versions.map(version => {
       return {
         id: version.id,
@@ -226,7 +206,7 @@ versionManager.init();
 
 async function ipcManager() {
   // profile = selected version, not account!
-
+  console.log("[IPC] ipcManager");
   ipcMain.on("getProfiles", (event, arg) => {
     event.reply("profiles", versionManager.getProfiles());
   });

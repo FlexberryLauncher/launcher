@@ -1,7 +1,7 @@
 {
   "name": "flexberry-launcher",
   "productName": "flexberry-launcher",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Lightweight and customizable launcher for Minecraft",
   "main": "src/index.js",
   "scripts": {
@@ -17,10 +17,12 @@
   },
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.27.2",
     "discord-rpc": "^4.0.1",
     "lowdb": "^1.0.0",
     "msmc": "^3.1.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "unzipper": "^0.10.11"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.63",

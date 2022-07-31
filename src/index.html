@@ -62,7 +62,24 @@
               </div>
             </div>
           </div>
-          <div class="wizardContent subTab">2</div>
+          <div class="wizardContent subTab">
+            <div class="selector">
+              <label for="versionSelect">Select Version</label>
+              <div class="select" id="versions">
+              </div>
+              <div class="checkboxes">
+                <div class="checkbox checked versionType" id="release" onclick="check('release', 'drawVersions')">
+                  <span>Releases</span>
+                </div>
+                <div class="checkbox versionType" id="snapshot" onclick="check('snapshot', 'drawVersions')">
+                  <span>Snapshots</span>
+                </div>
+                <div class="checkbox versionType" id="old_alpha" onclick="check('old_alpha', 'drawVersions')">
+                  <span>Old Alpha</span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="wizardContent subTab">3</div>
           <div class="wizardContent subTab">4</div>
         </div>

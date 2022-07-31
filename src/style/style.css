@@ -38,6 +38,10 @@
   background: var(--main-color-halfly-visible);
 }
 
+.select::-webkit-scrollbar-thumb {
+  background: var(--main-color);
+}
+
 body {
   user-select: none;
   font-family: "Minercraftory", sans-serif;
@@ -720,4 +724,89 @@ label {
 
 .selectedBlock {
   border: 4px solid var(--main-color-darkest);
+}
+
+.selector {
+  display: flex; 
+  flex-direction: column;
+  gap: 8px;
+  height: 218px;
+}
+
+.select {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: scroll;
+  height: 80%;
+  padding-right: 8px;
+  margin-right: -8px;
+}
+
+.option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  font-size: 14px;
+  background: var(--main-color-slightly-dark);
+  cursor: pointer;
+  transition: .2s;
+  font-family: "Minecraft Turkish";
+}
+
+.optionText {
+  font-family: "Minecraft Turkish";
+  font-size: 14px;
+  text-shadow: none;
+}
+
+.optionAlt {
+  font-family: "Minecraft Turkish";
+  font-size: 12px;
+  text-shadow: none;
+  opacity: .8;
+}
+
+.option:hover {
+  background: var(--main-color-darker);
+}
+
+.checkboxes {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.checkbox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 16px;
+  background: var(--main-color-slightly-dark);
+  transition: .2s;
+  cursor: pointer;
+}
+
+.checkbox:hover {
+  background: var(--main-color);
+}
+
+.checkbox span {
+  font-family: "Minecrafter";
+  font-size: 14px;
+  text-shadow: none;
+  color: var(--main-color-lightest);
+}
+
+.checkbox.checked {
+  background: var(--main-color-light);
+}
+
+.checkbox.checked span {
+  color: var(--main-color-dark);
 }

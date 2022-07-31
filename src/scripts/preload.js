@@ -60,6 +60,16 @@ function toggleLoading(tab, forceClose) {
 let wiz;
 
 window.addEventListener("DOMContentLoaded", () => {
+  // DEBUG
+  setTimeout(() => {
+    openVersionSelect();
+    wizardCycle();
+  }, 200);
+  // DEBUG
+  setTimeout(() => {
+    drawVersions();
+  }, 1000);
+  ipcRenderer.send("getVersions");
   wiz = document.getElementById("wizard").outerHTML.toString();
   setActivity();
   ipcRenderer.send("loaded");
@@ -116,6 +126,58 @@ ipcRenderer.on("refreshAccountResult", (event, arg) => {
   }
   ipcRenderer.send("setSelectedAccount", arg.uuid);
 })
+
+let versions = [];
+
+ipcRenderer.on("versions", (event, arg) => {
+  versions = arg;
+});
+
+Date.prototype.toShortFormat = function() {
+
+  let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+  let day = this.getDate();
+  
+  let monthIndex = this.getMonth();
+  let monthName = monthNames[monthIndex];
+  
+  let year = this.getFullYear();
+  
+  return `${day} ${monthName} ${year}`;  
+}
+
+function drawVersions() {
+  const checked = document.getElementsByClassName("checked versionType");
+  const filter = [...checked].map(el => el.id);
+  const els = [];
+  versions.filter(version => {
+    return filter.includes(version.type);
+  }).forEach(version => {
+    console.log(version.type)
+    const optionEl = document.createElement("div");
+    optionEl.classList.add("option");
+    const optionTextEl = document.createElement("span");
+    optionTextEl.classList.add("optionText");
+    console.log(version.id, version.actualReleaseTime, version.releaseTime)
+    const formattedDate = (new Date(version.actualReleaseTime || version.releaseTime)).toShortFormat(); 
+    optionTextEl.innerHTML = version.id;
+    const optionAltEl = document.createElement("span");
+    optionAltEl.classList.add("optionAlt");
+    optionAltEl.innerHTML = formattedDate;
+    optionEl.appendChild(optionTextEl);
+    optionEl.appendChild(optionAltEl);
+    els.push(optionEl);
+  });
+  const vers = document.getElementById("versions");
+  vers.innerHTML = els.map(el => el.outerHTML).join("");
+}
+
+function check(id, fn) {
+  const check = document.getElementById(id);
+  check.classList.toggle("checked");
+  eval(fn + "()");
+}
 
 function createAccountList(accounts, selected) {
   try {
@@ -367,6 +429,7 @@ function selectIcon(id) {
   icon.classList.add("selectedBlock");
 }
 
+contextBridge.exposeInMainWorld("check", check);
 contextBridge.exposeInMainWorld("toggleSubTab", toggleSubTab);
 contextBridge.exposeInMainWorld("wizardCycle", wizardCycle);
 contextBridge.exposeInMainWorld("selectIcon", selectIcon);
