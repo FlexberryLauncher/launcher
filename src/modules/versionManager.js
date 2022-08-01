@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const fetch = require("node-fetch");
+const fetch = require("axios");
 const { ipcMain } = require("electron");
 
 const low = require("lowdb");
@@ -82,7 +82,7 @@ class VersionManager {
       versions.push({
         id: versionData.id,
         java: versionData.javaVersion ? versionData.javaVersion.majorVersion : 16,
-        releaseTime: versionData.inheritsFrom ? apiVersions.versions.filter(version => version.id ==  versionData.inheritsFrom)[0].releaseTime : versionData.releaseTime,
+        releaseTime: versionData.inheritsFrom ? apiVersions.versions.filter(version => version.id ==  versionData.inheritsFrom)[0]?.releaseTime : versionData.releaseTime,
         actualReleaseTime: versionData.releaseTime,
         type: versionData.type,
       });
@@ -90,7 +90,7 @@ class VersionManager {
     versions = versions.concat(apiVersions.versions.map(version => {
       return {
         id: version.id,
-        java: null, // do not change, this property also defines if version is local or not
+        java: null, // glitchy, do not use it in anywhere else
         releaseTime: version.releaseTime,
         type: version.type,
       }
@@ -190,10 +190,16 @@ class VersionManager {
     return this.selectedProfile;
   }
 
-  async getVersionFromAPI() {
-    let version = await fetch(`https://launchermeta.mojang.com/mc/game/version_manifest.json`);
-    let json = await version.json();
-    return json;
+  getVersionFromAPI() {
+    return fetch(`https://launchermeta.mojang.com/mc/game/version_manifest.json`).then(function (res) {
+      return res.data;
+    }).catch(err => {
+      console.error("Mojang servers are down or you have no connection");
+      return {
+        latest: [],
+        versions: []
+      };
+    })
   }
 
   getLatestVersion() {

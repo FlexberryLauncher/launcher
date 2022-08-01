@@ -788,7 +788,6 @@ label {
   justify-content: center;
   padding: 8px 16px;
   background: var(--main-color-slightly-dark);
-  transition: .2s;
   cursor: pointer;
 }
 
@@ -805,8 +804,10 @@ label {
 
 .checkbox.checked {
   background: var(--main-color-light);
+  box-shadow: var(--darker-shadow) 0 4px 24px;
 }
 
 .checkbox.checked span {
-  color: var(--main-color-dark);
+  color: var(--main-color-darkest);
+  opacity: .7;
 }

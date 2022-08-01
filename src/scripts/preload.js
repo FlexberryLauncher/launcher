@@ -60,6 +60,25 @@ function toggleLoading(tab, forceClose) {
 let wiz;
 
 window.addEventListener("DOMContentLoaded", () => {
+  function online() {
+    document.querySelectorAll(".requiresConnection").forEach((el) => {
+      el.style.display = "";
+    });
+    document.querySelectorAll(".noConnectionIndicator").forEach((el) => {
+      el.style.display = "none";
+    });
+  }
+  function noConnection() {
+    document.querySelectorAll(".requiresConnection").forEach((el) => {
+      el.style.display = "none";
+    });
+    document.querySelectorAll(".noConnectionIndicator").forEach((el) => {
+      el.style.display = "";
+    });
+  }
+  window.addEventListener('online', online);
+  window.addEventListener('offline', noConnection);
+  navigator.onLine ? online() : noConnection();
   // DEBUG
   setTimeout(() => {
     openVersionSelect();
@@ -70,12 +89,12 @@ window.addEventListener("DOMContentLoaded", () => {
     drawVersions();
   }, 1000);
   ipcRenderer.send("getVersions");
-  wiz = document.getElementById("wizard").outerHTML.toString();
   setActivity();
   ipcRenderer.send("loaded");
   addEvent("id", "login", ipcRenderer.send, true, "addAccount");
   ipcRenderer.send("getAccounts");
   ipcRenderer.send("getProfiles");
+  wiz = document.getElementById("wizard").outerHTML.toString();
   fs.readdir(path.join(mainDir, "style", "themes"), (err, files) => {
     if (err) return console.error(err);
     const themes = files.filter(file => file.endsWith(".css"));
@@ -154,12 +173,10 @@ function drawVersions() {
   versions.filter(version => {
     return filter.includes(version.type);
   }).forEach(version => {
-    console.log(version.type)
     const optionEl = document.createElement("div");
     optionEl.classList.add("option");
     const optionTextEl = document.createElement("span");
     optionTextEl.classList.add("optionText");
-    console.log(version.id, version.actualReleaseTime, version.releaseTime)
     const formattedDate = (new Date(version.actualReleaseTime || version.releaseTime)).toShortFormat(); 
     optionTextEl.innerHTML = version.id;
     const optionAltEl = document.createElement("span");
@@ -171,12 +188,18 @@ function drawVersions() {
   });
   const vers = document.getElementById("versions");
   vers.innerHTML = els.map(el => el.outerHTML).join("");
+  wiz = document.getElementById("wizard").outerHTML.toString();
 }
 
 function check(id, fn) {
+  if (fn == "drawVersions" && document.getElementsByClassName("checked versionType").length == 1 && (document.getElementById(id).classList.contains("checked")))
+    return;
   const check = document.getElementById(id);
   check.classList.toggle("checked");
-  eval(fn + "()");
+  setTimeout(() => {
+    // 10 ms delay to avoid flickering. if you've saw that, screenshot it and send it to our Discord server https://discord.gg/Mrt8HFmwne
+    eval(fn + "()");
+  }, 6.9 + 3.1);
 }
 
 function createAccountList(accounts, selected) {
@@ -188,6 +211,7 @@ function createAccountList(accounts, selected) {
     const loginEl = document.createElement("div");
     loginEl.classList.add("addAccount");
     loginEl.classList.add("account");
+    loginEl.classList.add("requiresConnection");
     loginEl.setAttribute("id", "login");
     const loginIconEl = document.createElement("img");
     loginIconEl.classList.add("addAccountIcon");
@@ -202,6 +226,7 @@ function createAccountList(accounts, selected) {
     accounts.forEach(account => {
       const accountEl = document.createElement("div");
       accountEl.classList.add("account");
+      accountEl.classList.add("requiresConnection");
       account.isSelected && accountEl.classList.add("selectedAccount");
       account.isSelected && (selectedAccount = account);
       accountEl.setAttribute("id", account.uuid);
