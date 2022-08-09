@@ -1,11 +1,15 @@
 <h1 align="center"> 💫 Flexberry Launcher</h1>
 <p align="center">
 An open-source and lightweight launcher for Minecraft<br>
-Flexberry launcher is <b align="center">under development</b>, come to our  [Discord Server](https://discord.gg/dbVPH8KYP2) and check the progress
+<em>Flexberry Launcher is <b align="center">under development</b>, come to <a href="https://discord.gg/dbVPH8KYP2">
+Discord server
+</a> and check the progress</em>
+<br><br>
+<img src="./src/assets/images/launcher.png" width="768px" align="center">
 </p>
 
-<img src="https://github.com/FlexberryLauncher/launcher/blob/master/src/assets/images/launcher.png?raw=true" width="100%" align="center">
-<h1 align="center">✨ Features</h1>
+
+<h1>✨ Features</h1>
 
 * 🔒 Easy and secure account management
   * Add multiple Microsoft accounts and easily switch.
