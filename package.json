@@ -5,7 +5,7 @@
   "description": "Lightweight and customizable launcher for Minecraft",
   "main": "src/index.js",
   "scripts": {
-    "start": "electron-forge start --inspect-electron",
+    "start": "electron-forge start",
     "package-windows": "node builder/windows.js",
     "package-linux": "node builder/linux.js",
     "package-macos": "node builder/darwin.js"
@@ -25,8 +25,8 @@
     "unzipper": "^0.10.11"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.63",
+    "@electron-forge/cli": "^6.0.0-beta.65",
     "electron": "17.4.7",
-    "electron-builder": "^23.0.3"
+    "electron-packager": "^15.5.1"
   }
 }

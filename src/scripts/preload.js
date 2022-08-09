@@ -85,9 +85,6 @@ window.addEventListener("DOMContentLoaded", () => {
     wizardCycle();
   }, 200);
   // DEBUG
-  setTimeout(() => {
-    drawVersions();
-  }, 1000);
   ipcRenderer.send("getVersions");
   setActivity();
   ipcRenderer.send("loaded");
@@ -188,7 +185,7 @@ function drawVersions() {
   });
   const vers = document.getElementById("versions");
   vers.innerHTML = els.map(el => el.outerHTML).join("");
-  wiz = document.getElementById("wizard").outerHTML.toString();
+  !wiz && (wiz = document.getElementById("wizard").outerHTML.toString());
 }
 
 function check(id, fn) {
@@ -334,6 +331,8 @@ function openVersionSelect() {
   document.getElementById("versionSelect").classList.add("visibleModal");
   document.getElementById("versionSelectWrapper").classList.add("visibleModalWrapper");
   document.getElementById("wizard").outerHTML = wiz;
+  drawVersions();
+  console.log(wiz);
 }
 
 function closeVersionSelect() {

@@ -9,3 +9,5 @@ build/
 
 # shittyOS
 .DS_Store
+
+out/
