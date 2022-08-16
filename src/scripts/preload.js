@@ -79,12 +79,6 @@ window.addEventListener("DOMContentLoaded", () => {
   window.addEventListener('online', online);
   window.addEventListener('offline', noConnection);
   navigator.onLine ? online() : noConnection();
-  // DEBUG
-  setTimeout(() => {
-    openVersionSelect();
-    wizardCycle();
-  }, 200);
-  // DEBUG
   ipcRenderer.send("getVersions");
   setActivity();
   ipcRenderer.send("loaded");
@@ -171,7 +165,9 @@ function drawVersions() {
     return filter.includes(version.type);
   }).forEach(version => {
     const optionEl = document.createElement("div");
+    optionEl.id = version.id.split(" ").join("");
     optionEl.classList.add("option");
+    optionEl.classList.add("version");
     const optionTextEl = document.createElement("span");
     optionTextEl.classList.add("optionText");
     const formattedDate = (new Date(version.actualReleaseTime || version.releaseTime)).toShortFormat(); 
@@ -185,7 +181,25 @@ function drawVersions() {
   });
   const vers = document.getElementById("versions");
   vers.innerHTML = els.map(el => el.outerHTML).join("");
+  els.forEach(el => {
+    addEvent("id", el.id, selectVersion, false, el.id);
+  });
   !wiz && (wiz = document.getElementById("wizard").outerHTML.toString());
+}
+
+function selectVersion(versionId) {
+  const versionEl = document.getElementById(versionId);
+  const version = versions.find(version => version.id == versionEl.innerText.replace((new Date(version.actualReleaseTime || version.releaseTime)).toShortFormat(), "").trim());
+  if (!version) return;
+  console.log(version);
+  const versionEls = document.querySelectorAll(".version");
+  console.log(version);
+  for (let i = 0; i < versionEls.length; i++) {
+    versionEls[i].classList.remove("selectedVersionSE");
+  }
+  versionEl.classList.add("selectedVersionSE");
+  wizard.version = version.id;
+  wizard.type == version.type || "unknown";
 }
 
 function check(id, fn) {
@@ -327,12 +341,12 @@ function toggleSubTab(tabName) {
 
 // version mgmt
 function openVersionSelect() {
+  document.getElementById("wizardAction").innerHTML = "Next";
   clearObject(wizard);
   document.getElementById("versionSelect").classList.add("visibleModal");
   document.getElementById("versionSelectWrapper").classList.add("visibleModalWrapper");
   document.getElementById("wizard").outerHTML = wiz;
   drawVersions();
-  console.log(wiz);
 }
 
 function closeVersionSelect() {
@@ -340,7 +354,20 @@ function closeVersionSelect() {
   document.getElementById("versionSelectWrapper").classList.remove("visibleModalWrapper");
 }
 
+let launchOptions = {};
+
 function createProfileList(profiles) {
+  console.log(profiles);
+  let selected = profiles.find(profile => profile.isSelected);
+  if (!selected) {
+    if (profiles[0]) {
+      ipcRenderer.send("selectProfile", profiles[0].uuid);
+      selected = profiles[0];
+    }
+  }
+  document.getElementById("ver").innerHTML = selected.appearance.name;
+  launchOptions = versions.find(version => version.id == selected.version);
+  launchOptions.profile = selected;
   try {
     let tbs = [];
     console.log("[DEBUG] Creating profile list");
@@ -370,7 +397,7 @@ function createProfileList(profiles) {
       accountMainEl.classList.add("versionMain");
       const accountImageEl = document.createElement("img");
       accountImageEl.classList.add("versionImage");
-      accountImageEl.setAttribute("src", `https://static.wikia.nocookie.net/minecraft_gamepedia/images/3/3e/Glass_JE4_BE2.png/revision/latest?cb=20200925033414`);
+      accountImageEl.setAttribute("src", `assets/blocks/${account.appearance.icon}.png`);
       const accountInfoEl = document.createElement("div");
       accountInfoEl.classList.add("versionInfo");
       const accountUsernameEl = document.createElement("span");
@@ -426,13 +453,26 @@ function clearObject(object) {
 function wizardCycle() {
   if (alreadyCycling) return;
   const wizardEl = document.getElementById("wizard");
+  let page = Math.round((wizardEl.scrollLeft - 17 * Math.floor(wizardEl.scrollLeft / wizardEl.offsetWidth)) / wizardEl.offsetWidth) + 1;
+  let wizardAction = document.getElementById("wizardAction");
+  if (page == 1) {
+    wizard.appearance.name = document.getElementById("profileName").value || "Unnamed Profile " + Math.floor(Math.random() * 999) + 1;
+    wizardAction.innerHTML = "Add profile";
+  } else if (page == 2) {
+    if (document.querySelector(".selectedVersionSE")) {
+      ipcRenderer.send("addProfile", wizard);
+      console.log(wizard)
+      closeVersionSelect();
+    } else {
+      wizardAction.innerHTML = "Select a version";
+      setTimeout(function () {
+        wizardAction.innerHTML = "Add profile";
+      }, 1000);
+      return;
+    }
+  }
   wizardEl.scrollBy(wizardEl.offsetWidth + 17, 0);
   alreadyCycling = true;
-  let page = Math.round((wizardEl.scrollLeft - 17 * Math.floor(wizardEl.scrollLeft / wizardEl.offsetWidth)) / wizardEl.offsetWidth) + 1;
-  switch (page) {
-    case 1:
-      wizard.appearance.name = document.getElementById("profileName").value || "Unnamed Profile";
-  }
   console.log(wizard)
   setTimeout(() => {
     alreadyCycling = false;
@@ -453,9 +493,25 @@ function selectIcon(id) {
   icon.classList.add("selectedBlock");
 }
 
+function launch() {
+  console.log(launchOptions);
+  ipcRenderer.send("launch", launchOptions);
+  document.body.classList.add("loaded");
+}
+
+ipcRenderer.on("launched", () => {
+});
+
+ipcRenderer.on("progress", (event, arg) => {
+  console.log("PROGRESS");
+  console.log(event, arg);
+})
+
 contextBridge.exposeInMainWorld("check", check);
 contextBridge.exposeInMainWorld("toggleSubTab", toggleSubTab);
 contextBridge.exposeInMainWorld("wizardCycle", wizardCycle);
 contextBridge.exposeInMainWorld("selectIcon", selectIcon);
 contextBridge.exposeInMainWorld("toggleTab", toggleTab);
 contextBridge.exposeInMainWorld("closeVersionSelect", closeVersionSelect);
+contextBridge.exposeInMainWorld("selectVersion", selectVersion);
+contextBridge.exposeInMainWorld("launch", launch);

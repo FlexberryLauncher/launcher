@@ -6,7 +6,6 @@ const { checkUpdates } = require("./modules/updater");
 let mainWindow;
 
 
-
 const createWindow = () => {
   try {
     checkUpdates();
@@ -33,6 +32,7 @@ const createWindow = () => {
   mainWindow.loadFile(join(__dirname, "index.html"));
   if (process.platform === "darwin")
     mainWindow.setWindowButtonVisibility(false);
+  require("./modules/gameManager")(mainWindow);
 };
 
 ipcMain.on("minimize", () => mainWindow.minimize());

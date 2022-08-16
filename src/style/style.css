@@ -64,7 +64,7 @@ body::after {
   height: 490px;
   border-radius: 16px;
   transform: translateZ(30deg);
-  transition: 1s background-image;
+  transition: 1s;
 }
 
 body::before {
@@ -117,6 +117,7 @@ body::before {
   background-repeat: no-repeat;
   background-position: center;
   -webkit-app-region: drag;
+  transition: .4s;
 }
 
 @keyframes titleAltStartUp {
@@ -215,9 +216,8 @@ body::before {
 }
 
 .buttons {
-  display: grid;
-  grid-template-columns: 20% 60% 20%;
-  justify-content: center;
+  display: flex;
+  
   gap: 16px;
 }
 
@@ -232,18 +232,20 @@ body::before {
 
 .iconButton {
   padding: 12px;
-  min-width: calc(12px * 2 + 38px);
+  min-width: 78px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .playButton {
-  padding: 12px 64px;
+  padding: 12px;
+  width: 264px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
 .button:hover {
@@ -266,6 +268,10 @@ body::before {
   font-family: "Minercraftory";
   font-size: 12px;
   opacity: .7;
+  text-overflow: ellipsis;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .topBar {
@@ -335,9 +341,9 @@ body::before {
 
 .tab {
   overflow: hidden;
-  margin: 0 24.8%;
   height: 60%;
-  width: 50.4%;
+  width: 54.5%;
+  margin: 0 50%;
   background: var(--main-color);
   border-bottom: var(--main-color-darker) 6px solid;
   padding: 12px;
@@ -345,7 +351,7 @@ body::before {
   opacity: 0;
   flex-direction: column;
   align-items: center;
-  transform: translateY(150%);
+  transform: translateY(150%) translateX(-50%);
   position: absolute;
   top: 80px;
   transition: opacity .4s ease-in-out, transform .2s ease-in-out;
@@ -376,7 +382,7 @@ body::before {
 .visibleModal {
   opacity: 1;
   box-shadow: var(--main-color-darkest) 0 0 40px;
-  transform: none!important;
+  transform: translateX(-50%)!important;
 }
 
 .modal {
@@ -388,7 +394,7 @@ body::before {
 .visibleTab {
   opacity: 1;
   display: flex;
-  transform: none;
+  transform: translateX(-50%)!important;
 }
 
 .tabTitle {
@@ -772,6 +778,12 @@ label {
 
 .option:hover {
   background: var(--main-color-darker);
+  color: var(--main-color-lightest);
+}
+
+.selectedVersionSE {
+  background: var(--main-color-light)!important;
+  color: var(--main-color-darker)!important;
 }
 
 .checkboxes {
@@ -810,4 +822,24 @@ label {
 .checkbox.checked span {
   color: var(--main-color-darkest);
   opacity: .7;
+}
+
+body.loaded .tab {
+  transform: translateX(-50%) translateY(150%)!important;
+  opacity: 0!important;
+  transition: 2s, .1s opacity;
+}
+
+body.loaded .bottomBar {
+  transform: translateY(100px)!important;
+  animation: .4s fadeOut forwards, 1s levitateOut forwards!important;
+}
+
+body.loaded .bottomBar .button:not(.playButton) {
+  transform: translateY(-20px)!important;
+  animation: 4s levitateOut forwards!important;
+}
+
+body.loaded::after {
+  filter: brightness(.4);
 }

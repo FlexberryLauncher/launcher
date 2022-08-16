@@ -1,27 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 const fetch = require("axios");
-const { ipcMain } = require("electron");
+const { app, ipcMain } = require("electron");
 
 const low = require("lowdb");
 const FileSync = require("lowdb/adapters/FileSync");
-
-let pth = null;
-
-if (process.platform == "win32") {
-  pth = (path.join(process.env.APPDATA, "flexberry-launcher", "profiles.json"));
-} else if (process.platform == "darwin") {
-  pth = (path.join(process.env.HOME, "Library", "Application Support", "flexberry-launcher", "profiles.json"));
-} else if (process.platform == "linux") {
-  pth = (path.join(process.env.HOME, ".flexberry-launcher", "profiles.json"));
-}
-
-let dir = path.dirname(pth);
-
-!fs.existsSync(dir) && fs.mkdirSync(dir) && console.log("Not found " + dir + " -- Creating it!");
-!fs.existsSync(pth) && fs.openSync(pth, "w") && console.log("Not found " + pth + " -- Creating it!");
-
-const adapter = new FileSync(pth);
+const adapter = new FileSync(path.join(app.getPath("userData"), "profiles.json"));
 const db = low(adapter)
 
 db.defaults({ profiles: [] }).write();
@@ -60,13 +44,28 @@ class VersionManager {
     await this.loadVersions();
     await this.loadProfiles();
     ipcManager();
+    if (db.get("profiles").size().value() == 0) {
+      this.addProfile({
+        version: this.latest.release,
+        type: "release",
+        memory: 2048,
+        dimensions: {
+          height: 600,
+          width: 720
+        },
+        appearance: {
+          icon: "crying_obsidian",
+          name: "Latest Release",
+        },
+        isSelected: true,
+      });
+    }
   }
 
   async loadVersions() {
     let apiVersions = await this.getVersionFromAPI();
     let versionFolders = fs.readdirSync(versionsDir);
     let versions = [];
-
     versionFolders.forEach((versionFolder) => {
       let stats = fs.statSync(path.join(versionsDir, versionFolder));
       if (versionFolder.startsWith("."))
@@ -84,13 +83,15 @@ class VersionManager {
         java: versionData.javaVersion ? versionData.javaVersion.majorVersion : 16,
         releaseTime: versionData.inheritsFrom ? apiVersions.versions.filter(version => version.id ==  versionData.inheritsFrom)[0]?.releaseTime : versionData.releaseTime,
         actualReleaseTime: versionData.releaseTime,
-        type: versionData.type,
+        actualVersion: apiVersions.versions.find(v => v?.id == versionData?.inheritsFrom) || undefined,
+        type: versionData.type
       });
     });
     versions = versions.concat(apiVersions.versions.map(version => {
       return {
         id: version.id,
-        java: null, // glitchy, do not use it in anywhere else
+        java: null, // glitchy
+        url: version.url,
         releaseTime: version.releaseTime,
         type: version.type,
       }
@@ -117,7 +118,7 @@ class VersionManager {
       icon: "glass",
       name: "Latest Release",
     };
-    profile.isSelected = false;
+    profile.isSelected = profile.isSelected || false;
     profile.acronym = profile.appearance.name.replace(/\s/g, "").toLowerCase();
     let profileExists = await db.get("profiles").find({
       acronym: profile.appearance.name.replace(/\s/g, "").toLowerCase()

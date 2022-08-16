@@ -1,27 +1,11 @@
-const { ipcMain } = require('electron');
+const { app, ipcMain } = require('electron');
 const msmc = require("msmc");
 const path = require('path');
-const fs = require("fs");
 
 const low = require("lowdb");
 const FileSync = require('lowdb/adapters/FileSync');
 
-let pth = null;
-
-if (process.platform == "win32") {
-  pth = (path.join(process.env.APPDATA, "flexberry-launcher", "accounts.json"));
-} else if (process.platform == "darwin") {
-  pth = (path.join(process.env.HOME, "Library", "Application Support", "Flexberry Launcher", "accounts.json"));
-} else if (process.platform == "linux") {
-  pth = (path.join(process.env.HOME, ".flexberry-launcher", "accounts.json"));
-}
-
-let dir = path.dirname(pth);
-
-!fs.existsSync(dir) && fs.mkdirSync(dir) && console.log("Not found " + dir + " -- Creating it!");
-!fs.existsSync(pth) && fs.openSync(pth, "w") && console.log("Not found " + pth + " -- Creating it!");
-
-const adapter = new FileSync(pth);
+const adapter = new FileSync(path.join(app.getPath("userData"), "accounts.json"));
 const db = low(adapter)
 
 // TO-DO - C L E A N     T H I S     C O D E

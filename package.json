@@ -1,6 +1,6 @@
 {
   "name": "flexberry-launcher",
-  "productName": "flexberry-launcher",
+  "productName": "Flexberry Launcher",
   "version": "0.9.0",
   "description": "Lightweight and customizable launcher for Minecraft",
   "main": "src/index.js",
@@ -20,6 +20,7 @@
     "axios": "^0.27.2",
     "discord-rpc": "^4.0.1",
     "lowdb": "^1.0.0",
+    "minecraft-launcher-core": "^3.16.13",
     "msmc": "^3.1.0",
     "node-fetch": "^2.6.0",
     "unzipper": "^0.10.11"

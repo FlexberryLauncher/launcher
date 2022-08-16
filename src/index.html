@@ -80,13 +80,10 @@
               </div>
             </div>
           </div>
-          <div class="wizardContent subTab">3</div>
-          <div class="wizardContent subTab">4</div>
         </div>
         <div class="wizardActions">
-            <span class="wizardAction" onclick="wizardCycle()">Next</span>
+            <span class="wizardAction" id="wizardAction" onclick="wizardCycle()">Next</span>
         </div>
-
       </div>
     </div>
 
@@ -137,15 +134,15 @@
       </div>
       <span class="noConnectionIndicator" style="display: none; font-family: 'Minecrafter'; text-shadow: none; opacity: .8; color: rgb(253, 68, 68);">No internet connection</span>
     </div>
-    <div class="bottomBar">
+    <div class="bottomBar" id="bbr">
       <span class="username barContainer" id="username">Not logged in</span>
-      <div class="buttons">
+      <div class="buttons" id="btns">
         <div class="button iconButton" onclick="toggleTab('accounts')" id="accountsToggler">
           <img class="icon" src="assets/icons/user.png" alt="user" />
         </div>
-        <div class="button playButton">
+        <div class="button playButton" id="playBtn" onclick="launch()">
           <span class="playButtonTitle">Play</span>
-          <span class="playButtonSubtitle">Release 1.18.1</span>
+          <span class="playButtonSubtitle" id="ver"></span>
         </div>
         <div class="button iconButton" onclick="toggleTab('settings')" id="settingsToggler">
           <img class="icon" src="assets/icons/cog.png" alt="settings" />
