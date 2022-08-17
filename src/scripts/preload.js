@@ -165,9 +165,8 @@ function drawVersions() {
     return filter.includes(version.type);
   }).forEach(version => {
     const optionEl = document.createElement("div");
-    optionEl.id = version.id.split(" ").join("");
-    optionEl.classList.add("option");
-    optionEl.classList.add("version");
+    optionEl.id = version.id.split(" ").join("") + Date.now();
+    optionEl.classList.add("option", "version");
     const optionTextEl = document.createElement("span");
     optionTextEl.classList.add("optionText");
     const formattedDate = (new Date(version.actualReleaseTime || version.releaseTime)).toShortFormat(); 
@@ -343,6 +342,7 @@ function toggleSubTab(tabName) {
 function openVersionSelect() {
   document.getElementById("wizardAction").innerHTML = "Next";
   clearObject(wizard);
+  wizard.appearance.icon = "glass";
   document.getElementById("versionSelect").classList.add("visibleModal");
   document.getElementById("versionSelectWrapper").classList.add("visibleModalWrapper");
   document.getElementById("wizard").outerHTML = wiz;
@@ -374,8 +374,7 @@ function createProfileList(profiles) {
     const listEl = document.querySelector("#versionList");
     listEl.innerHTML = "";
     const loginEl = document.createElement("div");
-    loginEl.classList.add("addVersion");
-    loginEl.classList.add("version");
+    loginEl.classList.add("addVersion", "version");
     loginEl.setAttribute("id", "addVersion");
     const loginIconEl = document.createElement("span");
     loginIconEl.classList.add("addVersionIcon");
@@ -431,8 +430,7 @@ function createProfileList(profiles) {
 let alreadyCycling = false;
 let wizard = {
   appearance: {
-    name: "asd",
-    icon: "fxghfgh",
+
   }
 }
 
@@ -461,7 +459,6 @@ function wizardCycle() {
   } else if (page == 2) {
     if (document.querySelector(".selectedVersionSE")) {
       ipcRenderer.send("addProfile", wizard);
-      console.log(wizard)
       closeVersionSelect();
     } else {
       wizardAction.innerHTML = "Select a version";

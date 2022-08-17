@@ -54,11 +54,15 @@ module.exports = (win) => {
             max: arg.profile.memory + "M",
             min: arg.profile.memory + "M",
           },
-          javaPath: "C:\\Program Files\\Java\\jdk-17\\bin\\java.exe",
+          // javaPath: "C:\\Users\\kuzey\\Desktop\\jdk-11.0.12\\bin\\java.exe",
           overrides: {
             gameDirectory: arg.profile.dir || this.minecraftDir,
           }
         }
+        launcher.on("progress", (e) => {
+          console.log(e);
+          win.webContents.send("progress", e);
+        });
         launcher.launch(launcherOptions).then(() => {
           console.log("LAUNCH -> PASS");
           this.alreadyLaunched = true;
@@ -76,10 +80,6 @@ module.exports = (win) => {
     Minecraft.launch(arg).then((instance) => {
       console.log("RESOLVED");
       win.webContents.send("launched", true);
-      instance.on("progress", (e) => {
-        console.log(e);
-        win.webContents.send("progress", e);
-      });
       instance.on("debug", console.log);
       instance.on("data", console.log);
     });
