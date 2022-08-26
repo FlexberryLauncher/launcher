@@ -14,11 +14,13 @@ Discord server
 * 🔒 Easy and secure account management
   * Add multiple Microsoft accounts and easily switch.
   * Does not stores your data.
-  *  Supports offline mode. `soon`
+  * Supports offline mode. `soon`
 * 📂 Version control system
-  * New versions are launcher automatically gets downloaded
+  * Launcher updates itself automatically.
 * ⚙️ Useful settings to manage launcher
 	* Theme system which includes 3 seperate themes.
-	* Java version manager `soon`
+  * More settings will be added `soon`
+* ☕ Automatic Java installer
+  * Installs Java for versions that needs different version of Java.
 * 🎨 Built in skin library to select from `soon`
 * 🏗️ Mod manager to install new mods  `soon`

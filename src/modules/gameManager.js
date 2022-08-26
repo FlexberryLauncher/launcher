@@ -3,10 +3,15 @@ const { Client, Authenticator } = require("minecraft-launcher-core");
 const msmc = require("msmc");
 const low = require("lowdb");
 const path = require("path");
+const axios = require("axios");
+const https = require("https");
+const fs = require("fs");
 
-const FileSync = require('lowdb/adapters/FileSync');
+const FileSync = require("lowdb/adapters/FileSync");
 const adapter = new FileSync(path.join(app.getPath("userData"), "accounts.json"));
-const db = low(adapter)
+const db = low(adapter);
+
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 module.exports = (win) => {
   class GameManager {
@@ -18,30 +23,118 @@ module.exports = (win) => {
         this.minecraftDir = path.join(app.getPath("appData"), "minecraft");
       } else if (process.platform == "linux") {
         this.minecraftDir = path.join(app.getPath("home"), ".minecraft");
-      } else { 
+      } else {
         // TO-DO - add popup for error
         throw new Error("Unsupported platform");
       }
-      
+
       this.alreadyLaunched = false;
     }
-  
+
+    async downloadJava(javaVersionCode) {
+      return new Promise(async (resolve, reject) => {
+        const javaPath = path.join(this.minecraftDir, "flexberry-jre", javaVersionCode, "bin", "javaw.exe");
+        if (fs.existsSync(javaPath)) {
+          win.webContents.send("progress", "Required Java is already installed, skipping installation");
+          return resolve(javaPath);
+        } else {
+          require("./javaManager")(javaVersionCode)
+            .then(async (java) => {
+              try {
+                let res = await axios(java.manifest.url);
+                const files = Object.keys(res.data.files).map((file) => {
+                  return { name: file, downloads: res.data.files[file].downloads, type: res.data.files[file].type };
+                });
+
+                let directory = files.filter((file) => file.type == "directory");
+                let filesToDownload = files.filter((file) => file.type == "file");
+
+                let javaDirs = [this.minecraftDir, "flexberry-jre", javaVersionCode]
+                javaDirs.forEach((dir, i) => {
+                  let _dir = javaDirs.slice(0, i + 1).join(path.sep);
+                  if (!fs.existsSync(_dir)) {
+                    console.log("Creating directory: " + _dir);
+                    win.webContents.send("progress", "Creating directory: " + _dir);
+                    fs.mkdirSync(_dir);
+                  }
+                });
+
+                console.time("createDir");
+                directory.forEach((dir) => {
+                  console.log("Creating directory: " + dir.name);
+                  win.webContents.send("progress", "Creating directory: " + dir.name);
+                  fs.mkdirSync(path.join(this.minecraftDir, "flexberry-jre", javaVersionCode, dir.name));
+                });
+                console.timeEnd("createDir");
+
+                console.time("downloadFiles");
+                let downloadedFiles = 0;
+                for (let file of filesToDownload) {
+                  win.webContents.send("progress", { type: "Java", task: downloadedFiles, total: filesToDownload.length });
+                  let download = await axios.get(file.downloads["raw"].url, { responseType: "stream", timeout: 2147483647, httpsAgent: new https.Agent({ keepAlive: true }) });
+                  let stream = fs.createWriteStream(path.join(this.minecraftDir, "flexberry-jre", javaVersionCode, file.name));
+                  download.data.pipe(stream);
+                  stream.on("finish", () => {
+                    downloadedFiles++;
+                    win.webContents.send("progress", { type: "Java", task: downloadedFiles, total: filesToDownload.length });
+                    console.log(downloadedFiles + " of " + filesToDownload.length + " files downloaded (" + file.name + ")");
+                    if (downloadedFiles == filesToDownload.length) {
+                      console.timeEnd("downloadFiles");
+                      return resolve(javaPath);
+                    }
+                  });
+                }
+              } catch (err) {
+                console.log(err);
+                return reject("Could not download java")
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              return reject(err);
+            });
+        }
+      });
+    }
+
     async getCurrentAccount() {
       const selectedAccount = await db.get("accounts").find({ isSelected: true }).value();
       if (!selectedAccount)
         return null;
       return msmc.getMCLC().getAuth(selectedAccount.profile);
     }
-  
+
     async launch(arg) {
-      console.log("LAUNCHING");
       return new Promise(async (resolve, reject) => {
+        let versionMetaURL = arg.url || arg.actualVersion.url;
+        let versionMeta = {};
+        try {
+          versionMeta = (await axios.get(versionMetaURL)).data;
+        } catch (err) {
+          console.log(err);
+          reject({ code: 777, error: "Could not download version meta, skipping automatic java download" });
+        }
+        console.log(versionMeta);
+        const javaVersionCode = versionMeta?.javaVersion?.component || "jre-legacy";
+        /*
+          currently only 1.6.x versions does not have javaVersion.component property, jre-legacy is used instead
+          if Mojang decides to change the API, it'll attemp to use jre-legacy for all versions
+          and jre-legacy won't launch versions over 1.16
+        */
+        let javaPath;
+        try {
+          javaPath = await this.downloadJava(javaVersionCode)
+        } catch (err) {
+          win.webContents.send("progress", "Could not download java, skipping automatic java download");
+          reject({ code: 778, error: "Could not download java, " + err });
+        }
+        console.log(javaPath);
         const launcher = new Client();
         let version = {
           number: arg.actualVersion?.id || arg.id,
           type: arg.type
         }
-        if (arg.actualVersion) 
+        if (arg.actualVersion)
           version.custom = arg.id;
 
         console.log(version);
@@ -49,39 +142,50 @@ module.exports = (win) => {
           clientPackage: null,
           root: this.minecraftDir,
           version,
-          authorization: await this.getCurrentAccount() || Authenticator.getAuth("flexberry"+Math.floor(Math.random() * 999) + 1),
+          authorization: await this.getCurrentAccount() || Authenticator.getAuth("flexberry" + Math.floor(Math.random() * 999) + 1),
           memory: {
             max: arg.profile.memory + "M",
             min: arg.profile.memory + "M",
           },
-          // javaPath: "C:\\Users\\kuzey\\Desktop\\jdk-11.0.12\\bin\\java.exe",
           overrides: {
             gameDirectory: arg.profile.dir || this.minecraftDir,
           }
         }
+        javaPath && (launcherOptions.javaPath = javaPath);
+        
         launcher.on("progress", (e) => {
-          console.log(e);
           win.webContents.send("progress", e);
         });
+        await wait(1000);
         launcher.launch(launcherOptions).then(() => {
           console.log("LAUNCH -> PASS");
           this.alreadyLaunched = true;
           resolve(launcher);
         }).catch(err => {
-          reject(err);
+          reject({
+            code: 580,
+            error: err
+          });
         });
       });
     }
   }
-  
+
   const Minecraft = new GameManager();
-  
+
   ipcMain.on("launch", async (event, arg) => {
+    console.log(arg);
+    win.webContents.send("launched", true);
     Minecraft.launch(arg).then((instance) => {
-      console.log("RESOLVED");
-      win.webContents.send("launched", true);
-      instance.on("debug", console.log);
-      instance.on("data", console.log);
+      win.webContents.send("progress", "Launching");
+      instance.on("debug", (d) => {
+        console.log(d + "debug ^^");
+      });
+      instance.on("data", (d) => {
+        console.log(d + "data ^^");
+      });
+    }).catch(err => {
+      console.log(err);
     });
-  });  
+  });
 }

@@ -493,16 +493,18 @@ function selectIcon(id) {
 function launch() {
   console.log(launchOptions);
   ipcRenderer.send("launch", launchOptions);
-  document.body.classList.add("loaded");
 }
 
 ipcRenderer.on("launched", () => {
+  document.body.classList.add("loaded");
+  document.getElementsByClassName("progress")[0].style.opacity = "1";
 });
 
 ipcRenderer.on("progress", (event, arg) => {
   console.log("PROGRESS");
   console.log(event, arg);
-})
+  document.getElementById("progress").innerText = (arg instanceof Object) ? `Downloading ${arg.type} ${Math.round((arg.task / arg.total) * 100)}%` : arg;
+});
 
 contextBridge.exposeInMainWorld("check", check);
 contextBridge.exposeInMainWorld("toggleSubTab", toggleSubTab);
