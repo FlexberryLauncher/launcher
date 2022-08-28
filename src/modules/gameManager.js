@@ -175,14 +175,22 @@ module.exports = (win) => {
 
   ipcMain.on("launch", async (event, arg) => {
     console.log(arg);
-    win.webContents.send("launched", true);
+    win.webContents.send("launching", true);
     Minecraft.launch(arg).then((instance) => {
       win.webContents.send("progress", "Launching");
-      instance.on("debug", (d) => {
-        console.log(d + "debug ^^");
-      });
       instance.on("data", (d) => {
-        console.log(d + "data ^^");
+        console.log("[Minecraft] ", d);
+        if (win.isVisible()) {
+          win.webContents.send("launched", true);
+          win.hide();
+        }
+      });
+      instance.on("close", (d) => {
+        console.log("Minecraft is closed: ", d);
+        if (!win.isVisible()) {
+          win.webContents.send("launched", false);
+          win.show();
+        }
       });
     }).catch(err => {
       console.log(err);

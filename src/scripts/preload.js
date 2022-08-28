@@ -495,7 +495,15 @@ function launch() {
   ipcRenderer.send("launch", launchOptions);
 }
 
-ipcRenderer.on("launched", () => {
+ipcRenderer.on("launched", (event, arg) => {
+  if (!arg) {
+    document.body.classList.remove("loaded");
+  } else {
+    document.getElementById("progress").innerText = "";
+  }
+});
+
+ipcRenderer.on("launching", (event, arg) => {
   document.body.classList.add("loaded");
   document.getElementsByClassName("progress")[0].style.opacity = "1";
 });
