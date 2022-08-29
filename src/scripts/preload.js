@@ -1,6 +1,6 @@
 // TO-DO - organize this file
 
-const { ipcRenderer, contextBridge } = require("electron");
+const { ipcRenderer, contextBridge, ipcMain } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const DiscordRPC = require("discord-rpc");
@@ -503,15 +503,36 @@ ipcRenderer.on("launched", (event, arg) => {
   }
 });
 
-ipcRenderer.on("launching", (event, arg) => {
-  document.body.classList.add("loaded");
-  document.getElementsByClassName("progress")[0].style.opacity = "1";
+ipcRenderer.on("hideUi", (event, arg) => {
+  if (!arg) {
+    document.body.classList.remove("loaded");
+    document.getElementsByClassName("progress")[0].style.opacity = "1";
+  } else {
+    document.body.classList.add("loaded");
+    document.getElementsByClassName("progress")[0].style.opacity = "1";
+  }
 });
 
 ipcRenderer.on("progress", (event, arg) => {
   console.log("PROGRESS");
   console.log(event, arg);
   document.getElementById("progress").innerText = (arg instanceof Object) ? `Downloading ${arg.type} ${Math.round((arg.task / arg.total) * 100)}%` : arg;
+});
+
+ipcRenderer.on("updateAvailable", (event, arg) => {
+  document.getElementsByClassName("progress")[0].innerText = `Downloading new version ${arg.version} with size of ${(arg.size / 1024).toFixed(1)} KB`;
+  setTimeout(() => {
+    ipcRenderer.send("update", arg.url);
+  } , 3000);  
+});
+
+ipcRenderer.on("updateError", (event, arg) => {
+  console.log(arg);
+  document.getElementsByClassName("progress")[0].innerText = `\nError downloading the update. Please restart the launcher.`;
+});
+
+ipcRenderer.on("updateProgress", (event, arg) => {
+  document.getElementsByClassName("progress")[0].innerText = arg;
 });
 
 contextBridge.exposeInMainWorld("check", check);

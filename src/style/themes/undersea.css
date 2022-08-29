@@ -16,7 +16,7 @@
 }
 
 body::after {
-  background: url("../../assets/backgrounds/undersea.png");
+  background: url("../../assets/backgrounds/undersea.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

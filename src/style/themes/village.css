@@ -16,7 +16,7 @@
 }
 
 body::after {
-  background: url("../../assets/backgrounds/village.png");
+  background: url("../../assets/backgrounds/village.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

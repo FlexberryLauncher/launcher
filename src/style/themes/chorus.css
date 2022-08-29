@@ -16,7 +16,7 @@
 }
 
 body::after {
-  background: url("../../assets/backgrounds/chorus.png");
+  background: url("../../assets/backgrounds/chorus.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

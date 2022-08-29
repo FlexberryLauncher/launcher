@@ -1,18 +1,67 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const { join } = require('path');
+const { join, resolve } = require('path');
+const axios = require("axios");
+const unzipper = require("unzipper");
+const { createWriteStream, createReadStream, existsSync, unlinkSync } = require("fs");
+const parentDir = resolve(__dirname, "..");
+const updateZip = join(parentDir, "updateModules.zip")
+
 require("./modules/accountManager");
 require("./modules/versionManager");
-const { checkUpdates } = require("./modules/updater");
+
 let mainWindow;
 
+function checkForUpdates() {
+  return new Promise ((resolve, reject) => {
+    if (app.isPackaged)
+      return resolve(false);
+    axios.get("https://api.github.com/repos/FlexberryLauncher/launcher/releases/latest").then(async (res) => {
+      if (process.env.npm_package_version !== res.data.tag_name.replace("v", "") && !existsSync(__dirname + "/updateModules.zip")) {
+        const updateModules = res.data.assets?.find(asset => asset.name === "updateModules.zip");
+        const updateMeta = updateModules ? {
+          version: res.data.tag_name,
+          url: updateModules?.browser_download_url,
+          size: updateModules?.size,
+        } : false;
+        resolve(updateMeta);
+      } else {
+        resolve(false);
+      }
+    }).catch(err => {
+      console.log("Couldn't check updates due connection problems");
+      resolve(false);
+    });
+  });
+}
 
-const createWindow = () => {
-  try {
-    checkUpdates();
-  } catch (error) {
-    // TO-DO - An error occured during version control.
-  }
+function update(zipUrl) {
+  return new Promise ((resolve, reject) => {
+    mainWindow.webContents.send("hideUi", true);
+    axios({
+      url: zipUrl,
+      method: "get",
+      responseType: "stream"
+    }).then((response) => {
+      const stream = createWriteStream(updateZip)
+      response.data.pipe(stream);
+      mainWindow.webContents.send("updateProgress", "Downloading update...");
+      stream.on("finish", () => {
+        mainWindow.webContents.send("updateProgress", "Extracting update...");
+        createReadStream(updateZip).pipe(unzipper.Extract({ path: parentDir }).on("close", () => {
+          resolve("Update completed");
+          unlinkSync(updateZip);
+        }));
+      });
+    }).catch(() => {
+      reject("Couldn't download the update");
+      mainWindow.webContents.send("hideUi", false);
+      mainWindow.webContents.send("updateError", "Couldn't download the update");
+    });
+  });
+}
 
+async function createWindow() {
+  console.log(`Running on ${app.isPackaged ? "production" : "development"} mode`);
   mainWindow = new BrowserWindow({
     width: 830,
     height: 520,
@@ -35,8 +84,27 @@ const createWindow = () => {
   require("./modules/gameManager")(mainWindow);
 };
 
+ipcMain.on("update", (event, arg) => {
+  update(arg).then(() => {
+    mainWindow.webContents.send("updateProgress", "Update is completed, restarting the launcher");
+    setTimeout(() => {
+      app.relaunch();
+      app.quit();
+    }, 3000);
+  }).catch(err => {
+    mainWindow.webContents.send("updateError", err);
+  });
+});
+
 ipcMain.on("minimize", () => mainWindow.minimize());
-ipcMain.on("loaded", () => mainWindow.setSkipTaskbar(false));
+ipcMain.on("loaded", async () => {
+  mainWindow.setSkipTaskbar(false);
+  const updateMeta = await checkForUpdates();
+  if (updateMeta.url) {
+    mainWindow.webContents.send("updateAvailable", updateMeta);
+    mainWindow.webContents.send("hideUi", true);
+  }
+});
 
 app.on("ready", createWindow);
 

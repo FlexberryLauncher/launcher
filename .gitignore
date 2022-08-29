@@ -9,3 +9,6 @@ build/
 
 # shittyOS
 .DS_Store
+
+# dotenv
+.env

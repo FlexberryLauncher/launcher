@@ -181,14 +181,14 @@ module.exports = (win) => {
       instance.on("data", (d) => {
         console.log("[Minecraft] ", d);
         if (win.isVisible()) {
-          win.webContents.send("launched", true);
+          win.webContents.send("hideUi", true);
           win.hide();
         }
       });
       instance.on("close", (d) => {
         console.log("Minecraft is closed: ", d);
         if (!win.isVisible()) {
-          win.webContents.send("launched", false);
+          win.webContents.send("hideUi", false);
           win.show();
         }
       });
