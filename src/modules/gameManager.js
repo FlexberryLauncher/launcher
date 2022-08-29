@@ -175,7 +175,7 @@ module.exports = (win) => {
 
   ipcMain.on("launch", async (event, arg) => {
     console.log(arg);
-    win.webContents.send("launching", true);
+    win.webContents.send("hideUi", true);
     Minecraft.launch(arg).then((instance) => {
       win.webContents.send("progress", "Launching");
       instance.on("data", (d) => {

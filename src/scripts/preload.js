@@ -1,6 +1,6 @@
 // TO-DO - organize this file
 
-const { ipcRenderer, contextBridge, ipcMain } = require("electron");
+const { ipcRenderer, contextBridge } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const DiscordRPC = require("discord-rpc");
@@ -45,7 +45,7 @@ function addEvent(type, element, event, loading, ...params) {
         toggleLoading("accounts");
       event(...params);
     });
-  } catch {
+  } catch (err) {
     return;
   }
 }
@@ -495,21 +495,14 @@ function launch() {
   ipcRenderer.send("launch", launchOptions);
 }
 
-ipcRenderer.on("launched", (event, arg) => {
-  if (!arg) {
-    document.body.classList.remove("loaded");
-  } else {
-    document.getElementById("progress").innerText = "";
-  }
-});
-
 ipcRenderer.on("hideUi", (event, arg) => {
   if (!arg) {
     document.body.classList.remove("loaded");
-    document.getElementsByClassName("progress")[0].style.opacity = "1";
+    document.getElementsByClassName("progress")[0].style.opacity = "0";
   } else {
     document.body.classList.add("loaded");
     document.getElementsByClassName("progress")[0].style.opacity = "1";
+    document.getElementById("progress").innerText = "";
   }
 });
 
