@@ -18,7 +18,6 @@
   src: url("../assets/typefaces/Minecraft-Turkish.ttf");
 }
 
-
 * {
   margin: 0;
   padding: 0;
@@ -54,7 +53,7 @@ body {
 body::after {
   opacity: 0;
   animation: 2s fadeIn forwards;
-  animation-delay: .3s;
+  animation-delay: 0.3s;
   z-index: -2000;
   content: "";
   position: absolute;
@@ -70,7 +69,7 @@ body::after {
 body::before {
   opacity: 0;
   animation: 1s fadeIn forwards;
-  animation-delay: .7s;
+  animation-delay: 0.7s;
   z-index: -1000;
   content: "";
   position: absolute;
@@ -79,11 +78,7 @@ body::before {
   width: 100%;
   height: 30%;
   mask: none;
-  -webkit-mask: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 1)
-  ); 
+  -webkit-mask: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
   background: rgba(0, 0, 0, 1);
   backdrop-filter: blur(32px);
   border-radius: 14px;
@@ -103,7 +98,7 @@ body::before {
 .titleHolder {
   opacity: 0;
   transform: translateY(190%);
-  animation: .5s titleStartUp forwards ease-out;
+  animation: 0.5s titleStartUp forwards ease-out;
   z-index: 100000;
   position: absolute;
   display: flex;
@@ -117,7 +112,7 @@ body::before {
   background-repeat: no-repeat;
   background-position: center;
   -webkit-app-region: drag;
-  transition: .4s;
+  transition: 0.4s;
 }
 
 @keyframes titleAltStartUp {
@@ -131,7 +126,7 @@ body::before {
 
 .titleAlt {
   opacity: 0;
-  animation: .2s fadeIn forwards, .8s titleAltStartUp forwards;
+  animation: 0.2s fadeIn forwards, 0.8s titleAltStartUp forwards;
   transform: translateY(76px);
   width: 280px;
 }
@@ -186,7 +181,7 @@ body::before {
 .bottomBar {
   opacity: 0;
   transform: translateY(-20px);
-  animation: .2s fadeIn forwards, .2s levitateIn forwards;
+  animation: 0.2s fadeIn forwards, 0.2s levitateIn forwards;
   animation-delay: 1s;
   display: flex;
   justify-content: space-between;
@@ -198,7 +193,7 @@ body::before {
 .bottomBar .button:not(.playButton) {
   transform: translateY(20px);
   animation: 1s levitateIn forwards;
-  animation-delay: .8s;
+  animation-delay: 0.8s;
 }
 
 .barContainer {
@@ -217,12 +212,12 @@ body::before {
 
 .buttons {
   display: flex;
-  
+
   gap: 16px;
 }
 
 .button {
-  transition: .2s background;
+  transition: 0.2s background;
   cursor: pointer;
   height: calc(12px * 3 + 38px);
   background: var(--main-color);
@@ -252,10 +247,11 @@ body::before {
   background: var(--main-color-slightly-dark);
 }
 
-.button:active, .toggledButton {
+.button:active,
+.toggledButton {
   border-bottom: none;
   height: calc(12px * 3 + 38px - 6px);
-  transform: translateY(6px)!important;
+  transform: translateY(6px) !important;
 }
 
 .playButtonTitle {
@@ -267,7 +263,7 @@ body::before {
 .playButtonSubtitle {
   font-family: "Minercraftory";
   font-size: 12px;
-  opacity: .7;
+  opacity: 0.7;
   text-overflow: ellipsis;
   width: 100%;
   overflow: hidden;
@@ -289,7 +285,7 @@ body::before {
   margin-top: -8px;
   padding: 10px;
   cursor: pointer;
-  transition: .1s;
+  transition: 0.1s;
 }
 
 .scene {
@@ -325,18 +321,34 @@ body::before {
   background-position: center;
 }
 
-.cube__face--front  { transform: rotateY(  0deg) translateZ(12px); }
-.cube__face--right  { transform: rotateY( 90deg) translateZ(12px); }
-.cube__face--back   { transform: rotateY(180deg) translateZ(12px); }
-.cube__face--left   { transform: rotateY(-90deg) translateZ(12px); }
-.cube__face--bottom { transform: rotateX(-90deg) translateZ(12px); }
-.cube__face--top    { transform: rotateX( 90deg) translateZ(12px); }
+.cube__face--front {
+  transform: rotateY(0deg) translateZ(12px);
+}
+.cube__face--right {
+  transform: rotateY(90deg) translateZ(12px);
+}
+.cube__face--back {
+  transform: rotateY(180deg) translateZ(12px);
+}
+.cube__face--left {
+  transform: rotateY(-90deg) translateZ(12px);
+}
+.cube__face--bottom {
+  transform: rotateX(-90deg) translateZ(12px);
+}
+.cube__face--top {
+  transform: rotateX(90deg) translateZ(12px);
+}
 
-.cube { transform: translateZ(-12px); }
-.cube { transition: transform .2s; }
+.cube {
+  transform: translateZ(-12px);
+}
+.cube {
+  transition: transform 0.2s;
+}
 
 .close:hover .cube {
-  transform: translateZ(-12px) rotateX( -90deg);
+  transform: translateZ(-12px) rotateX(-90deg);
 }
 
 .tab {
@@ -354,7 +366,7 @@ body::before {
   transform: translateY(150%) translateX(-50%);
   position: absolute;
   top: 80px;
-  transition: opacity .4s ease-in-out, transform .2s ease-in-out;
+  transition: opacity 0.4s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .modalWrapper {
@@ -367,7 +379,7 @@ body::before {
   z-index: -500;
   border-radius: 16px;
   opacity: 0;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 .visibleModalWrapper {
@@ -382,19 +394,19 @@ body::before {
 .visibleModal {
   opacity: 1;
   box-shadow: var(--main-color-darkest) 0 0 40px;
-  transform: translateX(-50%)!important;
+  transform: translateX(-50%) !important;
 }
 
 .modal {
   z-index: 1000;
   height: 76%;
-  transition: .4s;
+  transition: 0.4s;
 }
 
 .visibleTab {
   opacity: 1;
   display: flex;
-  transform: translateX(-50%)!important;
+  transform: translateX(-50%) !important;
 }
 
 .tabTitle {
@@ -411,10 +423,11 @@ body::before {
   width: 100%;
 }
 
-.tabClose, .tabExternal {
+.tabClose,
+.tabExternal {
   width: 32px;
   height: 32px;
-  transition: .2s;
+  transition: 0.2s;
   padding: 8px;
 }
 
@@ -434,14 +447,15 @@ body::before {
   width: 100%;
 }
 
-.accountList, .versionList {
+.accountList,
+.versionList {
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
   overflow-y: scroll;
   height: 100%;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 .tabLoading::after {
@@ -451,7 +465,7 @@ body::before {
   height: 100%;
   position: absolute;
   top: 0;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 .tabLoading::before {
@@ -464,14 +478,15 @@ body::before {
   top: calc(50% - 24px);
   bottom: calc(50% - 24px);
   position: absolute;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 .tabLoading {
-  transition: .2s;
+  transition: 0.2s;
 }
 
-.account, .version {
+.account,
+.version {
   padding: 8px;
   display: flex;
   flex-direction: row;
@@ -480,11 +495,12 @@ body::before {
   gap: 16px;
   background: var(--main-color-dark);
   width: calc(100% - 8px);
-  transition: .2s;
+  transition: 0.2s;
   cursor: pointer;
 }
 
-.addAccount, .addVersion {
+.addAccount,
+.addVersion {
   padding: 8px 32px;
   min-height: 52px;
   display: flex;
@@ -494,21 +510,25 @@ body::before {
   font-size: 14px;
 }
 
-.account:hover, .version:hover {
+.account:hover,
+.version:hover {
   background: var(--main-color-darker);
 }
 
-.addAccountTitle, .addVersionTitle {
+.addAccountTitle,
+.addVersionTitle {
   text-shadow: none;
 }
 
-.accountMain, .versionMain {
+.accountMain,
+.versionMain {
   display: flex;
   flex-direction: row;
   gap: 16px;
 }
 
-.addAccountIcon, .addVersionIcon {
+.addAccountIcon,
+.addVersionIcon {
   font-family: "Minecraft";
   color: white;
   width: 24px;
@@ -517,31 +537,36 @@ body::before {
   filter: drop-shadow(var(--shadow) 0 4px 0);
 }
 
-.accountImage, .versionImage {
+.accountImage,
+.versionImage {
   height: 44px;
 }
 
-.accountInfo, .versionInfo {
+.accountInfo,
+.versionInfo {
   display: flex;
   flex-direction: column;
   gap: 4px;
   justify-content: center;
 }
 
-.accountUsername, .versionName {
+.accountUsername,
+.versionName {
   font-family: "Minecraft";
   font-size: 16px;
   text-shadow: none;
 }
 
-.accountMail, .versionVersion {
+.accountMail,
+.versionVersion {
   font-family: "Minecraft";
   font-size: 14px;
   line-height: 8px;
   text-shadow: none;
 }
 
-.selectedAccount, .selectedVersion {
+.selectedAccount,
+.selectedVersion {
   cursor: default;
   background: var(--main-color-darker);
 }
@@ -552,7 +577,7 @@ body::before {
   background: var(--main-color);
   z-index: 1000;
   cursor: pointer;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 .deleteAccount:hover {
@@ -560,7 +585,7 @@ body::before {
 }
 
 .deleteAccount::after {
-  content: '';
+  content: "";
   z-index: -100;
   display: flex;
   justify-content: center;
@@ -592,9 +617,9 @@ body::before {
   width: 100%;
   height: 100%;
   padding: 10px 4px;
-  background: var(--main-color-dark);;
+  background: var(--main-color-dark);
   cursor: pointer;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 .subTabToggler:hover {
@@ -613,7 +638,7 @@ body::before {
 
 .subTab {
   position: absolute;
-  transition: ease-in-out .3s;
+  transition: ease-in-out 0.3s;
   width: 100%;
   height: 100%;
   transform: translateX(110%);
@@ -628,7 +653,7 @@ body::before {
 }
 
 .visibleSubTab {
-  transform: none!important;
+  transform: none !important;
 }
 
 .wizard {
@@ -645,7 +670,7 @@ body::before {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--main-color-dark); 
+  background: var(--main-color-dark);
   padding: 16px;
   width: 100%;
   height: 100%;
@@ -671,7 +696,7 @@ body::before {
   font-family: "Minecrafter";
   font-size: 16px;
   cursor: pointer;
-  transition: .2s;
+  transition: 0.2s;
   background: var(--main-color-dark);
   width: 100%;
 }
@@ -700,12 +725,12 @@ label {
   text-shadow: none;
   background: var(--main-color);
   border: none;
-  transition: .2s;
+  transition: 0.2s;
 }
 
 .input input::placeholder {
   color: var(--main-color-lightest);
-  opacity: .6;
+  opacity: 0.6;
 }
 
 .blocks {
@@ -719,7 +744,7 @@ label {
 .block {
   width: calc((100% - 12px * 5) / 6);
   position: relative;
-  transition: .2s ease-in;
+  transition: 0.2s ease-in;
   cursor: pointer;
 }
 
@@ -733,7 +758,7 @@ label {
 }
 
 .selector {
-  display: flex; 
+  display: flex;
   flex-direction: column;
   gap: 8px;
   height: 218px;
@@ -759,7 +784,7 @@ label {
   font-size: 14px;
   background: var(--main-color-slightly-dark);
   cursor: pointer;
-  transition: .2s;
+  transition: 0.2s;
   font-family: "Minecraft Turkish";
 }
 
@@ -773,7 +798,7 @@ label {
   font-family: "Minecraft Turkish";
   font-size: 12px;
   text-shadow: none;
-  opacity: .8;
+  opacity: 0.8;
 }
 
 .option:hover {
@@ -782,8 +807,8 @@ label {
 }
 
 .selectedVersionSE {
-  background: var(--main-color-light)!important;
-  color: var(--main-color-darker)!important;
+  background: var(--main-color-light) !important;
+  color: var(--main-color-darker) !important;
 }
 
 .checkboxes {
@@ -821,27 +846,27 @@ label {
 
 .checkbox.checked span {
   color: var(--main-color-darkest);
-  opacity: .7;
+  opacity: 0.7;
 }
 
 body.loaded .tab {
-  transform: translateX(-50%) translateY(150%)!important;
-  opacity: 0!important;
-  transition: 2s, .1s opacity;
+  transform: translateX(-50%) translateY(150%) !important;
+  opacity: 0 !important;
+  transition: 2s, 0.1s opacity;
 }
 
 body.loaded .bottomBar {
-  transform: translateY(100px)!important;
-  animation: .4s fadeOut forwards, 1s levitateOut forwards!important;
+  transform: translateY(100px) !important;
+  animation: 0.4s fadeOut forwards, 1s levitateOut forwards !important;
 }
 
 body.loaded .bottomBar .button:not(.playButton) {
-  transform: translateY(-20px)!important;
-  animation: 4s levitateOut forwards!important;
+  transform: translateY(-20px) !important;
+  animation: 4s levitateOut forwards !important;
 }
 
 body.loaded::after {
-  filter: brightness(.4);
+  filter: brightness(0.4);
 }
 
 .progress {
@@ -849,10 +874,37 @@ body.loaded::after {
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
+  text-align: center;
   width: 100%;
   height: 100%;
   transition: 2s;
   padding-bottom: 4%;
   opacity: 0;
+  line-height: 24px;
   font-family: "Minecraft Turkish";
+}
+
+.updateModalWrapper {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 20%;
+  transition: 2s;
+  opacity: 1;
+  bottom: 0;
+  background: #00000050;
+}
+
+.updateModal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  transition: 2s;
+  opacity: 1;
 }

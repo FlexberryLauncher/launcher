@@ -1,0 +1,306 @@
+import { KeyableObject } from "../interface";
+const path = require("path");
+const { app } = require("electron");
+const fs = require("fs");
+
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
+const adapter = new FileSync(path.join(app.getPath("userData"), "profiles.json"));
+const db = low(adapter);
+
+db.defaults({ profiles: [] }).write();
+
+let appData,
+   minecraftDir: string,
+   versionsDir = "";
+
+if (process.platform == "win32") {
+   appData = process.env.APPDATA;
+   minecraftDir = path.join(appData, ".minecraft");
+   versionsDir = path.join(minecraftDir, "versions");
+} else if (process.platform == "darwin") {
+   appData = process.env.HOME;
+   minecraftDir = path.join(appData, "Library", "Application Support", "minecraft");
+   versionsDir = path.join(minecraftDir, "versions");
+} else if (process.platform == "linux") {
+   appData = process.env.HOME;
+   minecraftDir = path.join(appData, ".minecraft");
+   versionsDir = path.join(minecraftDir, "versions");
+} else {
+   // TO-DO - add popup for error
+   throw new Error("Unsupported platform");
+}
+
+class VersionManager {
+   versions: Array<any>;
+   latest: KeyableObject;
+   selectedVersion: any;
+   selectedProfile: any;
+   doesExis: any = false;
+
+   constructor() {
+      this.versions = [];
+      this.latest = {};
+      this.selectedVersion = null;
+      this.selectedProfile = null;
+   }
+
+   async init() {
+      if (fs.existsSync(versionsDir) || fs.existsSync(minecraftDir)) this.doesExist = false;
+      await this.loadVersions();
+      await this.loadProfiles();
+      ipcManager();
+      if (db.get("profiles").size().value() == 0) {
+         this.addProfile({
+            version: this.latest.release,
+            type: "release",
+            memory: 2048,
+            dimensions: {
+               height: 600,
+               width: 720,
+            },
+            appearance: {
+               icon: "crying_obsidian",
+               name: "Latest Release",
+            },
+            isSelected: true,
+         });
+      }
+   }
+
+   async loadVersions() {
+      let apiVersions = await this.getVersionFromAPI();
+      let versionFolders = fs.readdirSync(versionsDir);
+      let versions: any[] = [];
+      versionFolders.forEach((versionFolder: string) => {
+         let stats = fs.statSync(path.join(versionsDir, versionFolder));
+         if (versionFolder.startsWith(".")) return;
+         if (!stats.isDirectory()) return;
+         let versionDir = fs.readdirSync(path.join(versionsDir, versionFolder));
+         if (
+            !(
+               versionDir.includes(versionFolder + ".json") &&
+               versionDir.includes(versionFolder + ".jar")
+            )
+         )
+            return;
+         let versionData = JSON.parse(
+            fs.readFileSync(path.join(versionsDir, versionFolder, versionFolder + ".json")),
+         );
+         if (apiVersions.versions.map((v: { id: any }) => v.id).includes(versionFolder)) return;
+         versions.push({
+            id: versionData.id,
+            java: versionData.javaVersion ? versionData.javaVersion.majorVersion : 16,
+            releaseTime: versionData.inheritsFrom
+               ? apiVersions.versions.filter(
+                    (version: { id: any }) => version.id == versionData.inheritsFrom,
+                 )[0]?.releaseTime
+               : versionData.releaseTime,
+            actualReleaseTime: versionData.releaseTime,
+            actualVersion:
+               apiVersions.versions.find((v: { id: any }) => v?.id == versionData?.inheritsFrom) ||
+               undefined,
+            type: versionData.type,
+         });
+      });
+      versions = versions.concat(
+         apiVersions.versions.map((version: { id: any; url: any; releaseTime: any; type: any }) => {
+            return {
+               id: version.id,
+               java: null, // glitchy
+               url: version.url,
+               releaseTime: version.releaseTime,
+               type: version.type,
+            };
+         }),
+      );
+      versions = versions.filter((file) => file);
+      this.latest = apiVersions.latest;
+      this.versions = versions;
+   }
+
+   async loadProfiles() {
+      let profiles = await db.get("profiles").value();
+      this.profiles = profiles;
+   }
+
+   async addProfile(profile: KeyableObject) {
+      profile.version = profile.version || this.latest.release;
+      profile.type = profile.type || "release";
+      profile.memory = profile.memory || 2048;
+      profile.dimensions = profile.dimensions || {
+         height: 600,
+         width: 720,
+      };
+      profile.appearance = profile.appearance || {
+         icon: "glass",
+         name: "Latest Release",
+      };
+      profile.isSelected = profile.isSelected || false;
+      profile.acronym = profile.appearance.name.replace(/\s/g, "").toLowerCase();
+      let profileExists = await db
+         .get("profiles")
+         .find({
+            acronym: profile.appearance.name.replace(/\s/g, "").toLowerCase(),
+         })
+         .value();
+      if (profileExists) return { status: "error", message: "Profile already exists" };
+      let newProfiles = await db.get("profiles").push(profile).write();
+      this.profiles = newProfiles;
+      return this.profiles;
+   }
+
+   async selectProfile(profileName: any) {
+      let ifExists = await db
+         .get("profiles")
+         .find({
+            appearance: {
+               name: profileName,
+            },
+         })
+         .value();
+      if (!ifExists) return { status: "error", message: "Profile not found" };
+      console.log("[IPC] setSelected");
+      await db.get("profiles").find({ isSelected: true }).assign({ isSelected: false }).write();
+      await db
+         .get("profiles")
+         .find({
+            appearance: {
+               name: profileName,
+            },
+         })
+         .assign({ isSelected: true })
+         .write();
+      let prfs = await db.get("profiles").value();
+      this.profiles = prfs;
+      this.selectedProfile = profileName;
+      return this.profiles;
+   }
+
+   async deleteProfile(profileName: any) {
+      let profiles = db.get("profiles");
+      let profile = await profiles
+         .find({
+            appearance: {
+               name: profileName,
+            },
+         })
+         .value();
+      if (!profile) return { status: "error", message: "Profile does not exist" };
+      await profiles
+         .remove({
+            appearance: {
+               name: profileName,
+            },
+         })
+         .write();
+      this.profiles = await profiles.value();
+      return this.profiles;
+   }
+
+   getProfiles() {
+      return this.profiles;
+   }
+
+   getVersions() {
+      return this.versions.sort((a, b) => {
+         if (a.releaseTime > b.releaseTime) return -1;
+         if (a.releaseTime < b.releaseTime) return 1;
+         return 0;
+      });
+   }
+
+   getSelectedVersion() {
+      return this.selectedVersion;
+   }
+
+   getSelectedProfile() {
+      return this.selectedProfile;
+   }
+
+   getVersionFromAPI() {
+      return fetch(`https://launchermeta.mojang.com/mc/game/version_manifest.json`)
+         .then(function (res) {
+            return res.data;
+         })
+         .catch((err) => {
+            console.error("Mojang servers are down or you have no connection");
+            return {
+               latest: [],
+               versions: [],
+            };
+         });
+   }
+
+   getLatestVersion() {
+      return this.latest;
+   }
+}
+
+const versionManager = new VersionManager();
+versionManager.init();
+
+async function ipcManager() {
+   // profile = selected version, not account!
+   console.log("[IPC] ipcManager");
+   ipcMain.on("getProfiles", (event: { reply: (arg0: string, arg1: any) => void }, arg: any) => {
+      event.reply("profiles", versionManager.getProfiles());
+   });
+
+   ipcMain.on("getVersions", (event: { reply: (arg0: string, arg1: any[]) => void }, arg: any) => {
+      event.reply("versions", versionManager.getVersions());
+   });
+
+   ipcMain.on(
+      "getSelectedVersion",
+      (event: { reply: (arg0: string, arg1: any) => void }, arg: any) => {
+         event.reply("selectedVersion", versionManager.getSelectedVersion());
+      },
+   );
+
+   ipcMain.on(
+      "getSelectedProfile",
+      (event: { reply: (arg0: string, arg1: any) => void }, arg: any) => {
+         event.reply("selectedProfile", versionManager.getSelectedProfile());
+      },
+   );
+
+   ipcMain.on(
+      "getLatestVersion",
+      (event: { reply: (arg0: string, arg1: KeyableObject) => void }, arg: any) => {
+         event.reply("latestVersion", versionManager.getLatestVersion());
+      },
+   );
+
+   ipcMain.on(
+      "addProfile",
+      async (event: { reply: (arg0: string, arg1: any) => void }, arg: {}) => {
+         event.reply("profiles", await versionManager.addProfile(arg));
+      },
+   );
+
+   ipcMain.on(
+      "selectProfile",
+      async (event: { reply: (arg0: string, arg1: any) => void }, arg: any) => {
+         event.reply("profiles", await versionManager.selectProfile(arg));
+      },
+   );
+
+   ipcMain.on(
+      "deleteProfile",
+      async (event: { reply: (arg0: string, arg1: any) => void }, arg: any) => {
+         event.reply("profiles", await versionManager.deleteProfile(arg));
+      },
+   );
+
+   /*
+  let random = versionManager.getVersions()[Math.floor(Math.random() * versionManager.getVersions().length)]
+  versionManager.addProfile({
+    version: random.id,
+    type: random.type,
+    appearance: {
+      name: Math.random().toString(36).substring(2, 8)
+    }
+  });
+  */
+}

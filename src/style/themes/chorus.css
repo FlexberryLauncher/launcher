@@ -1,22 +1,22 @@
 :root {
-  --main-color-lightest:       #bb7bf3;
-  --main-color-lighter:        #8e30e0;
-  --main-color-light:          #7623be;
+  --main-color-lightest: #bb7bf3;
+  --main-color-lighter: #8e30e0;
+  --main-color-light: #7623be;
   --main-color-slightly-light: #681bac;
-  --main-color:                #5a1497;
-  --main-color-slightly-dark:  #4c1180;
-  --main-color-dark:           #441270;
-  --main-color-darker:         #3a0e61;
-  --main-color-darkest:        #19052c;
+  --main-color: #5a1497;
+  --main-color-slightly-dark: #4c1180;
+  --main-color-dark: #441270;
+  --main-color-darker: #3a0e61;
+  --main-color-darkest: #19052c;
   --main-color-halfly-visible: #5a149750;
-  --white:                     #f2f2f2;
-  --danger:                    #3a0e61;
-  --shadow:                    #030e1b40;
-  --darker-shadow:             #030e1b70;
+  --white: #f2f2f2;
+  --danger: #3a0e61;
+  --shadow: #030e1b40;
+  --darker-shadow: #030e1b70;
 }
 
 body::after {
-  background: url("../../assets/backgrounds/chorus.png");
+  background: url("../../assets/backgrounds/chorus.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

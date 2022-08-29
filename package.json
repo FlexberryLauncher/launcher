@@ -1,33 +1,64 @@
 {
-  "name": "flexberry-launcher",
-  "productName": "Flexberry Launcher",
-  "version": "0.9.0",
-  "description": "Lightweight and customizable launcher for Minecraft",
-  "main": "src/index.js",
-  "scripts": {
-    "start": "electron-forge start",
-    "package-windows": "node builder/windows.js",
-    "package-linux": "node builder/linux.js",
-    "package-macos": "node builder/darwin.js"
-  },
-  "keywords": [],
-  "author": {
-    "name": "Kuzey Kurtuluş",
-    "email": "kuzeeeyk@gmail.com"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "axios": "^0.27.2",
-    "discord-rpc": "^4.0.1",
-    "lowdb": "^1.0.0",
-    "minecraft-launcher-core": "^3.16.13",
-    "msmc": "^3.1.0",
-    "node-fetch": "^2.6.0",
-    "unzipper": "^0.10.11"
-  },
-  "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.65",
-    "electron": "17.4.7",
-    "electron-packager": "^15.5.1"
-  }
+   "name": "flexberry-launcher",
+   "productName": "Flexberry Launcher",
+   "version": "0.9.0",
+   "description": "Lightweight and customizable launcher for Minecraft",
+   "main": "dist/src/index",
+   "keywords": [],
+   "license": "MIT",
+   "dependencies": {
+      "axios": "^0.27.2",
+      "discord-rpc": "^4.0.1",
+      "lowdb": "^1.0.0",
+      "minecraft-launcher-core": "^3.16.13",
+      "msmc": "^3.1.0",
+      "node-fetch": "^2.6.0",
+      "unzipper": "^0.10.11"
+   },
+   "author": "Kuzey Kurtuluş <kuzeeeyk@gmail.com>",
+   "contributurs": [
+      {
+         "name": "Kaan Karaman",
+         "email": "karliyimamk@gmail.com"
+      }
+   ],
+   "devDependencies": {
+      "@electron-forge/cli": "^6.0.0-beta.65",
+      "electron": "17.4.7",
+      "electron-packager": "^15.5.1"
+   },
+   "scripts": {
+      "start": "tsc && electron-forge start",
+      "package": "electron-forge package",
+      "make": "electron-forge make",
+      "publish": "electron-forge publish",
+      "lint": "eslint --ext .ts ."
+   },
+   "config": {
+      "forge": {
+         "packagerConfig": {},
+         "makers": [
+            {
+               "name": "@electron-forge/maker-squirrel",
+               "config": {
+                  "name": "my_new_app"
+               }
+            },
+            {
+               "name": "@electron-forge/maker-zip",
+               "platforms": [
+                  "darwin"
+               ]
+            },
+            {
+               "name": "@electron-forge/maker-deb",
+               "config": {}
+            },
+            {
+               "name": "@electron-forge/maker-rpm",
+               "config": {}
+            }
+         ]
+      }
+   }
 }
