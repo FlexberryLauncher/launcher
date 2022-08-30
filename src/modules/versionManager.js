@@ -58,7 +58,17 @@ class VersionManager {
           name: "Latest Release",
         },
         isSelected: true,
+        latest: true
       });
+    }
+    try {
+      let firstProfile = await db.get("profiles").find({ latest: true }).value();
+      if (firstProfile.version != this.latest.release) {
+        firstProfile.version = this.latest.release;
+        db.get("profiles").find({ latest: true }).assign(firstProfile).write();
+      }
+    } catch {
+      return;
     }
   }
 
@@ -245,15 +255,4 @@ async function ipcManager() {
   ipcMain.on("deleteProfile", async (event, arg) => {
     event.reply("profiles", (await versionManager.deleteProfile(arg)));
   });
-
-  /*
-  let random = versionManager.getVersions()[Math.floor(Math.random() * versionManager.getVersions().length)]
-  versionManager.addProfile({
-    version: random.id,
-    type: random.type,
-    appearance: {
-      name: Math.random().toString(36).substring(2, 8)
-    }
-  });
-  */
 }

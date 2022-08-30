@@ -361,12 +361,12 @@ function createProfileList(profiles) {
   let selected = profiles.find(profile => profile.isSelected);
   if (!selected) {
     if (profiles[0]) {
-      ipcRenderer.send("selectProfile", profiles[0].uuid);
+      ipcRenderer.send("selectProfile", profiles[0]?.appearance?.name);
       selected = profiles[0];
     }
   }
-  document.getElementById("ver").innerHTML = selected.appearance.name;
-  launchOptions = versions.find(version => version.id == selected.version);
+  document.getElementById("ver").innerHTML = selected?.appearance?.name;
+  launchOptions = versions.find(version => version.id == selected?.version) || {};
   launchOptions.profile = selected;
   try {
     let tbs = [];
@@ -411,9 +411,9 @@ function createProfileList(profiles) {
       accountMainEl.appendChild(accountInfoEl);
       accountEl.appendChild(accountMainEl);
       const deleteAccountEl = document.createElement("div");
-      deleteAccountEl.classList.add("deleteVersion");
+      deleteAccountEl.classList.add("deleteAccount");
       deleteAccountEl.setAttribute("id", "trash-" + account.acronym);
-      accountEl.appendChild(deleteAccountEl);
+      account.appearance.name !== "Latest Release" && accountEl.appendChild(deleteAccountEl);
       listEl.appendChild(accountEl);
       !account.isSelected && addEvent("id", account.acronym, ipcRenderer.send, false, "selectProfile", account.appearance.name);
       addEvent("id", "trash-"+account.acronym, ipcRenderer.send, false, "deleteProfile", account.appearance.name);
