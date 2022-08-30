@@ -12,14 +12,19 @@ require("./modules/versionManager");
 let mainWindow;
 
 function checkForUpdates() {
-  return new Promise ((resolve, reject) => {
-    if (app.isPackaged)
+  return new Promise((resolve, reject) => {
+    if (!app.isPackaged)
       return resolve(false);
-    axios.get("https://api.github.com/repos/FlexberryLauncher/launcher/releases/latest").then(async (res) => {
-      if (process.env.npm_package_version !== res.data.tag_name.replace("v", "") && !existsSync(__dirname + "/updateModules.zip")) {
-        const updateModules = res.data.assets?.find(asset => asset.name === "updateModules.zip");
+    else
+      console.log("Updating...");
+    axios.get("https://api.github.com/repos/FlexberryLauncher/launcher/releases").then(async (r) => {
+      let res = r?.data[0];
+      if (!res)
+        return resolve(false);
+      if (process.env.npm_package_version !== res.tag_name.replace("v", "") && !existsSync(__dirname + "/updateModules.zip")) {
+        const updateModules = res.assets?.find(asset => asset.name === "updateModules.zip");
         const updateMeta = updateModules ? {
-          version: res.data.tag_name,
+          version: res.tag_name,
           url: updateModules?.browser_download_url,
           size: updateModules?.size,
         } : false;
@@ -28,6 +33,7 @@ function checkForUpdates() {
         resolve(false);
       }
     }).catch(err => {
+      console.log(err);
       console.log("Couldn't check updates due connection problems");
       resolve(false);
     });
@@ -35,7 +41,7 @@ function checkForUpdates() {
 }
 
 function update(zipUrl) {
-  return new Promise ((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     mainWindow.webContents.send("hideUi", true);
     axios({
       url: zipUrl,
@@ -45,13 +51,19 @@ function update(zipUrl) {
       const stream = createWriteStream(updateZip)
       response.data.pipe(stream);
       mainWindow.webContents.send("updateProgress", "Downloading update...");
-      stream.on("finish", () => {
-        mainWindow.webContents.send("updateProgress", "Extracting update...");
-        createReadStream(updateZip).pipe(unzipper.Extract({ path: parentDir }).on("close", () => {
-          resolve("Update completed");
-          unlinkSync(updateZip);
-        }));
-      });
+      try {
+        stream.on("finish", () => {
+          mainWindow.webContents.send("updateProgress", "Extracting update...");
+          createReadStream(updateZip).pipe(unzipper.Extract({ path: parentDir }).on("close", () => {
+            resolve("Update completed");
+            unlinkSync(updateZip);
+          })).on("error", (err) => {
+            console.log(err);
+          });
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }).catch(() => {
       reject("Couldn't download the update");
       mainWindow.webContents.send("hideUi", false);
