@@ -41,9 +41,6 @@ class VersionManager {
   async init() {
     if (fs.existsSync(versionsDir) || fs.existsSync(minecraftDir))
       this.doesExist = false;
-    await this.loadVersions();
-    await this.loadProfiles();
-    ipcManager();
     if (db.get("profiles").size().value() == 0) {
       this.addProfile({
         version: this.latest.release,
@@ -61,6 +58,7 @@ class VersionManager {
         latest: true
       });
     }
+    await this.loadVersions();
     try {
       let firstProfile = await db.get("profiles").find({ latest: true }).value();
       if (firstProfile.version != this.latest.release) {
@@ -68,8 +66,10 @@ class VersionManager {
         db.get("profiles").find({ latest: true }).assign(firstProfile).write();
       }
     } catch {
-      return;
+      console.log("Could not set Latest Release profile to latest release of Minecraft");
     }
+    await this.loadProfiles();
+    ipcManager();
   }
 
   async loadVersions() {
