@@ -29,6 +29,8 @@ if (process.platform == "win32") {
   throw new Error("Unsupported platform");
 }
 
+// 
+
 class VersionManager {
   constructor() {
     this.versions = [];
@@ -39,9 +41,12 @@ class VersionManager {
   }
 
   async init() {
-    if (fs.existsSync(versionsDir) || fs.existsSync(minecraftDir)) {
-      this.doesExist = false;
-      fs.mkdirSync(versionsDir);
+    try {
+      if (!fs.existsSync(versionsDir)) {
+        fs.mkdirSync(versionsDir, { recursive: true });
+      }
+    } catch (e) { 
+      console.log("warning", e);
     }
     if (db.get("profiles").size().value() == 0) {
       this.addProfile({
@@ -78,7 +83,7 @@ class VersionManager {
     let apiVersions = await this.getVersionFromAPI();
     let versions = [];
     try {
-      if (this.doesExist) {
+      if (fs.existsSync(versionsDir)) {
         let versionFolders = fs.readdirSync(versionsDir);
         versionFolders.forEach((versionFolder) => {
           let stats = fs.statSync(path.join(versionsDir, versionFolder));
