@@ -19,9 +19,10 @@ function checkForUpdates() {
       console.log("Updating...");
     axios.get("https://api.github.com/repos/FlexberryLauncher/launcher/releases").then(async (r) => {
       let res = r?.data[0];
-      if (!res)
-        return resolve(false);
-      if (process.env.npm_package_version !== res.tag_name.replace("v", "") && !existsSync(__dirname + "/updateModules.zip")) {
+      let pkg = require("../package.json").version;
+      if (!pkg)
+        return;
+      if (pkg !== res.tag_name.replace("v", "") && !existsSync(__dirname + "/updateModules.zip")) {
         const updateModules = res.assets?.find(asset => asset.name === "updateModules.zip");
         const updateMeta = updateModules ? {
           version: res.tag_name,
