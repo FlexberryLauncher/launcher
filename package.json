@@ -1,7 +1,7 @@
 {
   "name": "flexberry-launcher",
   "productName": "Flexberry Launcher",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-pre.1",
   "description": "Lightweight and customizable launcher for Minecraft",
   "main": "src/index.js",
   "scripts": {
