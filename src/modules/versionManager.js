@@ -77,7 +77,7 @@ class VersionManager {
   async loadVersions() {
     let apiVersions = await this.getVersionFromAPI();
     let versions = [];
-    if (this.doesExist) {
+    try {
       let versionFolders = fs.readdirSync(versionsDir);
       versionFolders.forEach((versionFolder) => {
         let stats = fs.statSync(path.join(versionsDir, versionFolder));
@@ -100,6 +100,8 @@ class VersionManager {
           type: versionData.type
         });
       });
+    } catch (e) {
+      console.log("warning: ", e);
     }
     versions = versions.concat(apiVersions.versions.map(version => {
       return {
