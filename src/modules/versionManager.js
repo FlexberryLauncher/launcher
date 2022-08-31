@@ -78,28 +78,30 @@ class VersionManager {
     let apiVersions = await this.getVersionFromAPI();
     let versions = [];
     try {
-      let versionFolders = fs.readdirSync(versionsDir);
-      versionFolders.forEach((versionFolder) => {
-        let stats = fs.statSync(path.join(versionsDir, versionFolder));
-        if (versionFolder.startsWith("."))
-          return;
-        if (!stats.isDirectory())
-          return;
-        let versionDir = fs.readdirSync(path.join(versionsDir, versionFolder));
-        if (!(versionDir.includes(versionFolder + ".json") && versionDir.includes(versionFolder + ".jar")))
-          return;
-        let versionData = JSON.parse(fs.readFileSync(path.join(versionsDir, versionFolder, versionFolder + ".json")));
-        if (apiVersions.versions.map(v => v.id).includes(versionFolder))
-          return;
-        versions.push({
-          id: versionData.id,
-          java: versionData.javaVersion ? versionData.javaVersion.majorVersion : 16,
-          releaseTime: versionData.inheritsFrom ? apiVersions.versions.filter(version => version.id ==  versionData.inheritsFrom)[0]?.releaseTime : versionData.releaseTime,
-          actualReleaseTime: versionData.releaseTime,
-          actualVersion: apiVersions.versions.find(v => v?.id == versionData?.inheritsFrom) || undefined,
-          type: versionData.type
+      if (this.doesExist) {
+        let versionFolders = fs.readdirSync(versionsDir);
+        versionFolders.forEach((versionFolder) => {
+          let stats = fs.statSync(path.join(versionsDir, versionFolder));
+          if (versionFolder.startsWith("."))
+            return;
+          if (!stats.isDirectory())
+            return;
+          let versionDir = fs.readdirSync(path.join(versionsDir, versionFolder));
+          if (!(versionDir.includes(versionFolder + ".json") && versionDir.includes(versionFolder + ".jar")))
+            return;
+          let versionData = JSON.parse(fs.readFileSync(path.join(versionsDir, versionFolder, versionFolder + ".json")));
+          if (apiVersions.versions.map(v => v.id).includes(versionFolder))
+            return;
+          versions.push({
+            id: versionData.id,
+            java: versionData.javaVersion ? versionData.javaVersion.majorVersion : 16,
+            releaseTime: versionData.inheritsFrom ? apiVersions.versions.filter(version => version.id ==  versionData.inheritsFrom)[0]?.releaseTime : versionData.releaseTime,
+            actualReleaseTime: versionData.releaseTime,
+            actualVersion: apiVersions.versions.find(v => v?.id == versionData?.inheritsFrom) || undefined,
+            type: versionData.type
+          });
         });
-      });
+      }
     } catch (e) {
       console.log("warning: ", e);
     }
