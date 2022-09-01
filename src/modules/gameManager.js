@@ -145,7 +145,7 @@ module.exports = (win) => {
           authorization: await this.getCurrentAccount() || Authenticator.getAuth("flexberry" + Math.floor(Math.random() * 999) + 1),
           memory: {
             max: arg.profile.memory + "M",
-            min: arg.profile.memory + "M",
+            min: arg.profile.memory - 512 + "M",
           },
           overrides: {
             gameDirectory: arg.profile.dir || this.minecraftDir,
