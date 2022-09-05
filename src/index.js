@@ -1,10 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const { join, resolve } = require('path');
 const axios = require("axios");
-const unzipper = require("unzipper");
-const { createWriteStream, createReadStream, existsSync, unlinkSync } = require("fs");
-const parentDir = resolve(__dirname, "..");
-const updateZip = join(parentDir, "updateModules.zip")
+const { createWriteStream, existsSync, unlinkSync, copyFile } = require("fs");
+const tempDir = join(__dirname, "..", "..")
 
 require("./modules/accountManager");
 require("./modules/versionManager");
@@ -17,13 +15,17 @@ function checkForUpdates() {
       return resolve(false);
     else
       console.log("Updating...");
+    /* 
+     * if you want to make updater only check for stable releases change add /latest to the url
+     * and remove [0] from res
+     */
     axios.get("https://api.github.com/repos/FlexberryLauncher/launcher/releases").then(async (r) => {
       let res = r?.data[0];
       let pkg = require("../package.json").version;
       if (!pkg)
         return;
-      if (pkg !== res.tag_name.replace("v", "") && !existsSync(__dirname + "/updateModules.zip")) {
-        const updateModules = res.assets?.find(asset => asset.name === "updateModules.zip");
+      if (pkg !== res.tag_name.replace("v", "") && !existsSync(join(__dirname, "..", "..", "update.asar"))) {
+        const updateModules = res.assets?.find(asset => asset.name.includes("asar"));
         const updateMeta = updateModules ? {
           version: res.tag_name,
           url: updateModules?.browser_download_url,
@@ -41,30 +43,32 @@ function checkForUpdates() {
   });
 }
 
-function update(zipUrl) {
+function update(url) {
   return new Promise((resolve, reject) => {
     mainWindow.webContents.send("hideUi", true);
     axios({
-      url: zipUrl,
-      method: "get",
+      url,
       responseType: "stream"
     }).then((response) => {
-      const stream = createWriteStream(updateZip)
-      response.data.pipe(stream);
-      mainWindow.webContents.send("updateProgress", "Downloading update...");
+      // You can replace .flexberry with anything you want except .asar!
       try {
-        stream.on("finish", () => {
-          mainWindow.webContents.send("updateProgress", "Extracting update...");
-          createReadStream(updateZip).pipe(unzipper.Extract({ path: parentDir }).on("close", () => {
-            resolve("Update completed");
-            unlinkSync(updateZip);
-          })).on("error", (err) => {
-            console.log(err);
+      response.data.pipe(createWriteStream(join(tempDir, "app.flexberry")))
+        .on("finish", () => {
+          copyFile(join(tempDir, "app.flexberry"), join(tempDir, "app.asar"), (err) => {
+            if (err) {
+              console.log(err);
+              reject(err);
+            } else {
+              console.log("Update is completed, restarting...");
+              resolve(true);
+              unlinkSync(join(tempDir, "app.flexberry"));
+            }
           });
-        });
+        })
+        .on("error", reject);
       } catch (err) {
-        console.log(err);
-      }
+        reject(err);
+      };
     }).catch(() => {
       reject("Couldn't download the update");
       mainWindow.webContents.send("hideUi", false);
@@ -105,6 +109,7 @@ ipcMain.on("update", (event, arg) => {
       app.quit();
     }, 3000);
   }).catch(err => {
+    console.error(err);
     mainWindow.webContents.send("updateError", err);
   });
 });
