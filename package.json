@@ -10,7 +10,6 @@
     "package-linux": "node builder/linux.js",
     "package-macos": "node builder/darwin.js"
   },
-  "keywords": [],
   "author": {
     "name": "Kuzey Kurtuluş",
     "email": "kuzeeeyk@gmail.com"

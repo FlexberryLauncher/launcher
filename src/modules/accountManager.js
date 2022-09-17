@@ -22,6 +22,7 @@ async function setup() {
 setup();
 
 ipcMain.on("addAccount", (event) => {
+  console.log(__dirname);
   msmc.fastLaunch("electron",
     (update) => {
       console.log((update.percent || 0) + "% - Logging in...");
@@ -30,10 +31,7 @@ ipcMain.on("addAccount", (event) => {
       fullscreenable: false,
       width: 520,
       height: 700,
-      titleBarStyle: 'hidden',
-      skipTaskbar: true,
-      alwaysOnTop: true,
-      icon: path.join(__dirname, "assets/images/flexberry-launcher-icon.png"),
+      icon: path.join(__dirname, "../assets/images/flexberry-launcher-icon.png"),
     }).then(async result => {
       if (msmc.errorCheck(result)) {
         console.log("Error logging in:", result.reason);

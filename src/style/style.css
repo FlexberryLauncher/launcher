@@ -18,6 +18,16 @@
   src: url("../assets/typefaces/Minecraft-Turkish.ttf");
 }
 
+/*
+@keyframes 😡 {
+  0% {
+    pointer-events: none;
+  }
+  100% {
+    pointer-events: auto;
+  }
+}
+*/
 
 * {
   margin: 0;
@@ -27,6 +37,7 @@
   transform-style: preserve-3d;
   -webkit-user-drag: none;
   outline: none;
+  /* animation: 😡 4s linear; */
 }
 
 ::-webkit-scrollbar {
@@ -703,6 +714,19 @@ label {
   transition: .2s;
 }
 
+.sizes {
+  display: grid;
+  grid-template-columns: 48% 12px 48%;
+  gap: 8px;
+  align-items: center;
+}
+
+.x {
+  text-shadow: none;
+  font-family: "Minecraft";
+  opacity: .7;
+}
+
 .input input::placeholder {
   color: var(--main-color-lightest);
   opacity: .6;
@@ -856,5 +880,74 @@ body.loaded::after {
   padding-bottom: 4%;
   opacity: 0;
   line-height: 24px;
+  font-family: "Minecraft Turkish";
+}
+
+.range {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.ramValue {
+  text-align: right;
+  width: 25%;
+  font-size: 12px;
+  text-shadow: none;
+  color: var(--main-color-lightest);
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 0px;
+  padding: 6px;
+  background: var(--main-color-darker);
+  outline: none;
+  opacity: 0.7;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--main-color-light);
+  cursor: pointer;
+}
+
+.settingsInfos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settingsInfo {
+  background: var(--main-color-slightly-dark);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Minecrafter";
+}
+
+.infoTitle {
+  font-size: 16px;
+  text-shadow: none;
+  color: var(--main-color-lightest);
+}
+
+.infoValue {
+  font-size: 14px;
+  text-shadow: none;
+  color: var(--main-color-lightest);
+  opacity: .8;
   font-family: "Minecraft Turkish";
 }

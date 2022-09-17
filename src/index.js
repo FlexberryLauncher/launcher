@@ -4,6 +4,8 @@ const axios = require("axios");
 const { createWriteStream, existsSync, unlinkSync, copyFile } = require("fs");
 const tempDir = join(__dirname, "..", "..")
 
+const pkg = require("../package.json").version;
+
 require("./modules/accountManager");
 require("./modules/versionManager");
 
@@ -21,7 +23,6 @@ function checkForUpdates() {
      */
     axios.get("https://api.github.com/repos/FlexberryLauncher/launcher/releases").then(async (r) => {
       let res = r?.data[0];
-      let pkg = require("../package.json").version;
       if (!pkg)
         return;
       if (pkg !== res.tag_name.replace("v", "") && !existsSync(join(__dirname, "..", "..", "update.asar"))) {
@@ -112,6 +113,14 @@ ipcMain.on("update", (event, arg) => {
     console.error(err);
     mainWindow.webContents.send("updateError", err);
   });
+});
+
+ipcMain.on("getVersion", (event, arg) => {
+  event.reply("version", pkg);
+});
+
+ipcMain.on("getMemory", (event, arg) => {
+  event.reply("memory", require("os").totalmem());
 });
 
 ipcMain.on("minimize", () => mainWindow.minimize());

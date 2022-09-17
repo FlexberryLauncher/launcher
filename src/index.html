@@ -85,6 +85,19 @@
               </div>
             </div>
           </div>
+          <div class="wizardContent subTab">
+            <label for="ramSlider">Allocated Memory</label>
+            <div class="range">
+              <input oninput="ramSlider(this.value)" type="range" min="0" max="100" value="0" class="slider" id="ramSlider">
+              <span class="ramValue" id="allocated">0</span>
+            </div>
+            <label for="windowSize">Minecraft Window Size</label>
+            <div class="sizes input">
+              <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" id="mcWindowHeight" placeholder="600" value="600">
+              <span class="x">x</span>
+              <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" id="mcWindowWidth" placeholder="720" value="720">
+            </div>
+          </div>
         </div>
         <div class="wizardActions">
             <span class="wizardAction" id="wizardAction" onclick="wizardCycle()">Next</span>
@@ -116,7 +129,15 @@
           </div>
         </div>
         <div class="subTab" id="otherSettings">
-
+          <div class="settingsInfos">
+            <div class="settingsInfo">
+              <span class="infoTitle">Launcher Version</span>
+              <span class="infoValue" id="launcherVersion">1.0.0</span>
+            </div>
+          </div>
+          <div class="themes" id="themes">
+            <label for="themeSelect">This page is still work in progress</label>
+          </div>
         </div>
       </div>
     </div>

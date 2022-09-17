@@ -96,6 +96,12 @@ window.addEventListener("DOMContentLoaded", () => {
     style.setAttribute("href", `style/themes/${theme}`);
     document.head.appendChild(style);
   });
+  ipcRenderer.send("getMemory");
+  ipcRenderer.send("getVersion");
+});
+
+ipcRenderer.on("version", (event, data) => {
+  document.getElementById("launcherVersion").innerHTML = data || "???";
 });
 
 rpc.login({ "clientId": "935845425599094824" }).catch(console.error);
@@ -346,6 +352,7 @@ function openVersionSelect() {
   document.getElementById("versionSelect").classList.add("visibleModal");
   document.getElementById("versionSelectWrapper").classList.add("visibleModalWrapper");
   document.getElementById("wizard").outerHTML = wiz;
+  ipcRenderer.send("getMemory");
   drawVersions();
 }
 
@@ -430,7 +437,13 @@ function createProfileList(profiles) {
 let alreadyCycling = false;
 let wizard = {
   appearance: {
-
+    icon: "glass",
+    name: "Unnamed Version " + Math.floor(Math.random() * 1000),
+  },
+  memory: 1024,
+  dimensions: {
+    width: 500,
+    height: 420
   }
 }
 
@@ -457,16 +470,21 @@ function wizardCycle() {
     wizard.appearance.name = document.getElementById("profileName").value || "Unnamed Profile " + Math.floor(Math.random() * 999) + 1;
     wizardAction.innerHTML = "Add profile";
   } else if (page == 2) {
-    if (document.querySelector(".selectedVersionSE")) {
-      ipcRenderer.send("addProfile", wizard);
-      closeVersionSelect();
-    } else {
+    if (!document.querySelector(".selectedVersionSE")) {
       wizardAction.innerHTML = "Select a version";
       setTimeout(function () {
         wizardAction.innerHTML = "Add profile";
       }, 1000);
       return;
     }
+  } else if (page == 3) {
+    wizard.memory = document.getElementById("ramSlider").value || 1024;
+    wizard.dimensions = {
+      width: document.getElementById("mcWindowWidth").value,
+      height: document.getElementById("mcWindowHeight").value
+    }
+    ipcRenderer.send("addProfile", wizard);
+    closeVersionSelect();
   }
   wizardEl.scrollBy(wizardEl.offsetWidth + 17, 0);
   alreadyCycling = true;
@@ -528,6 +546,22 @@ ipcRenderer.on("updateProgress", (event, arg) => {
   document.getElementsByClassName("progress")[0].innerText = arg;
 });
 
+let systemMemory;
+
+ipcRenderer.on("memory", (event, arg) => {
+  systemMemory = Math.floor(arg / 1024 / 1024);
+  let slider = document.getElementById("ramSlider");
+  slider.max = systemMemory;
+  slider.min = Math.min(1024, Math.floor(systemMemory / 4));
+  slider.value = Math.min(Math.floor(slider.max / 2.5), 8000);
+  ramSlider(slider.value);
+});
+
+function ramSlider(value) {
+  console.log(value);
+  document.getElementById("allocated").innerText = value + " MB";
+};
+
 contextBridge.exposeInMainWorld("check", check);
 contextBridge.exposeInMainWorld("toggleSubTab", toggleSubTab);
 contextBridge.exposeInMainWorld("wizardCycle", wizardCycle);
@@ -536,3 +570,4 @@ contextBridge.exposeInMainWorld("toggleTab", toggleTab);
 contextBridge.exposeInMainWorld("closeVersionSelect", closeVersionSelect);
 contextBridge.exposeInMainWorld("selectVersion", selectVersion);
 contextBridge.exposeInMainWorld("launch", launch);
+contextBridge.exposeInMainWorld("ramSlider", ramSlider);
