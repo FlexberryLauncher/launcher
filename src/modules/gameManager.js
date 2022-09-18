@@ -13,6 +13,9 @@ const db = low(adapter);
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+const logPath = path.join(app.getPath("logs"), "launcher.log");
+const berry = require("./logger")(logPath);
+
 module.exports = (win) => {
   class GameManager {
     constructor() {
@@ -53,7 +56,7 @@ module.exports = (win) => {
                 javaDirs.forEach((dir, i) => {
                   let _dir = javaDirs.slice(0, i + 1).join(path.sep);
                   if (!fs.existsSync(_dir)) {
-                    console.log("Creating directory: " + _dir);
+                    berry.log(`Creating directory ${_dir}`, "gameManager");
                     win.webContents.send("progress", "Creating directory: " + _dir);
                     fs.mkdirSync(_dir);
                   }
@@ -61,7 +64,7 @@ module.exports = (win) => {
 
                 console.time("createDir");
                 directory.forEach((dir) => {
-                  console.log("Creating directory: " + dir.name);
+                  berry.log(`Creating directory ${dir.name}`, "gameManager");
                   win.webContents.send("progress", "Creating directory: " + dir.name);
                   fs.mkdirSync(path.join(this.minecraftDir, "flexberry-jre", javaVersionCode, dir.name));
                 });
@@ -77,7 +80,7 @@ module.exports = (win) => {
                   stream.on("finish", () => {
                     downloadedFiles++;
                     win.webContents.send("progress", { type: "Java", task: downloadedFiles, total: filesToDownload.length });
-                    console.log(downloadedFiles + " of " + filesToDownload.length + " files downloaded (" + file.name + ")");
+                    berry.log(downloadedFiles + " of " + filesToDownload.length + " files downloaded (" + file.name + ")", "gameManager");
                     if (downloadedFiles == filesToDownload.length) {
                       console.timeEnd("downloadFiles");
                       return resolve(javaPath);
@@ -85,12 +88,12 @@ module.exports = (win) => {
                   });
                 }
               } catch (err) {
-                console.log(err);
+                berry.error(err);
                 return reject("Could not download java")
               }
             })
             .catch((err) => {
-              console.log(err);
+              berry.error(err);
               return reject(err);
             });
         }
@@ -111,10 +114,9 @@ module.exports = (win) => {
         try {
           versionMeta = (await axios.get(versionMetaURL)).data;
         } catch (err) {
-          console.log(err);
+          berry.error("Could not get version meta Stack:\n" + err?.stack, "gameManager");
           reject({ code: 777, error: "Could not download version meta, skipping automatic java download" });
         }
-        console.log(versionMeta);
         const javaVersionCode = versionMeta?.javaVersion?.component || "jre-legacy";
         /*
           currently only 1.6.x versions does not have javaVersion.component property, jre-legacy is used instead
@@ -128,7 +130,7 @@ module.exports = (win) => {
           win.webContents.send("progress", "Could not download java, skipping automatic java download");
           reject({ code: 778, error: "Could not download java, " + err });
         }
-        console.log(javaPath);
+        berry.log("Java path: " + javaPath, "gameManager");
         const launcher = new Client();
         let version = {
           number: arg.actualVersion?.id || arg.id,
@@ -137,7 +139,7 @@ module.exports = (win) => {
         if (arg.actualVersion)
           version.custom = arg.id;
 
-        console.log(version);
+        berry.log("Launching version " + (version.custom || version.number), "gameManager");
         const launcherOptions = {
           clientPackage: null,
           root: this.minecraftDir,
@@ -158,10 +160,10 @@ module.exports = (win) => {
         });
         await wait(1000);
         launcher.launch(launcherOptions).then(() => {
-          console.log("LAUNCH -> PASS");
           this.alreadyLaunched = true;
           resolve(launcher);
         }).catch(err => {
+          berry.error(err, "gameManager");
           reject({
             code: 580,
             error: err
@@ -174,26 +176,25 @@ module.exports = (win) => {
   const Minecraft = new GameManager();
 
   ipcMain.on("launch", async (event, arg) => {
-    console.log(arg);
     win.webContents.send("hideUi", true);
     Minecraft.launch(arg).then((instance) => {
       win.webContents.send("progress", "Launching");
       instance.on("data", (d) => {
-        console.log("[Minecraft] ", d);
+        // berry.log("[Minecraft] " + d, "gameManager", true);
         if (win.isVisible()) {
           win.webContents.send("hideUi", true);
           win.hide();
         }
       });
       instance.on("close", (d) => {
-        console.log("Minecraft is closed: ", d);
+        berry.log("Minecraft is closed: " + d);
         if (!win.isVisible()) {
           win.webContents.send("hideUi", false);
           win.show();
         }
       });
     }).catch(err => {
-      console.log(err);
+      berry.error(err, "gameManager");
     });
   });
 }

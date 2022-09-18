@@ -8,6 +8,9 @@ const FileSync = require("lowdb/adapters/FileSync");
 const adapter = new FileSync(path.join(app.getPath("userData"), "profiles.json"));
 const db = low(adapter)
 
+const logPath = path.join(app.getPath("logs"), "launcher.log");
+const berry = require("./logger")(logPath);
+
 db.defaults({ profiles: [] }).write();
 
 let [appData, minecraftDir, versionsDir] = [];
@@ -46,7 +49,7 @@ class VersionManager {
         fs.mkdirSync(versionsDir, { recursive: true });
       }
     } catch (e) { 
-      console.log("warning", e);
+      berry.error("Couldn't create versions directory!!! Stack:\n" + e.stack, "versionManager");
     }
     if (db.get("profiles").size().value() == 0) {
       this.addProfile({
@@ -73,7 +76,7 @@ class VersionManager {
         db.get("profiles").find({ latest: true }).assign(firstProfile).write();
       }
     } catch {
-      console.log("Could not set Latest Release profile to latest release of Minecraft");
+      berry.error("Could not set Latest Release profile to latest release of Minecraft", "versionManager");
     }
     await this.loadProfiles();
     ipcManager();
@@ -108,7 +111,7 @@ class VersionManager {
         });
       }
     } catch (e) {
-      console.log("warning: ", e);
+      berry.error("Couldn't load versions Stack:\n" + e.stack, "versionManager");
     }
     versions = versions.concat(apiVersions.versions.map(version => {
       return {
@@ -161,7 +164,6 @@ class VersionManager {
     }).value();
     if (!ifExists)
       return { status: "error", message: "Profile not found" };
-    console.log("[IPC] setSelected");
     await db.get("profiles").find({ isSelected: true}).assign({ isSelected: false }).write();
     await db.get("profiles").find({
       appearance: {
@@ -171,6 +173,7 @@ class VersionManager {
     let prfs = await db.get("profiles").value();
     this.profiles = prfs;
     this.selectedProfile = profileName;
+    berry.log("Selected profile " + profileName, "versionManager");
     return this.profiles;
   }
 
@@ -236,7 +239,7 @@ versionManager.init();
 
 async function ipcManager() {
   // profile = selected version, not account!
-  console.log("[IPC] ipcManager");
+  berry.log("Starting IPC modules of versionManager", "versionManager");
   ipcMain.on("getProfiles", (event, arg) => {
     event.reply("profiles", versionManager.getProfiles());
   });

@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const { join, resolve } = require('path');
+const { join } = require('path');
 const axios = require("axios");
-const { createWriteStream, existsSync, unlinkSync, copyFile } = require("fs");
+const { createWriteStream, existsSync, unlinkSync, copyFile, readFileSync } = require("fs");
 const tempDir = join(__dirname, "..", "..")
 
 const pkg = require("../package.json").version;
@@ -11,12 +11,17 @@ require("./modules/versionManager");
 
 let mainWindow;
 
+const logPath = join(app.getPath("logs"), "launcher.log");
+const berry = require("./modules/logger")(logPath);
+
+berry.log("Starting Flexberry Launcher...");
+
 function checkForUpdates() {
   return new Promise((resolve, reject) => {
     if (!app.isPackaged)
       return resolve(false);
     else
-      console.log("Updating...");
+      berry.log("Checking for updates...");
     /* 
      * if you want to make updater only check for stable releases change add /latest to the url
      * and remove [0] from res
@@ -37,8 +42,8 @@ function checkForUpdates() {
         resolve(false);
       }
     }).catch(err => {
-      console.log(err);
-      console.log("Couldn't check updates due connection problems");
+      berry.error("Couldn't check for updates");
+      berry.error(err);
       resolve(false);
     });
   });
@@ -57,10 +62,11 @@ function update(url) {
         .on("finish", () => {
           copyFile(join(tempDir, "app.flexberry"), join(tempDir, "app.asar"), (err) => {
             if (err) {
-              console.log(err);
+              berry.error("Couldn't copy update file");
+              berry.error(err);
               reject(err);
             } else {
-              console.log("Update is completed, restarting...");
+              berry.log("Update is completed, restarting...");
               resolve(true);
               unlinkSync(join(tempDir, "app.flexberry"));
             }
@@ -72,6 +78,7 @@ function update(url) {
       };
     }).catch(() => {
       reject("Couldn't download the update");
+      berry.error("Couldn't download the update");
       mainWindow.webContents.send("hideUi", false);
       mainWindow.webContents.send("updateError", "Couldn't download the update");
     });
@@ -79,7 +86,11 @@ function update(url) {
 }
 
 async function createWindow() {
-  console.log(`Running on ${app.isPackaged ? "production" : "development"} mode`);
+  const log = readFileSync(logPath, "utf8");
+  if (log.split("Launcher is closed").length > 5) {
+    unlinkSync(logPath);
+  }
+  berry.log("Launcher is running in production mode. Version: " + pkg);
   mainWindow = new BrowserWindow({
     width: 830,
     height: 520,
@@ -110,7 +121,7 @@ ipcMain.on("update", (event, arg) => {
       app.quit();
     }, 3000);
   }).catch(err => {
-    console.error(err);
+    berry.error(err);
     mainWindow.webContents.send("updateError", err);
   });
 });
@@ -145,4 +156,9 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+app.on("quit", () => {
+  berry.log("Launcher is closed");
+  berry.log("$1");
 });

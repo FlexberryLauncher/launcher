@@ -196,9 +196,7 @@ function selectVersion(versionId) {
   const versionEl = document.getElementById(versionId);
   const version = versions.find(version => version.id == versionEl.innerText.replace((new Date(version.actualReleaseTime || version.releaseTime)).toShortFormat(), "").trim());
   if (!version) return;
-  console.log(version);
   const versionEls = document.querySelectorAll(".version");
-  console.log(version);
   for (let i = 0; i < versionEls.length; i++) {
     versionEls[i].classList.remove("selectedVersionSE");
   }
@@ -364,7 +362,6 @@ function closeVersionSelect() {
 let launchOptions = {};
 
 function createProfileList(profiles) {
-  console.log(profiles);
   let selected = profiles.find(profile => profile.isSelected);
   if (!selected) {
     if (profiles[0]) {
@@ -488,7 +485,6 @@ function wizardCycle() {
   }
   wizardEl.scrollBy(wizardEl.offsetWidth + 17, 0);
   alreadyCycling = true;
-  console.log(wizard)
   setTimeout(() => {
     alreadyCycling = false;
   }, 400);
@@ -558,7 +554,6 @@ ipcRenderer.on("memory", (event, arg) => {
 });
 
 function ramSlider(value) {
-  console.log(value);
   document.getElementById("allocated").innerText = value + " MB";
 };
 

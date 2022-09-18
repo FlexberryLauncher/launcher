@@ -1,6 +1,6 @@
-const { app, ipcMain } = require('electron');
+const { app, ipcMain } = require("electron");
 const msmc = require("msmc");
-const path = require('path');
+const path = require("path");
 
 const low = require("lowdb");
 const FileSync = require('lowdb/adapters/FileSync');
@@ -8,13 +8,15 @@ const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync(path.join(app.getPath("userData"), "accounts.json"));
 const db = low(adapter)
 
+const logPath = path.join(app.getPath("logs"), "launcher.log");
+const berry = require("./logger")(logPath);
 // TO-DO - C L E A N     T H I S     C O D E
 
 async function setup() {
   await db.defaults({ accounts: [] }).write()
   let selectedAccount = await db.get('accounts').find({ isSelected: true }).value();
   if (selectedAccount && !msmc.validate(selectedAccount.profile)) {
-    console.log("[MANAGERS => ACCOUNT MANAGER] Deselecting selected account, because it's expired.");
+    berry.log("Deselecting selected account, because it's expired.", "accountManager");
     db.get('accounts').find({ isSelected: true }).assign({ isSelected: false }).write();
   }
 }
@@ -22,10 +24,9 @@ async function setup() {
 setup();
 
 ipcMain.on("addAccount", (event) => {
-  console.log(__dirname);
   msmc.fastLaunch("electron",
     (update) => {
-      console.log((update.percent || 0) + "% - Logging in...");
+      berry.log((update.percent || 0) + "% - Logging in to Microsoft account", "accountManager");
     }, undefined, {
       resizable: false,
       fullscreenable: false,
@@ -34,13 +35,13 @@ ipcMain.on("addAccount", (event) => {
       icon: path.join(__dirname, "../assets/images/flexberry-launcher-icon.png"),
     }).then(async result => {
       if (msmc.errorCheck(result)) {
-        console.log("Error logging in:", result.reason);
+        berry.error("Error logging in: " + result.reason, "accountManager");
         event.reply("loginResult", JSON.stringify({ status: "error", error: result.reason}));
         return;
       }
       
       if ((await db.get("accounts").find({ uuid: result.profile.id }).value())) {
-        console.log("Account already exists");
+        berry.error("Account already exists", "accountManager");
         event.reply("loginResult", JSON.stringify({ status: "error", error: "Account already exists"}));
       } else {
         let xbox = await result.getXbox();
@@ -55,32 +56,31 @@ ipcMain.on("addAccount", (event) => {
         event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
       }
     }).catch(reason => {
-      console.log("Error logging in:", reason);
+      berry.error("Error logging in Stack:\n" + reason?.stack, "accountManager");
       event.reply("loginResult", JSON.stringify({ status: "error", error: reason}));
     })
 });
 
 
 ipcMain.on("verifyAccount", async (event, uuid) => {
-  console.log("[IPC] verifyAccount");
+  berry.log("Verifying account " + uuid, "accountManager");
   let profileObject = db.get("accounts").find({ uuid: uuid }).value();
   if (!profileObject)
     return event.reply("verifyAccountResult", JSON.stringify({ status: "error", error: "Account not found"}));
   let isValid = msmc.validate(profileObject.profile);
   event.reply("verifyAccountResult", JSON.stringify({ status: "success", valid: isValid, uuid}));
-  console.log("[IPC] |-> " + isValid);
 });
 
 ipcMain.on("setSelectedAccount", async (event, uuid) => {
-  console.log("[IPC] setSelected");
   await db.get("accounts").find({ isSelected: true}).assign({ isSelected: false }).write();
   await db.get("accounts").find({ uuid: uuid }).assign({ isSelected: true }).write();
   let accs = await db.get("accounts").value();
   event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
+  berry.log("Selected account " + uuid, "accountManager");
 });
 
 ipcMain.on("refreshAccount", async (event, uuid) => {
-  console.log("[IPC] refreshAccount");
+  berry.log("Refreshing account " + uuid, "accountManager");
   let profileObject = db.get("accounts").find({ uuid: uuid }).value();
   if (!profileObject)
     return event.reply("refreshAccountResult", JSON.stringify({ status: "error", error: "Account not found"}));
@@ -90,6 +90,7 @@ ipcMain.on("refreshAccount", async (event, uuid) => {
     let accounts = await db.get("accounts").value();
     return event.reply("refreshAccountResult", JSON.stringify({ status: "success", valid: false, uuid, accounts }));
   }).catch(reason => {
+    berry.error("Error refreshing account Stack:\n" + reason?.stack, "accountManager");
     return event.reply("refreshAccountResult", JSON.stringify({ status: "error", error: reason}));
   });
 })
@@ -106,7 +107,7 @@ ipcMain.on("deleteAccount", async (event, data) => {
     if (accs[0])
       await db.get("accounts").first().assign({ isSelected: true }).write();
     else {
-      console.log("DELETE [ELSE] >> No accounts left");
+      berry.error("Can't delete account because no accounts left", "accountManager");
       return event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs), haveSelected: false }));
     }
   }
