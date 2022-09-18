@@ -26,7 +26,8 @@ setup();
 ipcMain.on("addAccount", (event) => {
   msmc.fastLaunch("electron",
     (update) => {
-      berry.log((update.percent || 0) + "% - Logging in to Microsoft account", "accountManager");
+      if (update.percent == 0)
+        berry.log("Logging in to Microsoft account", "accountManager");
     }, undefined, {
       resizable: false,
       fullscreenable: false,
@@ -53,6 +54,7 @@ ipcMain.on("addAccount", (event) => {
           isSelected: false
         }
         let accs = await db.get("accounts").push(newData).write();
+        berry.log("Logged in to account " + result.profile.name, "accountManager");
         event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
       }
     }).catch(reason => {
