@@ -64,8 +64,8 @@ body {
 
 body::after {
   opacity: 0;
-  animation: 2s fadeIn forwards;
-  animation-delay: .3s;
+  animation: 1.2s fadeIn forwards;
+  animation-delay: 1s;
   z-index: -2000;
   content: "";
   position: absolute;
@@ -80,42 +80,42 @@ body::after {
 
 body::before {
   opacity: 0;
-  animation: 1s fadeIn forwards;
-  animation-delay: .7s;
+  animation: 3s fadeIn forwards;
+  animation-delay: .8s;
   z-index: -1000;
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 30%;
-  mask: none;
-  -webkit-mask: linear-gradient(
+  height: 50%;
+  background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 1)
-  ); 
-  background: rgba(0, 0, 0, 1);
-  backdrop-filter: blur(32px);
+    #00000000,
+    #000000); 
   border-radius: 14px;
 }
 
 @keyframes titleStartUp {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(190%);
+    transform: translateY(190%) scale(1);
   }
-  to {
+  80% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(-1%) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
 .titleHolder {
   opacity: 0;
   transform: translateY(190%);
-  animation: .5s titleStartUp forwards ease-out;
-  z-index: 100000;
+  animation: .8s titleStartUp forwards;
+  z-index: 10000;
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -132,11 +132,13 @@ body::before {
 }
 
 @keyframes titleAltStartUp {
-  from {
-    transform: translateY(100px);
+  0% {
+    transform: translateY(100px) scale(1);
+    opacity: 0;
   }
-  to {
-    transform: translateY(76px);
+  100% {
+    transform: translateY(76px) scale(1);
+    opacity: 1;
   }
 }
 
@@ -197,8 +199,8 @@ body::before {
 .bottomBar {
   opacity: 0;
   transform: translateY(-20px);
-  animation: .2s fadeIn forwards, .2s levitateIn forwards;
-  animation-delay: 1s;
+  animation: .4s fadeIn forwards, .4s levitateIn forwards;
+  animation-delay: 1.4s;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -208,8 +210,8 @@ body::before {
 
 .bottomBar .button:not(.playButton) {
   transform: translateY(20px);
-  animation: 1s levitateIn forwards;
-  animation-delay: .8s;
+  animation: .8s levitateIn forwards;
+  animation-delay: 1.2s;
 }
 
 .barContainer {
@@ -266,7 +268,8 @@ body::before {
 .button:active, .toggledButton {
   border-bottom: none;
   height: calc(12px * 3 + 38px - 6px);
-  transform: translateY(6px)!important;
+  position: relative;
+  top: 6px!important;
 }
 
 .playButtonTitle {
@@ -287,7 +290,7 @@ body::before {
 
 .topBar {
   opacity: 0;
-  animation: 3s fadeIn forwards;
+  animation: 2s fadeIn forwards;
   animation-delay: 2s;
   padding: 10px;
   width: 100%;
@@ -352,7 +355,7 @@ body::before {
 
 .tab {
   overflow: hidden;
-  height: 60%;
+  height: 62%;
   width: 54.5%;
   margin: 0 50%;
   background: var(--main-color);
@@ -876,9 +879,10 @@ body.loaded::after {
   text-align: center;
   width: 100%;
   height: 100%;
-  transition: 2s;
+  transition: 1.2s ease transform, 4s ease opacity;
   padding-bottom: 4%;
   opacity: 0;
+  transform: translateY(128px);
   line-height: 24px;
   font-family: "Minecraft Turkish";
 }
@@ -950,4 +954,17 @@ body.loaded::after {
   color: var(--main-color-lightest);
   opacity: .8;
   font-family: "Minecraft Turkish";
+}
+
+.list-move, .list-enter-active, .list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from, .list-leave-to {
+  opacity: 0;
+  transform: translateY(48px);
+}
+
+.list-leave-active {
+  position: absolute;
 }

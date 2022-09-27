@@ -149,10 +149,6 @@ module.exports = (win) => {
             max: (+arg.profile.memory) + "M",
             min: (+arg.profile.memory) - 512 + "M",
           },
-          window: {
-            width: +arg.profile.dimensions.width,
-            height: +arg.profile.dimensions.height
-          },
           overrides: {
             gameDirectory: arg.profile.dir || this.minecraftDir,
           }
@@ -180,20 +176,20 @@ module.exports = (win) => {
   const Minecraft = new GameManager();
 
   ipcMain.on("launch", async (event, arg) => {
-    win.webContents.send("hideUi", true);
+    win.webContents.send("progress", { action: "ui", state: true });
     Minecraft.launch(arg).then((instance) => {
       win.webContents.send("progress", "Launching");
       instance.on("data", (d) => {
         // berry.log("[Minecraft] " + d, "gameManager", true);
         if (win.isVisible()) {
-          win.webContents.send("hideUi", true);
+          win.webContents.send("progress", { action: "ui", state: true });
           win.hide();
         }
       });
       instance.on("close", (d) => {
         berry.log("Minecraft is closed: " + d);
         if (!win.isVisible()) {
-          win.webContents.send("hideUi", false);
+          win.webContents.send("progress", { action: "ui", state: false });
           win.show();
         }
       });

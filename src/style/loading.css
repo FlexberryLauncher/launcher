@@ -1,0 +1,6 @@
+/* This file gets deleted from index upon Vue is loaded */
+/* It prevents animations to play 2 times (app launch & vue mount) */
+* {
+  opacity: 0;
+  animation: none!important;
+}

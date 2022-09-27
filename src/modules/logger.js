@@ -12,16 +12,24 @@ module.exports = (logPath) => {
   const logStream = fs.createWriteStream(logFile, { flags: 'a' });
   return {
     log: (message) => {
-      if (message == "$1")
-        return logStream.write("\n\n")
-      let log = `[  INFO  ] [ ${(new Date()).toLocaleString("en-US")} ] ${message}\n`;
-      console.log(`${icons.info} ${message}`);
-      app.isPackaged && logStream.write(log);
+      try {
+        if (message == "$1")
+          return logStream.write("\n\n")
+        let log = `[  INFO  ] [ ${(new Date()).toLocaleString("en-US")} ] ${message}\n`;
+        console.log(`${icons.info} ${message}`);
+        app.isPackaged && logStream.write(log);
+      } catch (e) {
+        console.error(e);
+      }
     },
     error: (message) => {
-      let log = `[ ERROR! ] [ ${(new Date()).toLocaleString("en-US")} ] ${(message instanceof Error) ? message.stack : message}\n`;
-      console.error(`${icons.error} ${message}`);
-      app.isPackaged && logStream.write(log);
+      try {
+        let log = `[ ERROR! ] [ ${(new Date()).toLocaleString("en-US")} ] ${(message instanceof Error) ? message.stack : message}\n`;
+        console.error(`${icons.error} ${message}`);
+        app.isPackaged && logStream.write(log);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 }

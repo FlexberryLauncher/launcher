@@ -10,7 +10,6 @@ const db = low(adapter)
 
 const logPath = path.join(app.getPath("logs"), "launcher.log");
 const berry = require("./logger")(logPath);
-// TO-DO - C L E A N     T H I S     C O D E
 
 async function setup() {
   await db.defaults({ accounts: [] }).write()
@@ -37,13 +36,13 @@ ipcMain.on("addAccount", (event) => {
     }).then(async result => {
       if (msmc.errorCheck(result)) {
         berry.error("Error logging in: " + result.reason, "accountManager");
-        event.reply("loginResult", JSON.stringify({ status: "error", error: result.reason}));
+        event.reply("accounts", JSON.stringify({ status: "error", error: result.reason}));
         return;
       }
       
       if ((await db.get("accounts").find({ uuid: result.profile.id }).value())) {
         berry.error("Account already exists", "accountManager");
-        event.reply("loginResult", JSON.stringify({ status: "error", error: "Account already exists"}));
+        event.reply("accounts", JSON.stringify({ status: "error", error: "Account already exists"}));
       } else {
         let xbox = await result.getXbox();
         newData = {
@@ -55,11 +54,11 @@ ipcMain.on("addAccount", (event) => {
         }
         let accs = await db.get("accounts").push(newData).write();
         berry.log("Logged in to account " + result.profile.name, "accountManager");
-        event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
+        event.reply("accounts", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
       }
     }).catch(reason => {
       berry.error("Error logging in Stack:\n" + reason?.stack, "accountManager");
-      event.reply("loginResult", JSON.stringify({ status: "error", error: reason}));
+      event.reply("accounts", JSON.stringify({ status: "error", error: reason}));
     })
 });
 
@@ -68,16 +67,16 @@ ipcMain.on("verifyAccount", async (event, uuid) => {
   berry.log("Verifying account " + uuid, "accountManager");
   let profileObject = db.get("accounts").find({ uuid: uuid }).value();
   if (!profileObject)
-    return event.reply("verifyAccountResult", JSON.stringify({ status: "error", error: "Account not found"}));
+    return event.returnValue = JSON.stringify({ status: "error", error: "Account not found"});
   let isValid = msmc.validate(profileObject.profile);
-  event.reply("verifyAccountResult", JSON.stringify({ status: "success", valid: isValid, uuid}));
+  event.returnValue = JSON.stringify({ status: "success", valid: isValid, uuid});
 });
 
-ipcMain.on("setSelectedAccount", async (event, uuid) => {
+ipcMain.on("selectAccount", async (event, uuid) => {
   await db.get("accounts").find({ isSelected: true}).assign({ isSelected: false }).write();
   await db.get("accounts").find({ uuid: uuid }).assign({ isSelected: true }).write();
   let accs = await db.get("accounts").value();
-  event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
+  event.reply("accounts", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
   berry.log("Selected account " + uuid, "accountManager");
 });
 
@@ -99,7 +98,7 @@ ipcMain.on("refreshAccount", async (event, uuid) => {
 
 ipcMain.on("getAccounts", async (event) => {
   let accs = await db.get("accounts").value();
-  event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
+  event.reply("accounts", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
 });
 
 ipcMain.on("deleteAccount", async (event, data) => {
@@ -110,8 +109,8 @@ ipcMain.on("deleteAccount", async (event, data) => {
       await db.get("accounts").first().assign({ isSelected: true }).write();
     else {
       berry.error("Can't delete account because no accounts left", "accountManager");
-      return event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs), haveSelected: false }));
+      return event.reply("accounts", JSON.stringify({ status: "success", accounts: JSON.stringify(accs), haveSelected: false }));
     }
   }
-  event.reply("loginResult", JSON.stringify({ status: "success", accounts: JSON.stringify(accs), haveSelected: true }));
+  event.reply("accounts", JSON.stringify({ status: "success", accounts: JSON.stringify(accs), haveSelected: true }));
 });

@@ -1,0 +1,2 @@
+src/scripts/vue/* linguist-vendored
+*.html linguist-language=Vue

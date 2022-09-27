@@ -27,16 +27,19 @@ function checkForUpdates() {
      * and remove [0] from res
      */
     axios.get("https://api.github.com/repos/FlexberryLauncher/launcher/releases").then(async (r) => {
+      berry.log("Got response from GitHub API");
       let res = r?.data[0];
       if (!pkg)
         return;
       if (pkg !== res.tag_name.replace("v", "") && !existsSync(join(__dirname, "..", "..", "update.asar"))) {
+        berry.log("Update is available, downloading...");
         const updateModules = res.assets?.find(asset => asset.name.includes("asar"));
         const updateMeta = updateModules ? {
           version: res.tag_name,
           url: updateModules?.browser_download_url,
           size: updateModules?.size,
         } : false;
+        mainWindow.webContents.send("progress", { type: "update", message: `Downloading new version ${updateMeta.version} with size of ${(updateMeta.size / 1024 / 1024).toFixed(1)} MB` });
         resolve(updateMeta);
       } else {
         resolve(false);
@@ -51,7 +54,6 @@ function checkForUpdates() {
 
 function update(url) {
   return new Promise((resolve, reject) => {
-    mainWindow.webContents.send("hideUi", true);
     axios({
       url,
       responseType: "stream"
@@ -71,24 +73,28 @@ function update(url) {
               unlinkSync(join(tempDir, "app.flexberry"));
             }
           });
+          resolve(true);
         })
         .on("error", reject);
       } catch (err) {
         reject(err);
       };
     }).catch(() => {
-      reject("Couldn't download the update");
+      reject("Couldn't update, please restart the launcher.");
       berry.error("Couldn't download the update");
-      mainWindow.webContents.send("hideUi", false);
-      mainWindow.webContents.send("updateError", "Couldn't download the update");
     });
   });
 }
 
 async function createWindow() {
-  const log = readFileSync(logPath, "utf8");
-  if (log.split("Launcher is closed").length > 5) {
-    unlinkSync(logPath);
+  try {
+    const log = readFileSync(logPath, "utf8");
+    if (log.split("Launcher is closed").length > 5) {
+      unlinkSync(logPath);
+    }
+  } catch (e) {
+    // :vibe:
+    berry.error(e);
   }
   berry.log("Launcher is running in production mode. Version: " + pkg);
   mainWindow = new BrowserWindow({
@@ -113,34 +119,31 @@ async function createWindow() {
   require("./modules/gameManager")(mainWindow);
 };
 
-ipcMain.on("update", (event, arg) => {
-  update(arg).then(() => {
-    mainWindow.webContents.send("updateProgress", "Update is completed, restarting the launcher");
-    setTimeout(() => {
-      app.relaunch();
-      app.quit();
-    }, 3000);
-  }).catch(err => {
-    berry.error(err);
-    mainWindow.webContents.send("updateError", err);
-  });
-});
-
-ipcMain.on("getVersion", (event, arg) => {
-  event.reply("version", pkg);
-});
-
-ipcMain.on("getMemory", (event, arg) => {
-  event.reply("memory", require("os").totalmem());
-});
-
 ipcMain.on("minimize", () => mainWindow.minimize());
-ipcMain.on("loaded", async () => {
+ipcMain.on("loaded", async (event) => {
   mainWindow.setSkipTaskbar(false);
+  event.returnValue = {
+    launcher: {
+      version: pkg,
+    },
+    system: {
+      memory: require("os").totalmem(),
+      platform: process.platform,
+    }
+  };
   const updateMeta = await checkForUpdates();
   if (updateMeta.url) {
-    mainWindow.webContents.send("updateAvailable", updateMeta);
-    mainWindow.webContents.send("hideUi", true);
+    // TO-DO: Ask user if they wants to update
+    update(updateMeta.url).then(() => {
+      mainWindow.webContents.send("progress", { type: "update", message: "Update is completed, restarting the launcher" });
+      setTimeout(() => {
+        app.relaunch();
+        app.quit();
+      }, 2000);
+    }).catch(err => {
+      berry.error(err);
+      mainWindow.webContents.send("progress", { type: "update", error: true, message: err });
+    });
   }
 });
 
