@@ -28,7 +28,7 @@ module.exports = () => {
         try {
           if (message == "$1")
             return logStream.write("\n\n")
-          let log = `[  i  ] [ ${(new Date()).toLocaleTimeString()} ] ${message}\n`;
+          let log = `[ i ] [ ${(new Date()).toLocaleTimeString()} ] ${message}\n`;
           console.log(`${icons.info} ${message}`);
           app.isPackaged && logStream.write(log);
         } catch (e) {
