@@ -13,8 +13,7 @@ const db = low(adapter);
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const logPath = path.join(app.getPath("logs"), "launcher.log");
-const berry = require("./logger")(logPath);
+const berry = require("./logger")();
 
 module.exports = (win) => {
   class GameManager {

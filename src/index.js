@@ -11,8 +11,7 @@ require("./modules/versionManager");
 
 let mainWindow;
 
-const logPath = join(app.getPath("logs"), "launcher.log");
-const berry = require("./modules/logger")(logPath);
+const berry = require("./modules/logger")();
 
 berry.log("Starting Flexberry Launcher...");
 
@@ -87,15 +86,6 @@ function update(url) {
 }
 
 async function createWindow() {
-  try {
-    const log = readFileSync(logPath, "utf8");
-    if (log.split("Launcher is closed").length > 5) {
-      unlinkSync(logPath);
-    }
-  } catch (e) {
-    // :vibe:
-    berry.error(e);
-  }
   berry.log("Launcher is running in production mode. Version: " + pkg);
   mainWindow = new BrowserWindow({
     width: 830,

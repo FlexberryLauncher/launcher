@@ -8,8 +8,7 @@ const FileSync = require("lowdb/adapters/FileSync");
 const adapter = new FileSync(path.join(app.getPath("userData"), "profiles.json"));
 const db = low(adapter)
 
-const logPath = path.join(app.getPath("logs"), "launcher.log");
-const berry = require("./logger")(logPath);
+const berry = require("./logger")();
 
 db.defaults({ profiles: [] }).write();
 
