@@ -1,16 +1,10 @@
 const { app, ipcMain } = require("electron");
 const { Client, Authenticator } = require("minecraft-launcher-core");
 const msmc = require("msmc");
-const low = require("lowdb");
 const path = require("path");
 const axios = require("axios");
 const https = require("https");
 const fs = require("fs");
-
-const FileSync = require("lowdb/adapters/FileSync");
-const adapter = new FileSync(path.join(app.getPath("userData"), "accounts.json"));
-const db = low(adapter);
-
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const berry = require("./logger")();
@@ -99,13 +93,6 @@ module.exports = (win) => {
       });
     }
 
-    async getCurrentAccount() {
-      const selectedAccount = await db.get("accounts").find({ isSelected: true }).value();
-      if (!selectedAccount)
-        return null;
-      return msmc.getMCLC().getAuth(selectedAccount.profile);
-    }
-
     async launch(arg) {
       return new Promise(async (resolve, reject) => {
         let versionMetaURL = arg.url || arg.actualVersion.url;
@@ -138,12 +125,13 @@ module.exports = (win) => {
         if (arg.actualVersion)
           version.custom = arg.id;
 
-        berry.log("Launching version " + (version.custom || version.number), "gameManager");
+        berry.log("Launching " + (version.custom || version.number) + " with account " + arg.account?.profile?.name || "???", "gameManager");
+        const account = msmc.getMCLC().getAuth(arg.account.profile);
         const launcherOptions = {
           clientPackage: null,
           root: this.minecraftDir,
           version,
-          authorization: await this.getCurrentAccount() || Authenticator.getAuth("flexberry" + Math.floor(Math.random() * 999) + 1),
+          authorization: account || Authenticator.getAuth(account.username || "flexberry" + Math.floor(Math.random() * 1000) + 100),
           memory: {
             max: (+arg.profile.memory) + "M",
             min: (+arg.profile.memory) - 512 + "M",

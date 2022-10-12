@@ -16,7 +16,10 @@ createApp({
         launcher: {},
         system: {}
       },
-      initEvents: ["getProfiles", "getAccounts", "getVersions"],
+
+      // I don't recommend you to edit this if you have no idea about know what you are doing
+      eventsToInvoke: [{ data: "versions", association: "versionManager", name: "getVersions", loaded: false }, { data: "profiles", association: "versionManager", name: "getProfiles", loaded: false }, { data: "accounts", bindIntoState: true, association: "accountManager", name: "getAccounts", loaded: false }],
+
       loadingStates: {
         accounts: true,
         launcher: false
@@ -35,11 +38,16 @@ createApp({
   computed: {
     filteredVersions: {
       get() {
-        return this.versions.filter(version => this.versionsFilter.includes(version.type));
+        return this.versions.filter(version => this.versionsFilter.some(filter => version.type.includes(filter)));
       }
     }
   },
   methods: {
+    load() {
+      this.loadingStates.launcher = false;
+      IPC.send("loaded");
+      document.querySelector("link[href='style/loading.css']")?.remove();
+    },
     toggleTab(tab) {
       this.activeTab = this.activeTab == tab ? "" : tab;
       this.toggledSubmenu = "versionSettings";
@@ -160,8 +168,10 @@ createApp({
       const selectedProfile = JSON.parse(JSON.stringify(this.profiles.find(profile => profile.isSelected)));
       const launchProfile = {
         ...JSON.parse(JSON.stringify(this.versions.find(version => version.id == selectedProfile.version))),
-        profile: selectedProfile
+        profile: selectedProfile,
+        account: JSON.parse(JSON.stringify(this.accounts.find(account => account.isSelected))) || ("flexberry" + Math.floor(Math.random() * 1000) + 100)
       }
+      console.log(launchProfile);
       this.loadingStates.launcher = true;
       this.progress.state = "Preparing...";
       IPC.send("launch", launchProfile);
@@ -179,19 +189,30 @@ createApp({
     // If you want faster load time, change beforeMount to created
     // But animations and images may be glitchy for a few milliseconds
     this.resetWizard();
-    document.querySelector("link[href='style/loading.css']").remove();
   },
   mounted() {
-    setTimeout(() => {
-      // See https://discord.com/channels/999748349429297175/999771291781431427/1021100883074883604 in https://discord.gg/dbVPH8KYP2
-      if (!this.profiles[0] || !this.versions)
-        location.reload();
-    }, 5000);
-    this.meta = IPC.sendSync("loaded"); 
+    this.meta = IPC.sendSync("getMeta"); 
     this.check("release", "versionsFilter");
 
-    this.initEvents.forEach(event => {
-      IPC.send(event);
+    let i = 0;
+    IPC.on("pong", (meta) => {
+      for (const event of meta.call) {
+        IPC.invoke(event).then(result => {
+          let eventToInvoke = this.eventsToInvoke.find(e => e.name == event);
+          if (eventToInvoke.bindIntoState)
+            this.loadingStates[eventToInvoke.data] = false;
+          console.log(eventToInvoke);
+          this[eventToInvoke.data] = result;
+          eventToInvoke.loaded = true;
+          if (this.eventsToInvoke.every(e => e.loaded) && !this.loadingStates.launcher)
+            this.load();
+          console.log(`Loaded ${event} from ${eventToInvoke.association} with ${result.length} data length`);
+        }).catch(error => {
+          // alert(`Error while loading ${event}: ${error}`);
+          console.error(error.stack);
+        });
+
+      }
     });
 
     IPC.on("profiles", (profiles) => {
@@ -210,11 +231,6 @@ createApp({
       this.accounts = JSON.parse(result.accounts);
     });
 
-    IPC.on("versions", (result) => {
-      this.versions = result;
-    });
-
-    // Refresh account function is async, that's the reason why i didn't used IPC.sendSync for refreshAccount
     IPC.on("refreshAccountResult", (result) => {
       result = JSON.parse(result);
       this.loadingStates.accounts = true;
@@ -239,5 +255,7 @@ createApp({
           : progress;
       }
     });
+
+    IPC.send("ping");
   }
 }).mount("#app");

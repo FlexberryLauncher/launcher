@@ -6,10 +6,8 @@ const tempDir = join(__dirname, "..", "..")
 
 const pkg = require("../package.json").version;
 
-require("./modules/accountManager");
-require("./modules/versionManager");
-
 let mainWindow;
+let isEverythingLoadedCorrectly = false;
 
 const berry = require("./modules/logger")();
 
@@ -85,7 +83,7 @@ function update(url) {
   });
 }
 
-async function createWindow() {
+function createWindow() {
   berry.log("Launcher is running in production mode. Version: " + pkg);
   mainWindow = new BrowserWindow({
     width: 830,
@@ -107,12 +105,13 @@ async function createWindow() {
   if (process.platform === "darwin")
     mainWindow.setWindowButtonVisibility(false);
   require("./modules/gameManager")(mainWindow);
+  require("./modules/versionManager")(mainWindow);
+  require("./modules/accountManager")(mainWindow);
 };
 
-ipcMain.on("minimize", () => mainWindow.minimize());
-ipcMain.on("loaded", async (event) => {
-  mainWindow.setSkipTaskbar(false);
+ipcMain.on("getMeta", async (event) => {
   event.returnValue = {
+    isEverythingLoadedCorrectly,
     launcher: {
       version: pkg,
     },
@@ -121,6 +120,12 @@ ipcMain.on("loaded", async (event) => {
       platform: process.platform,
     }
   };
+});
+
+ipcMain.on("loaded", async () => {
+  isEverythingLoadedCorrectly = true;
+  mainWindow.setSkipTaskbar(false);
+  mainWindow.focus();
   const updateMeta = await checkForUpdates();
   if (updateMeta.url) {
     // TO-DO: Ask user if they wants to update

@@ -6,9 +6,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
-    "package-windows": "node builder/windows.js",
-    "package-linux": "node builder/linux.js",
-    "package-macos": "node builder/darwin.js"
+    "package:windows": "node builder/packager.js --platform=win32",
+    "package:linux": "node builder/packager.js --platform=linux"
   },
   "author": {
     "name": "Kuzey Kurtuluş",
