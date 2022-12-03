@@ -1,37 +1,52 @@
-const { createApp } = Vue;
+const { createApp, toRaw } = Vue;
+
+// TO-DO: Migrate some of the CSS @keyframes to JS
 
 createApp({
   data() {
     return {
       activeTab: "",
-      toggledSubmenu: "versionSettings",
-      toggledModal: "",
 
       profiles: [],
+      profilesSearch: "",
       accounts: [],
+      accountsSearch: "",
       versions: [],
       versionsFilter: [],
 
+      skins: [],
+
       meta: {
         launcher: {},
-        system: {}
+        system: {},
+      },
+      
+      tooltip: {
+        visible: false,
+        actions: [],
       },
 
-      // I don't recommend you to edit this if you have no idea about know what you are doing
+      // I don't recommend you to edit this if you have no idea about what you are doing
       eventsToInvoke: [{ data: "versions", association: "versionManager", name: "getVersions", loaded: false }, { data: "profiles", association: "versionManager", name: "getProfiles", loaded: false }, { data: "accounts", bindIntoState: true, association: "accountManager", name: "getAccounts", loaded: false }],
 
       loadingStates: {
         accounts: true,
-        launcher: false
+        launcher: false,
+        addProfile: false,
       },
       progress: {
         state: undefined
       },
       blocks: ["glass", "grass_block", "diamond_block", "bedrock", "cobblestone", "crying_obsidian", "netherrack", "oak_log", "spruce_planks", "copper_block", "redstone_ore", "andesite"],
       wizard: {
-        page: 0,
         alert: undefined,
-        data: {}
+        mode: "data",
+        data: {
+          appearance: {}
+        },
+        edit: {
+          appearance: {}
+        }
       }
     }
   },
@@ -40,26 +55,44 @@ createApp({
       get() {
         return this.versions.filter(version => this.versionsFilter.some(filter => version.type.includes(filter)));
       }
+    },
+    filteredProfiles: {
+      get() {
+        return this.profiles.filter(profile => profile.appearance.name.toLowerCase().includes(this.profilesSearch.toLowerCase()) || profile.version.toLowerCase().includes(this.profilesSearch.toLowerCase()));
+      }
+    },
+    filteredAccounts: {
+      get() {
+        return this.accounts.filter(account => account.username.toLowerCase().includes(this.accountsSearch?.toLowerCase()));
+      }
     }
   },
   methods: {
+    // General methods
+    toggleTab(tab) {
+      if (this.activeTab == tab) {
+        this.activeTab = "";
+      } else {
+        this.activeTab = tab;
+      }
+      (tab == "addProfile") && this.resetWizard();
+    },
     load() {
       this.loadingStates.launcher = false;
       IPC.send("loaded");
       document.querySelector("link[href='style/loading.css']")?.remove();
     },
-    toggleTab(tab) {
-      this.activeTab = this.activeTab == tab ? "" : tab;
-      this.toggledSubmenu = "versionSettings";
+    async showTooltip(event, options) {
+      this.tooltip.actions = options;
+      const tooltipRef = this.$refs.tooltip;
+      await new Promise(resolve => setTimeout(resolve, 60)); // Wait for click event to be fired
+      const tooltipBounds = tooltipRef.getBoundingClientRect();
+      const buttonBounds = event.target.getBoundingClientRect();
+      tooltipRef.style.top = buttonBounds.top - tooltipBounds.height - 10 + "px";
+      tooltipRef.style.left = buttonBounds.left + buttonBounds.width / 2 - tooltipBounds.width / 2 + "px";
+      this.tooltip.visible = true;
     },
-    toggleSubTab(tab) {
-      this.toggledSubmenu = tab;
-    },
-    toggleModal(modal) {
-      if (((modal == "") && (this.toggledModal == "versionSelector")) || (modal == "versionSelector"))
-        this.resetWizard();
-      this.toggledModal = modal;
-    },
+    // Account and version profile methods
     deleteProfile(profile) {
       this.profiles = this.profiles.filter(pf => pf.appearance?.name != profile);
       IPC.send("deleteProfile", profile);
@@ -95,17 +128,17 @@ createApp({
       IPC.send("deleteAccount", uuid);
     },
     // Wizard methods
-    selectBlock(block) {
-      this.wizard.data.appearance.icon = block;
-    },
-    selectVersion(version) {
-      this.wizard.data.version = version.id;
-      this.wizard.data.type = version.type;
+    openEditProfile(profile) {
+      this.toggleTab("addProfile");
+      this.wizard.edit = JSON.parse(JSON.stringify(profile));
+      this.wizard.staticName = profile?.appearance?.name;
+      this.wizard.mode = "edit";
     },
     resetWizard() {
       this.wizard.data = {
         version: "",
         type: "",
+        directory: "",
         appearance: {
           icon: "glass",
           name: ""
@@ -116,62 +149,38 @@ createApp({
           height: 420
         }
       };
+      this.wizard.mode = "data";
       this.wizard.alert = undefined;
-      this.wizard.page = 0;
-      document?.getElementById("wizard")?.scrollTo(0, 0);
     },
-    nextWizardPage() {
-      if ((this.wizard.page == 0) && this.wizard.data.appearance.name == "") {
-        this.wizard.alert = "Please enter a profile name";
-        setTimeout(() => {
-          this.wizard.alert = undefined;
-        }, 2000);
-        return;
-      }
-      if (this.wizard.page == 1) {
-        if (this.wizard.data.version == "") {
-          this.wizard.alert = "Please select a version";
-          setTimeout(() => {
-            this.wizard.alert = undefined;
-          }, 2000);
-          return;
-        } else {
-          this.wizard.alert = "Create profile";
-        }
-      } else if (this.wizard.alert == "Create profile") {
-        // Vue treats the data Objects as a Proxy
-        const profile = JSON.parse(JSON.stringify(this.wizard.data));
+    createProfile() {
+      const profile = toRaw(this.wizard[this.wizard.mode]);
+      if (!profile.appearance.name)
+        return alert("Please enter a profile name");
+      if (!profile.version)
+        return alert("Please select a version");
+      this.loadingStates.addProfile = true;
+      if (this.wizard.mode == "edit")
+        IPC.send("editProfile", profile);
+      else
         IPC.send("addProfile", profile);
-        this.toggleModal("");
-        return;
-      }
-      const wizard = document.getElementById("wizard");
-      wizard.scrollBy({
-        top: 0,
-        left: wizard.offsetWidth + 17,
-        behavior: "smooth"
-      });
-      this.wizard.page++;
+      this.wizard.mode = "data"
+      this.toggleTab("profiles");
     },
-    check(value, data) {
-      if (this[data].includes(value) && this[data].length > 1)
-        this[data] = this[data].filter(v => v != value);
-      else if (!this[data].includes(value))
-        this[data].push(value);
-      if (data == "versionsFilter") {
-        if (!this.filteredVersions.map(version => version.id).includes(this.wizard.data.version))
-          this.wizard.data.version = this.wizard.data.type = "";
-      }
+    async openDirectory() {
+      this.loadingStates.addProfile = true;
+      this.wizard[this.wizard.mode].directory = (await IPC.invoke("openDirectory")) || "";
+      this.loadingStates.addProfile = false;
     },
     // Launch methods
     launch() {
-      const selectedProfile = JSON.parse(JSON.stringify(this.profiles.find(profile => profile.isSelected)));
+      const selectedProfile = toRaw(this.profiles.find(profile => profile.isSelected));
       const launchProfile = {
-        ...JSON.parse(JSON.stringify(this.versions.find(version => version.id == selectedProfile.version))),
+        ...toRaw(this.versions.find(version => version.id == selectedProfile.version)),
         profile: selectedProfile,
-        account: JSON.parse(JSON.stringify(this.accounts.find(account => account.isSelected))) || ("flexberry" + Math.floor(Math.random() * 1000) + 100)
+        account: toRaw(this.accounts.find(account => account.isSelected)) || ("flexberry" + Math.floor(Math.random() * 1000) + 100)
       }
       console.log(launchProfile);
+      this.toggleTab();
       this.loadingStates.launcher = true;
       this.progress.state = "Preparing...";
       IPC.send("launch", launchProfile);
@@ -185,28 +194,21 @@ createApp({
         document.body.classList.remove("loaded");
     }
   },
-  beforeMount() {
-    // If you want faster load time, change beforeMount to created
-    // But animations and images may be glitchy for a few milliseconds
-    this.resetWizard();
-  },
   mounted() {
     this.meta = IPC.sendSync("getMeta"); 
-    this.check("release", "versionsFilter");
+    this.resetWizard();
 
-    let i = 0;
     IPC.on("pong", (meta) => {
       for (const event of meta.call) {
         IPC.invoke(event).then(result => {
           let eventToInvoke = this.eventsToInvoke.find(e => e.name == event);
           if (eventToInvoke.bindIntoState)
             this.loadingStates[eventToInvoke.data] = false;
-          console.log(eventToInvoke);
           this[eventToInvoke.data] = result;
           eventToInvoke.loaded = true;
           if (this.eventsToInvoke.every(e => e.loaded) && !this.loadingStates.launcher)
             this.load();
-          console.log(`Loaded ${event} from ${eventToInvoke.association} with ${result.length} data length`);
+          // console.log(`Loaded ${event} from ${eventToInvoke.association} with ${result.length} data length`);
         }).catch(error => {
           // alert(`Error while loading ${event}: ${error}`);
           console.error(error.stack);
@@ -216,8 +218,9 @@ createApp({
     });
 
     IPC.on("profiles", (profiles) => {
-      if (profiles.status == "error") {
-        profiles.message && alert(profiles.message);
+      this.loadingStates.addProfile = false;
+      if (!profiles || profiles.status == "error") {
+        profiles?.message && alert(profiles.message);
         return console.error(profiles);
       }
       this.profiles = profiles;
@@ -255,6 +258,39 @@ createApp({
           : progress;
       }
     });
+
+    document.addEventListener("click", async (e) => {
+      if (e.target.classList.contains("profileAction")) {
+        this.tooltip.visible = false;
+        this.tooltip.visible = true;
+        // ^ To play transition
+      }
+      this.tooltip.visible = false;
+    });
+
+    // Demo code of skin library
+    /* (async () => {
+      const skinViewer = new skinview3d.SkinViewer({
+        width: 200,
+        height: 300,
+        renderPaused: true
+      });
+  
+      skinViewer.camera.rotation.y = -0.4;
+      skinViewer.camera.position.x = -18;
+      skinViewer.fov = 30;
+      skinViewer.nameTag = "kuzey_"
+
+      console.time("skin");
+      const skins = ["00001", "00002", "00003", "00004", "00005", "00006", "00007", "00008", "00009", "00010", "00011", "00012", "00013", "00014", "00015", "00016", "00017", "00018", "00019", "00020", "00021", "00022", "00023", "00024", "00025", "00026", "00027", "00028", "00029", "00030", "00031", "00032", "00033", "00034", "00035", "00036", "00037", "00038", "00039", "00040", "00041", "00042", "00043", "00044", "00045", "00046", "00047", "00048", "00049", "00050", "00051", "00052", "00053", "00054", "00055", "00056", "00057", "00058", "00059", "00060", "00061", "00062", "00063", "00064", "00065", "00066", "00067", "00068", "00069", "00070", "00071", "00072", "00073", "00074", "00075", "00076", "00077", "00078", "00079", "00080", "00081", "00082", "00083", "00084", "00085", "00086", "00087", "00088", "00089", "00090", "00091", "00092", "00093", "00094", "00095", "00096", "00097", "00098", "00099", "00100"];
+      for (const skin of skins) {
+        await skinViewer.loadSkin(`https://jcpopipvurwaefwngpnh.supabase.co/storage/v1/object/public/skins/general/${skin}.png`);
+        await skinViewer.render();
+        this.images += (skinViewer.canvas.toDataURL());
+        console.log(`Loaded ${skin}`);
+      }
+      console.timeEnd("skin");
+    })(); */
 
     IPC.send("ping");
   }

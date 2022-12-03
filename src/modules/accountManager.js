@@ -15,6 +15,7 @@ module.exports = (win) => {
     await db.defaults({ accounts: [] }).write()
     let selectedAccount = await db.get('accounts').find({ isSelected: true }).value();
     if (selectedAccount && !msmc.validate(selectedAccount.profile)) {
+      // TO-DO - Instead of deselecting the account, we should probably just revalidate it
       berry.log("Deselecting selected account, because it's expired.", "accountManager");
       db.get('accounts').find({ isSelected: true }).assign({ isSelected: false }).write();
     }
@@ -50,8 +51,9 @@ module.exports = (win) => {
             access_token: result.access_token,
             profile: result.profile,
             xbox: xbox,
-            isSelected: false
+            isSelected: true
           }
+          await db.get('accounts').find({ isSelected: true }).assign({ isSelected: false }).write();
           let accs = await db.get("accounts").push(newData).write();
           berry.log("Logged in to account " + result.profile.name, "accountManager");
           event.reply("accounts", JSON.stringify({ status: "success", accounts: JSON.stringify(accs) }));
@@ -61,7 +63,6 @@ module.exports = (win) => {
         event.reply("accounts", JSON.stringify({ status: "error", error: reason}));
       })
   });
-
 
   ipcMain.on("verifyAccount", async (event, uuid) => {
     berry.log("Verifying account " + uuid, "accountManager");
@@ -103,7 +104,7 @@ module.exports = (win) => {
 
   ipcMain.on("deleteAccount", async (event, data) => {
     let accs = await db.get("accounts").value();
-    if ((await db.get("accounts").find({ uuid: data }).value()).isSelected) {
+    if ((await db.get("accounts").find({ uuid: data }).value())) {
       await db.get("accounts").remove({ uuid: data }).write();
       if (accs[0])
         await db.get("accounts").first().assign({ isSelected: true }).write();

@@ -1,970 +1,617 @@
 @font-face {
-  font-family: "Minecrafter";
-  src: url("../assets/typefaces/Minecrafter.ttf");
-}
-
-@font-face {
   font-family: "Minercraftory";
   src: url("../assets/typefaces/Minercraftory.ttf");
 }
 
-@font-face {
-  font-family: "Minecraft";
-  src: url("../assets/typefaces/Minecraft.ttf");
-}
-
-@font-face {
-  font-family: "Minecraft Turkish";
-  src: url("../assets/typefaces/Minecraft-Turkish.ttf");
-}
-
-/*
-@keyframes 😡 {
-  0% {
-    pointer-events: none;
-  }
-  100% {
-    pointer-events: auto;
-  }
-}
-*/
-
 * {
   margin: 0;
-  padding: 0;
-  text-shadow: var(--shadow) 0 4px 0;
-  box-sizing: border-box;
-  transform-style: preserve-3d;
   -webkit-user-drag: none;
+  user-select: none;
+  box-sizing: border-box;
   outline: none;
-  /* animation: 😡 4s linear; */
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-  background: var(--main-color-darker);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--main-color-halfly-visible);
-}
-
-.select::-webkit-scrollbar-thumb {
-  background: var(--main-color);
+  font-family: "Poppins";
 }
 
 body {
-  user-select: none;
-  font-family: "Minercraftory", sans-serif;
-  color: var(--white);
-  height: 100vh;
   overflow: hidden;
-  border-radius: 10px;
+  height: 100vh;
 }
 
-body::after {
-  opacity: 0;
-  animation: 1.2s fadeIn forwards;
-  animation-delay: 1s;
-  z-index: -2000;
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 830px;
-  height: 490px;
-  border-radius: 16px;
-  transform: translateZ(30deg);
-  transition: 1s;
+*::-webkit-scrollbar {
+  width: 6px;
+  background-clip: padding-box;
+  background: #0b001480;
 }
 
-body::before {
-  opacity: 0;
-  animation: 3s fadeIn forwards;
-  animation-delay: .8s;
-  z-index: -1000;
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
+*::-webkit-scrollbar-thumb {     
+  background: #290e3f70;
+}
+
+#window {
   width: 100%;
-  height: 50%;
-  background: linear-gradient(
-    to bottom,
-    #00000000,
-    #000000); 
-  border-radius: 14px;
+  height: 100%;
+  background: linear-gradient(#000000c7, #000000c7), linear-gradient(to top, #000, #00000060), url("../assets/backgrounds/chorus.png");
+  background-size: cover;
+  border-radius: 20px;
+  padding: 24px;
+  padding-bottom: 0;
+  color: #fff;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-@keyframes titleStartUp {
-  0% {
-    opacity: 0;
-    transform: translateY(190%) scale(1);
-  }
-  80% {
-    opacity: 1;
-    transform: translateY(-1%) scale(1.1);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.launcherIcon {
+  width: 27px;
 }
 
-.titleHolder {
-  opacity: 0;
-  transform: translateY(190%);
-  animation: .8s titleStartUp forwards;
-  z-index: 10000;
+.titlebar {
+  -webkit-app-region: drag;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 24px 24px 0;
+}
+
+.sidebar {
   position: absolute;
+  left: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 60%;
-  margin: -2% 20%;
-  height: 20%;
-  background: url("../assets/images/minecraft.png");
-  background-size: 390px;
-  background-repeat: no-repeat;
+  gap: 24px;
+}
+
+.sidebarIcon {
+  opacity: .6;
+  width: 24px;
+  cursor: pointer;
+  transition: .2s;
+  color: #ffffff80;
+}
+
+.sidebarProfile {
+  padding: 30px 30px 0 0;
+  background: #00000080;
   background-position: center;
-  -webkit-app-region: drag;
-  transition: .4s;
+  background-size: cover;
 }
 
-@keyframes titleAltStartUp {
-  0% {
-    transform: translateY(100px) scale(1);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(76px) scale(1);
-    opacity: 1;
-  }
+.sidebarIcon:hover {
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 0 32px #00000090;
 }
 
-.titleAlt {
+.activeIcon {
+  color: #ffffffc8;
+  opacity: 1;
+}
+
+.backIcon {
+  position: absolute;
+  bottom: 27px;
+  left: 27px;
+  transition: .2s;
   opacity: 0;
-  animation: .2s fadeIn forwards, .8s titleAltStartUp forwards;
-  transform: translateY(76px);
-  width: 280px;
+  pointer-events: none;
+}
+
+.visibleBackIcon {
+  pointer-events: all;
+  opacity: .8;
+}
+
+.closeButton {
+  -webkit-app-region: no-drag;
+  opacity: .8;
+  background: #5A149750;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: .2s;
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  z-index: 1;
+}
+
+.closeIcon {
+  width: 11px;
+}
+
+.closeButton:hover {
+  opacity: 1;
 }
 
 .content {
-  position: absolute;
-  width: calc(100%);
-  height: calc(100% - 30px);
-  bottom: 0;
-  border-radius: 14px;
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes levitateIn {
-  from {
-    transform: translateY(20px);
-  }
-  to {
-    transform: translateY(0px);
-  }
-}
-
-@keyframes levitateOut {
-  from {
-    transform: translateY(0px);
-  }
-  to {
-    transform: translateY(20px);
-  }
-}
-
-.bottomBar {
-  opacity: 0;
-  transform: translateY(-20px);
-  animation: .4s fadeIn forwards, .4s levitateIn forwards;
-  animation-delay: 1.4s;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 32px;
-  border-radius: 0 0 14px 14px;
-}
-
-.bottomBar .button:not(.playButton) {
-  transform: translateY(20px);
-  animation: .8s levitateIn forwards;
-  animation-delay: 1.2s;
-}
-
-.barContainer {
-  width: 20%;
-}
-
-.username {
-  text-align: center;
-  font-size: 12px;
-}
-
-.button .icon {
-  width: 38px;
-  filter: drop-shadow(var(--shadow) 0 4px 0);
-}
-
-.buttons {
-  display: flex;
-  
-  gap: 16px;
-}
-
-.button {
-  transition: .2s background;
-  cursor: pointer;
-  height: calc(12px * 3 + 38px);
-  background: var(--main-color);
-  border-bottom: 6px solid var(--main-color-darker);
-  padding: 12px;
-}
-
-.iconButton {
-  padding: 12px;
-  min-width: 78px;
-  display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  transition: .3s ease;
 }
 
 .playButton {
-  padding: 12px;
-  width: 264px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.button:hover {
-  background: var(--main-color-slightly-dark);
-}
-
-.button:active, .toggledButton {
-  border-bottom: none;
-  height: calc(12px * 3 + 38px - 6px);
-  position: relative;
-  top: 6px!important;
-}
-
-.playButtonTitle {
-  text-transform: uppercase;
-  font-family: "Minecrafter";
-  font-size: 28px;
-}
-
-.playButtonSubtitle {
+  border: 4px #1E122850 solid;
+  background: #16002940;
+  color: #ffffff90;
+  padding: 12px 12vw;
   font-family: "Minercraftory";
-  font-size: 12px;
-  opacity: .7;
-  text-overflow: ellipsis;
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.topBar {
-  opacity: 0;
-  animation: 2s fadeIn forwards;
-  animation-delay: 2s;
-  padding: 10px;
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  z-index: 150000;
-}
-
-.close {
-  margin-top: -8px;
-  padding: 10px;
   cursor: pointer;
+  transition: .1s;
+  font-size: 1.5rem;
+}
+
+.playButton:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 32px #0c0111;
+}
+
+.playButton:active {
+  border: 4px #27133670 solid;
+}
+
+.profileInfo {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  font-weight: 300;
+  color: #ffffff90;
+  transition: .3s ease;
+  margin-top: 24px;
+}
+
+.changeProfile {
+  cursor: pointer;
+  color: #851ee0cc;
   transition: .1s;
 }
 
-.scene {
-  font-family: "Minecraft";
-  width: 24px;
-  height: 24px;
-  perspective: 96px;
+.changeProfile:hover {
+  color: #841ee0ee;
+  text-shadow: 0 0 16px #841ee060;
 }
 
-.cube {
-  width: 99%;
-  height: 99%;
-  position: relative;
-  transform-style: preserve-3d;
+.launchSection {
+  text-align: center;
+  transition: .3s ease;
 }
 
-.cube__face {
-  border-radius: 6px;
+.tabs {
+  height: 0;
+  pointer-events: none;
+  width: 66%;
+  opacity: 0;
+  transform-origin: top;
+  transform: translateY(-100vh);
+  transition: .4s;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background: var(--danger);
-  position: absolute;
-  width: 30px;
-  height: 30px;
+  flex-direction: row;
 }
 
-.cube__image {
-  width: 100%;
+.tabsEnabled .tabs {
   height: 100%;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.cube__face--front  { transform: rotateY(  0deg) translateZ(12px); }
-.cube__face--right  { transform: rotateY( 90deg) translateZ(12px); }
-.cube__face--back   { transform: rotateY(180deg) translateZ(12px); }
-.cube__face--left   { transform: rotateY(-90deg) translateZ(12px); }
-.cube__face--bottom { transform: rotateX(-90deg) translateZ(12px); }
-.cube__face--top    { transform: rotateX( 90deg) translateZ(12px); }
-
-.cube { transform: translateZ(-12px); }
-.cube { transition: transform .2s; }
-
-.close:hover .cube {
-  transform: translateZ(-12px) rotateX( -90deg);
+  transform: translateY(0);
+  pointer-events: all;
+  opacity: 1;
+  margin-top: 48px;
+  overflow: hidden;
 }
 
 .tab {
-  overflow: hidden;
-  height: 62%;
-  width: 54.5%;
-  margin: 0 50%;
-  background: var(--main-color);
-  border-bottom: var(--main-color-darker) 6px solid;
-  padding: 12px;
-  display: flex;
   opacity: 0;
-  flex-direction: column;
-  align-items: center;
-  transform: translateY(150%) translateX(-50%);
+  pointer-events: none;
+  transition: .2s;
   position: absolute;
-  top: 80px;
-  transition: opacity .4s ease-in-out, transform .2s ease-in-out;
+  height: 100%;
+  width: 100%;
+  /* -webkit-mask-image: linear-gradient(to top, transparent 0%, black 20%); */
 }
 
-.modalWrapper {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 0;
-  z-index: -500;
-  border-radius: 16px;
+.activeTab {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.tabsEnabled .launchSection .profileInfo {
   opacity: 0;
-  transition: .2s;
+  pointer-events: none;
+  transform: translateY(64px);
 }
 
-.visibleModalWrapper {
-  opacity: 1;
-  height: 100%;
-  top: 0;
-  z-index: 500;
-  backdrop-filter: blur(10px);
-  background: linear-gradient(to bottom, transparent, #00000050, transparent);
-}
-
-.visibleModal {
-  opacity: 1;
-  box-shadow: var(--main-color-darkest) 0 0 40px;
-  transform: translateX(-50%)!important;
-}
-
-.modal {
-  z-index: 1000;
-  height: 76%;
-  transition: .4s;
-}
-
-.visibleTab {
-  opacity: 1;
-  display: flex;
-  transform: translateX(-50%)!important;
-}
-
-.tabTitle {
-  font-family: "Minecrafter";
-  font-size: 28px;
-  text-transform: uppercase;
-}
-
-.tabTop {
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.tabClose, .tabExternal {
-  width: 32px;
-  height: 32px;
-  transition: .2s;
-  padding: 8px;
-}
-
-.tabClose {
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: var(--main-color-dark);
-}
-
-.tabClose:hover {
-  background: var(--main-color-darker);
-}
-
-.tabCloseIcon {
-  width: 100%;
-}
-
-.accountList, .versionList {
+.profiles {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 100%;
-  overflow-y: scroll;
-  height: 100%;
-  transition: .2s;
-}
-
-.tabLoading::after {
-  content: "";
-  background: var(--darker-shadow);
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  transition: .2s;
-}
-
-.tabLoading::before {
-  z-index: 1000;
-  content: "";
-  background: url("../assets/icons/loading.gif");
-  background-size: cover;
-  width: 48px;
-  height: 48px;
-  top: calc(50% - 24px);
-  bottom: calc(50% - 24px);
-  position: absolute;
-  transition: .2s;
-}
-
-.tabLoading {
-  transition: .2s;
-}
-
-.account, .version {
-  padding: 8px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  background: var(--main-color-dark);
-  width: calc(100% - 8px);
-  transition: .2s;
-  cursor: pointer;
+  width: 100%;
 }
 
-.addAccount, .addVersion {
-  padding: 8px 32px;
-  min-height: 52px;
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: space-between;
-  font-family: "Minecrafter";
-  font-size: 14px;
-}
-
-.account:hover, .version:hover {
-  background: var(--main-color-darker);
-}
-
-.addAccountTitle, .addVersionTitle {
-  text-shadow: none;
-}
-
-.accountMain, .versionMain {
-  display: flex;
-  flex-direction: row;
-  gap: 16px;
-}
-
-.addAccountIcon, .addVersionIcon {
-  font-family: "Minecraft";
-  color: white;
-  width: 24px;
-  font-size: 24px;
-  text-shadow: none;
-  filter: drop-shadow(var(--shadow) 0 4px 0);
-}
-
-.accountImage, .versionImage {
-  height: 44px;
-}
-
-.accountInfo, .versionInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  justify-content: center;
-}
-
-.accountUsername, .versionName {
-  font-family: "Minecraft";
-  font-size: 16px;
-  text-shadow: none;
-}
-
-.accountMail, .versionVersion {
-  font-family: "Minecraft";
-  font-size: 14px;
-  line-height: 8px;
-  text-shadow: none;
-}
-
-.selectedAccount, .selectedVersion {
-  cursor: default;
-  background: var(--main-color-darker);
-}
-
-.deleteAccount {
-  width: 44px;
-  height: 44px;
-  background: var(--main-color);
-  z-index: 1000;
-  cursor: pointer;
-  transition: .2s;
-}
-
-.deleteAccount:hover {
-  background: var(--main-color-dark);
-}
-
-.deleteAccount::after {
-  content: '';
-  z-index: -100;
+.profilesTop {
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  background: url("../assets/icons/trash-bin.png") no-repeat center;
-  background-size: 24px;
-  width: 44px;
-  height: 44px;
-  padding: 1px;
-}
-
-.subTabTogglers {
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  width: calc(100% - 16px);
-  margin-right: 16px;
-  justify-content: space-between;
-}
-
-.subTabToggler {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  font-family: "Minecrafter";
-  text-shadow: none;
-  width: 100%;
-  height: 100%;
-  padding: 10px 4px;
-  background: var(--main-color-dark);;
-  cursor: pointer;
-  transition: .2s;
-}
-
-.subTabToggler:hover {
-  background: var(--main-color-darker);
-}
-
-.toggledTabToggler {
-  background: var(--main-color-darker);
-}
-
-.subTabs {
-  margin-top: 6px;
-  width: 100%;
-  height: 100%;
-}
-
-.subTab {
-  position: absolute;
-  transition: ease-in-out .3s;
-  width: 100%;
-  height: 100%;
-  transform: translateX(110%);
-}
-
-.subTab:first-child {
-  transform: translateX(-110%);
-}
-
-.subTab:last-child {
-  transform: translateX(110%);
-}
-
-.visibleSubTab {
-  transform: none!important;
-}
-
-.wizard {
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 100% 100% 100% 100%;
-  flex-direction: row;
-  width: 100%;
-  gap: 16px;
-  scroll-behavior: smooth;
-}
-
-.wizardContent:nth-child(n) {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  background: var(--main-color-dark); 
-  padding: 16px;
-  width: 100%;
-  height: 100%;
-  transform: none;
-  gap: 16px;
-}
-
-.wizardActions {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 12px;
-  width: 100%;
-}
-
-.wizardAction {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-  font-family: "Minecrafter";
-  font-size: 16px;
-  cursor: pointer;
-  transition: .2s;
-  background: var(--main-color-dark);
-  width: 100%;
-}
-
-.input {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 4px;
-}
-
-label {
-  font-family: "Minecrafter";
-  font-size: 14px;
-  text-shadow: none;
-  color: var(--main-color-lightest);
-}
-
-.input input {
-  font-family: "Minecraft Turkish";
-  font-size: 14px;
-  color: var(--main-color-lightest);
-  width: 100%;
-  padding: 8px;
-  border: none;
-  text-shadow: none;
-  background: var(--main-color);
-  border: none;
-  transition: .2s;
-}
-
-.sizes {
-  display: grid;
-  grid-template-columns: 48% 12px 48%;
-  gap: 8px;
-  align-items: center;
-}
-
-.x {
-  text-shadow: none;
-  font-family: "Minecraft";
-  opacity: .7;
-}
-
-.input input::placeholder {
-  color: var(--main-color-lightest);
-  opacity: .6;
-}
-
-.blocks {
-  margin-top: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
   gap: 12px;
 }
 
-.block {
-  width: calc((100% - 12px * 5) / 6);
-  position: relative;
-  transition: .2s ease-in;
-  cursor: pointer;
+.verticalDivider {
+  width: 1px;
+  height: 60%;
+  align-self: center;
+  background: #b78fdb50;
 }
 
-.block:hover {
-  transform: scale(1.05);
-  box-shadow: var(--darker-shadow) 0 0 16px;
+input {
+  border: 4px #1E122850 solid;
+  background: #16002940;
+  color: #b78fdb;
+  padding: 10px 16px;
+  transition: .2s;
+  font-size: .9rem;
+  width: 50%;
+  backdrop-filter: blur(6px);
 }
 
-.selectedBlock {
-  border: 4px solid var(--main-color-darkest);
+input:hover, input:focus {
+  border: 4px #27133670 solid;
 }
 
-.selector {
-  display: flex; 
-  flex-direction: column;
-  gap: 8px;
-  height: 218px;
+input:focus {
+  box-shadow: 0 0 32px #0c0111;
 }
 
-.select {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  overflow-y: scroll;
-  height: 80%;
-  padding-right: 8px;
-  margin-right: -8px;
-}
-
-.option {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  padding: 12px;
-  font-size: 14px;
-  background: var(--main-color-slightly-dark);
+.button {
+  border: 4px #1E122850 solid;
+  background: #16002940;
+  color: #ffffff60;
+  padding: 10px 32px;
+  text-align: center;
   cursor: pointer;
   transition: .2s;
-  font-family: "Minecraft Turkish";
+  font-size: .85rem;
+  backdrop-filter: blur(6px);
 }
 
-.optionText {
-  font-family: "Minecraft Turkish";
-  font-size: 14px;
-  text-shadow: none;
+.button:hover {
+  box-shadow: 0 0 32px #0c0111;
 }
 
-.optionAlt {
-  font-family: "Minecraft Turkish";
-  font-size: 12px;
-  text-shadow: none;
-  opacity: .8;
+.button:active {
+  border: 4px #27133670 solid;
 }
 
-.option:hover {
-  background: var(--main-color-darker);
-  color: var(--main-color-lightest);
+.addProfile {
+  flex: 2;
 }
 
-.selectedVersionSE {
-  background: var(--main-color-light)!important;
-  color: var(--main-color-darker)!important;
+.profilesSearch {
+  flex: 2.5;
 }
 
-.checkboxes {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+.profileList {
   width: 100%;
-  margin-top: 4px;
+  /* display: flex;
+  flex-direction: column; */
+  gap: 12px;
+  overflow-y: scroll;
+  padding-right: 6px;
 }
 
-.checkbox {
+.profile {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: calc(100% - 128px) 128px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.profile:not(:first-child) {
+  margin-top: 12px;
+}
+
+.profileMeta {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 8px 16px;
-  background: var(--main-color-slightly-dark);
+  height: 56px;
+  gap: 12px;
+  width: 100%;
+  background: #16002940;
+  border: 4px #1E122850 solid;
+  padding: 12px 16px;
+  transition: .2s;
+  backdrop-filter: blur(6px);
   cursor: pointer;
-}
-
-.checkbox:hover {
-  background: var(--main-color);
-}
-
-.checkbox span {
-  font-family: "Minecrafter";
-  font-size: 14px;
-  text-shadow: none;
-  color: var(--main-color-lightest);
-}
-
-.checkbox.checked {
-  background: var(--main-color-light);
-  box-shadow: var(--darker-shadow) 0 4px 24px;
-}
-
-.checkbox.checked span {
-  color: var(--main-color-darkest);
-  opacity: .7;
-}
-
-body.loaded .tab {
-  transform: translateX(-50%) translateY(150%)!important;
-  opacity: 0!important;
-  transition: 2s, .1s opacity;
-}
-
-body.loaded .bottomBar {
-  transform: translateY(100px)!important;
-  animation: .4s fadeOut forwards, 1s levitateOut forwards!important;
-}
-
-body.loaded .bottomBar .button:not(.playButton) {
-  transform: translateY(-20px)!important;
-  animation: 4s levitateOut forwards!important;
-}
-
-body.loaded::after {
-  filter: brightness(.4);
-}
-
-.progress {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
   align-items: center;
-  text-align: center;
-  width: 100%;
-  height: 100%;
-  transition: 1.2s ease transform, 4s ease opacity;
-  padding-bottom: 4%;
-  opacity: 0;
-  transform: translateY(128px);
-  line-height: 24px;
-  font-family: "Minecraft Turkish";
+  overflow: hidden;
 }
 
-.range {
+.profileMeta:hover {
+  border: 4px #27133670 solid;
+}
+
+.profileMeta:active {
+  border: 4px #27133690 solid;
+}
+
+.profileName {
+  font-weight: 400;
+  color: #ffffffb0;
+}
+
+.profileVersion {
+  font-weight: 300;
+  color: #ffffff79;
+  font-size: .9rem;
+}
+
+.selectedProfile .profileMeta {
+  pointer-events: none;
+  border: 4px #3c165860 solid;
+  background: #25054140;
+}
+
+.profileActions {
   display: flex;
-  width: 100%;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-}
-
-.ramValue {
-  text-align: right;
-  width: 25%;
-  font-size: 12px;
-  text-shadow: none;
-  color: var(--main-color-lightest);
-}
-
-.slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 0px;
-  padding: 6px;
-  background: var(--main-color-darker);
-  outline: none;
-  opacity: 0.7;
-  transition: opacity .2s;
-}
-
-.slider:hover {
-  opacity: 1;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background: var(--main-color-light);
-  cursor: pointer;
-}
-
-.settingsInfos {
-  display: flex;
-  flex-direction: column;
   gap: 8px;
 }
 
-.settingsInfo {
-  background: var(--main-color-slightly-dark);
-  padding: 12px 16px;
+.profileAction {
+  padding: 12px;
+  background: #16002940;
+  border: 4px #1E122850 solid;
+  cursor: pointer;
+  aspect-ratio: 1 / 1;
+  color: #ffffff90;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  font-family: "Minecrafter";
 }
 
-.infoTitle {
-  font-size: 16px;
-  text-shadow: none;
-  color: var(--main-color-lightest);
+.profileActionIcon {
+  width: 20px;
+  pointer-events: none;
 }
 
-.infoValue {
-  font-size: 14px;
-  text-shadow: none;
-  color: var(--main-color-lightest);
-  opacity: .8;
-  font-family: "Minecraft Turkish";
+.profileAction:hover {
+  border: 4px #27133670 solid;
 }
 
-.list-move, .list-enter-active, .list-leave-active {
-  transition: all 0.5s ease;
+.profileAction:active {
+  border: 4px #27133690 solid;
 }
 
-.list-enter-from, .list-leave-to {
+.disabledActions {
+  opacity: .4;
+  pointer-events: none;
+}
+
+.list-move,
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.2s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
   opacity: 0;
-  transform: translateY(48px);
 }
 
 .list-leave-active {
   position: absolute;
+  width: calc(100% - 12px);
+}
+
+.loadingTab::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("../assets/icons/loading.gif");
+  background-size: 64px;
+  background-repeat: no-repeat;
+  background-position: center;
+  backdrop-filter: grayscale(.5);
+}
+
+.addProfileTab {
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 6px;
+}
+
+.addProfileInput {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.addProfileInput > input, .addProfileInput > .input {
+  width: 100%;
+  padding: 6px 8px;
+  flex: 3;
+}
+
+.addProfileInput > label {
+  color: #ffffff80;
+  padding: 10px 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: .2s;
+  font-size: .85rem;
+  width: 38%;
+  backdrop-filter: blur(6px);
+  background: #16002940;
+}
+
+.addProfileInput > input::-webkit-input-placeholder {
+  color: #ffffff30;
+}
+
+input[type="range"] {
+  appearance: none;
+  width: 100%;
+  background: #32184750;
+  outline: none;
+  opacity: 0.7;
+  transition: .2s;
+  padding: 4px 4px;
+  height: 12px;
+  border: none;
+}
+
+input[type="range"]:hover {
+  opacity: 1;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #4e078b9d;
+  cursor: pointer;
+}
+
+.addProfileTabTitle {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #ffffffb0;
+  text-transform: uppercase;
+  font-weight: 600;
+  width: 100%;
+  text-align: center;
+  line-height: 1.2;
+  background: #16002940;
+  padding: 12px 16px;
+}
+
+select {
+  border: 4px #1E122850 solid;
+  background: #16002940;
+  color: #ffffffce;
+  padding: 10px 16px;
+  transition: .2s;
+  font-size: .9rem;
+  width: 50%;
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+select:hover, select:focus {
+  border: 4px #27133670 solid;
+}
+
+select:focus {
+  box-shadow: 0 0 32px #0c0111;
+}
+
+select::webkit-scrollbar {
+  width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+  background: #242424;
+}
+
+select::-webkit-scrollbar-thumb {
+  background: #000000;
+}
+
+option {
+  color: #f2f2f2;
+  background: #111111!important;
+}
+
+.addProfileActions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.addProfileActions > .button {
+  flex: 4;
+}
+
+.tooltip {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: #16002940;
+  border: 4px #1E122850 solid;
+  transform: translateY(12px);
+  transition: opacity .2s, transform .2s;
+  pointer-events: none;
+  opacity: 0;
+  width: 150px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 32px #0c0111;
+}
+
+.visibleTooltip {
+  pointer-events: all;
+  opacity: 1;
+  transform: none;
+}
+
+.tooltipOption {
+  padding: 8px 12px;
+  color: #ffffff96;
+  cursor: pointer;
+  transition: .2s;
+  font-size: .9rem;
+  text-align: center;
+}
+
+.tooltipOption:not(:first-child) {
+  border-top: 4px #1E122850 solid;
+}
+
+.launching .launchSection, .launching .content, .launching .sidebar, .launching .tooltip {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.launching .progressText {
+  opacity: 1;
+}
+
+.progressText {
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: .3s ease;
+  position: absolute;
+  background: url("../assets/icons/loading.gif");
+  background-size: 48px;
+  background-repeat: no-repeat;
+  background-position: center calc(100vh - 24px - 48px);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.settings {
+  text-align: center;
 }

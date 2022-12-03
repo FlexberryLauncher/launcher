@@ -6,192 +6,137 @@
   <title>Flexberry Launcher</title>
   <link rel="stylesheet" href="style/loading.css" />
   <link rel="stylesheet" href="style/style.css" />
-  <link rel="stylesheet" href="style/themes/chorus.css" />
+  <!-- 👀 <script src="../node_modules/skinview3d/bundles/skinview3d.bundle.js" defer></script> -->
   <script src="scripts/vue/vue.global.prod.min.js" defer></script>
   <script src="scripts/launcher.js" defer></script>
 </head>
 
 <body id="app">
-  <div class="titleHolder">
-    <img class="titleAlt" src="assets/images/flexberry-launcher.png" alt="close" />
-  </div>
-  <div class="progress" :style="{ opacity: (this.loadingStates.launcher ? 1 : 0), transform: (this.loadingStates.launcher ? 'translateY(0)' : 'translateY(128px)') }">
-    <span class="progressText">{{ this.progress.state || "Preparing..." }}</span>
-  </div>
-
-  <div class="content">
-    <div class="topBar">
-      <div class="close" onclick="window.close()" id="close">
-        <div class="scene">
-          <div class="cube" id="closeCube">
-            <div class="cube__face cube__face--front">x</div>
-            <div class="cube__face cube__face--back"></div>
-            <div class="cube__face cube__face--right"></div>
-            <div class="cube__face cube__face--left"></div>
-            <div class="cube__face cube__face--top"><img class="cube__image" src="assets/images/tnt.png" alt="flexberry-launcher" /></div>
-            <div class="cube__face cube__face--bottom"></div>
+  <div id="window" :class="{ launching: loadingStates.launcher }">
+    <div class="titlebar">
+      <img src="assets/icons/launcher.png" class="launcherIcon">
+      <span class="closeButton" onclick="window.close()">
+        <img src="assets/icons/close.svg" class="closeIcon">
+      </span>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="sidebarIcon backIcon" :class="{ visibleBackIcon: activeTab }" @click="toggleTab()">
+      <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-4.28 9.22a.75.75 0 000 1.06l3 3a.75.75 0 101.06-1.06l-1.72-1.72h5.69a.75.75 0 000-1.5h-5.69l1.72-1.72a.75.75 0 00-1.06-1.06l-3 3z" clip-rule="evenodd" />
+    </svg>
+    <div class="sidebar">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="sidebarIcon" @click="return; toggleTab('extensionMarket')" :class="{ activeIcon: activeTab == 'extensionMarket' }" style="color: #ce9595; opacity: .1; cursor: disabled; pointer-events: none;">
+        <path d="M11.25 5.337c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.036 1.007-1.875 2.25-1.875S15 2.34 15 3.375c0 .369-.128.713-.349 1.003-.215.283-.401.604-.401.959 0 .332.278.598.61.578 1.91-.114 3.79-.342 5.632-.676a.75.75 0 01.878.645 49.17 49.17 0 01.376 5.452.657.657 0 01-.66.664c-.354 0-.675-.186-.958-.401a1.647 1.647 0 00-1.003-.349c-1.035 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401.31 0 .557.262.534.571a48.774 48.774 0 01-.595 4.845.75.75 0 01-.61.61c-1.82.317-3.673.533-5.555.642a.58.58 0 01-.611-.581c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.035-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959a.641.641 0 01-.658.643 49.118 49.118 0 01-4.708-.36.75.75 0 01-.645-.878c.293-1.614.504-3.257.629-4.924A.53.53 0 005.337 15c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.036 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.369 0 .713.128 1.003.349.283.215.604.401.959.401a.656.656 0 00.659-.663 47.703 47.703 0 00-.31-4.82.75.75 0 01.83-.832c1.343.155 2.703.254 4.077.294a.64.64 0 00.657-.642z" />
+      </svg>
+      <div :style="{ background: ('url(https://visage.surgeplay.com/face/32/' + (accounts.find(acc => acc.isSelected)?.uuid || 'X-Steve')) + ')' }"  @click="toggleTab('accounts')" class="sidebarIcon sidebarProfile" :class="{ activeIcon: activeTab == 'accounts' }"></div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="sidebarIcon" @click="toggleTab('settings')" :class="{ activeIcon: activeTab == 'settings' }">
+        <path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 00-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 00-2.282.819l-.922 1.597a1.875 1.875 0 00.432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 000 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 00-.432 2.385l.922 1.597a1.875 1.875 0 002.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 002.28-.819l.923-1.597a1.875 1.875 0 00-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 000-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 00-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 00-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 00-1.85-1.567h-1.843zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="content" :class="{ tabsEnabled: activeTab }">
+      <!-- <img :src="this.image" alt="Skin"> -->
+      <div class="tabs" :class="{ loadingTab: Object.values(loadingStates).some(state => state) }">
+        <div class="tab profiles" :class="{ activeTab: activeTab == 'accounts' }">
+          <div class="profilesTop">
+            <input v-model.trim="accountsSearch" class="search profilesSearch" placeholder="Search accounts">
+            <span class="verticalDivider"></span>
+            <span class="addProfile button" @click="login">Login with Microsoft</span>
           </div>
+          <div class="horizontalDivider"></div>
+          <transition-group name="list" class="profileList" tag="div">
+            <div class="profile" v-for="account in accounts" :class="{ selectedProfile: account.isSelected }" :key="account.uuid">
+              <div class="profileMeta" @click="selectAccount(account.uuid)">
+                <span class="profileName">{{ account.profile.name || "Unnamed Profile" }}</span>
+                <span class="profileVersion">{{ account.xbox?.name || "Unknown" }} on Xbox</span>
+              </div>
+              <div class="profileActions">
+                <span class="profileAction" @click="logout(account.uuid)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="profileActionIcon">
+                    <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+                <span class="profileAction">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="profileActionIcon">
+                    <path fill-rule="evenodd" d="M4.5 12a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm6 0a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm6 0a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </transition-group>
+        </div>
+        <div class="tab settings" :class="{ activeTab: activeTab == 'settings' }">
+          <h3>Under Construction</h3>
+          <p>Come to our <span onclick="shell.openExternal('https:\/\/discord.gg/dbVPH8KYP2')" style="color: #924feb; cursor: pointer;">Discord</span> server to see what we're working on!</p>
+          <code style="font-family: monospace; font-size: 16px; background: #f2f2f220;">Using v{{ meta.launcher.version }} of Flexberry Launcher</code>
+        </div>
+        <div class="tab profiles" :class="{ activeTab: activeTab == 'profiles' }">
+          <div class="profilesTop">
+            <input v-model.trim="profilesSearch" class="search profilesSearch" placeholder="Search profiles">
+            <span class="verticalDivider"></span>
+            <span class="addProfile button" @click="toggleTab('addProfile')">Add Profile</span>
+          </div>
+          <div class="horizontalDivider"></div>
+          <transition-group name="list" class="profileList" tag="div">
+            <div class="profile" v-for="profile in filteredProfiles" :class="{ selectedProfile: profile.isSelected }" :key="profile.appearance.name">
+              <div class="profileMeta" @click="selectProfile(profile.appearance.name)">
+                <span class="profileName">{{ profile.appearance?.name || "Unnamed Profile" }}</span>
+                <span class="profileVersion">{{ profile.version }}</span>
+              </div>
+              <div class="profileActions" :class="{ disabledActions: profile.appearance?.name == 'Latest Release' }">
+                <span class="profileAction" @click="deleteProfile(profile.appearance.name)">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="profileActionIcon">
+                    <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+                <span class="profileAction" @click="showTooltip($event, [{ action: () => { deleteProfile(profile.appearance.name) }, text: 'Delete Profile' }, { action: () => { openEditProfile(profile) }, text: 'Edit Profile' }])">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="profileActionIcon">
+                    <path fill-rule="evenodd" d="M4.5 12a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm6 0a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm6 0a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </transition-group>
+        </div>
+        <div class="tab addProfileTab" :class="{ activeTab: activeTab == 'addProfile' }" ref="wizard">
+          <span class="addProfileTabTitle">{{ wizard.mode == "edit" ? `Editing ${wizard.staticName}` : "Adding new profile" }}</span>
+          <div class="addProfileInput">
+            <label for="profileName">Profile Name</label>
+            <input id="profileName" v-model.trim="wizard[wizard.mode].appearance.name" placeholder="Survival with bois" maxlength="20">
+          </div>
+          <div class="addProfileInput">
+            <label for="ramAmount">RAM ({{ wizard[wizard.mode].memory }}MB)</label>
+            <input type="range" id="ramAmount" step="128" :min="Math.min(512, this.meta.system.memory / 1024 / 1024)" :max="Math.floor(this.meta.system.memory / 1024 / 1024)" v-model="wizard[wizard.mode].memory">
+          </div>
+          <div class="addProfileInput">
+            <label for="minecraftVersion">Minecraft Version</label>
+            <select id="minecraftVersion" class="input" v-model="wizard[wizard.mode].version">
+              <option value="" disabled>Select a version</option>
+              <option v-for="version in this.versions" :value="version.id">{{ version.id }}</option>
+            </select>
+          </div>
+          <div class="addProfileInput">
+            <label for="gameDirectory">Game Directory</label>
+            <input id="gameDirectory" @click="openDirectory()" v-model.trim="wizard[wizard.mode].directory" placeholder="Click to select (Optional)">
+          </div>
+          <div class="addProfileActions">
+            <span class="button" @click="toggleTab('profiles')">Cancel</span>
+            <span class="button" @click="createProfile()">{{ wizard.mode == "edit" ? "Edit" : "Add" }} Profile</span>
+          </div>
+        </div>
+        <div class="tab" :class="{ activeTab: activeTab == 'extensionMarket' }">
+          <h3>Under Construction</h3>
+        </div>
+      </div>
+      <div class="launchSection">
+        <span class="playButton" @click="launch()">PLAY</span>
+        <div class="profileInfo">
+          <span class="selectedProfileText">Selected {{ profiles.find(profile => profile.isSelected)?.appearance?.name || "none" }}</span>
+          <span class="separator">•</span>
+          <span class="changeProfile" @click="toggleTab('profiles')">change</span>
         </div>
       </div>
     </div>
-    <div class="modelWrapper" :class="'modalWrapper' + (toggledModal == 'versionSelector' ? ' visibleModalWrapper' : '')">
-      <div class="versionSelect modal tab" :class="{ visibleModal: toggledModal == 'versionSelector' }">
-        <div class="tabTop">
-          <span class="tabClose" @click="toggleModal('')">
-            <img src="assets/icons/arrow-left.png" alt="close" class="tabCloseIcon" />
-          </span>
-          <span class="tabTitle">Add Version</span>
-          <span class="tabExternal">
-          </span>
-        </div>
-
-        <div class="wizard subTabs" id="wizard"> 
-          <div class="wizardContent subTab">
-            <div class="input">
-              <label for="profileName">Profile Name</label>
-              <input type="text" id="profileName" maxlength="24" placeholder="Survival with Bois" v-model.trim="wizard.data.appearance.name" />
-            </div>
-            <div class="selector">
-              <label for="versionSelect">Profile Icon</label>
-              <div class="blocks">
-                <img v-for="block in blocks" @click="selectBlock(block)" class="block" :class="{ selectedBlock: wizard.data?.appearance?.icon == block }" :src="'assets/blocks/' + block + '.png'">
-              </div>
-            </div>
-          </div>
-          <div class="wizardContent subTab">
-            <div class="selector">
-              <label for="versionSelect">Select Version</label>
-              <div class="select" id="versions">
-                <div v-for="version in filteredVersions" @click="selectVersion(version)" class="option version" :class="{ selectedVersionSE: version.id == this.wizard.data.version }" :key="version.id">
-                  <span class="optionText" v-text="version.id"></span>
-                  <span class="optionAlt" v-text="(new Date(version.actualReleaseTime || version.releaseTime)).toLocaleDateString()"></span>
-                </div>
-              </div>
-              <div class="checkboxes">
-                <div class="checkbox versionType" :class="{ checked: this.versionsFilter.includes('release') }" @click="check('release', 'versionsFilter')">
-                  <span>Releases</span>
-                </div>
-                <div class="checkbox versionType" :class="{ checked: this.versionsFilter.includes('snapshot') }" @click="check('snapshot', 'versionsFilter')">
-                  <span>Snapshots</span>
-                </div>
-                <div class="checkbox versionType" :class="{ checked: this.versionsFilter.includes('old') }" @click="check('old', 'versionsFilter')">
-                  <span>Historical</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="wizardContent subTab">
-            <label for="ramSlider">Allocated Memory</label>
-            <div class="range">
-              <input type="range" step="128" :min="Math.min(512, this.meta.system.memory / 1024 / 1024)" :max="Math.floor(this.meta.system.memory / 1024 / 1024)" class="slider" v-model="this.wizard.data.memory">
-              <span class="ramValue" v-text="wizard.data.memory + ' MB'"></span>
-            </div>
-            <!-- <label for="windowSize">Minecraft Window Size</label>
-            <div class="sizes input">
-              <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" id="mcWindowHeight" placeholder="600" value="600">
-              <span class="x">x</span>
-              <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1');" id="mcWindowWidth" placeholder="720" value="720">
-            </div> -->
-          </div>
-        </div>
-        <div class="wizardActions">
-            <span class="wizardAction" @click="((wizard.alert == 'Create profile') || !wizard.alert) && nextWizardPage()" v-text="wizard.alert || 'Next'"></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="settingTab tab" :class="{ visibleTab: this.activeTab == 'settings' }" id="settings">
-      <div class="tabTop">
-        <span class="tabClose" @click="toggleTab('')">
-          <img src="assets/icons/arrow-left.png" alt="close" class="tabCloseIcon" />
-        </span>
-        <span class="tabTitle">Settings</span>
-        <span class="tabExternal"></span>
-      </div>
-      <div class="subTabTogglers">
-        <span class="subTabToggler" :class="{ toggledTabToggler: toggledSubmenu == 'versionSettings' }" @click="toggleSubTab('versionSettings')">Versions</span>
-        <span class="subTabToggler" :class="{ toggledTabToggler: toggledSubmenu == 'otherSettings' }" @click="toggleSubTab('otherSettings')">Other</span>
-      </div>
-      <div class="subTabs">
-        <div class="subTab" :class="{ visibleSubTab: toggledSubmenu == 'versionSettings' }">
-          <div class="versionList" id="versionList">
-            <div class="addVersion version" @click="toggleModal('versionSelector')">
-              <span class="addVersionIcon" style="font-family: Minecraft Turkish;">+</span>
-              <span class="addVersionText">Add version</span>
-            </div>
-            <transition-group name="list">
-              <div :key="profile.appearance?.name || profile.acronym || profile" class="version" :class="{ selectedVersion: profile.isSelected }" @click="!profile.isSelected && selectProfile(profile.appearance?.name)" v-for="profile in profiles">
-                <div class="versionMain">
-                  <img class="versionImage" :src="`assets/blocks/${profile.appearance?.icon}.png`">
-                  <div class="versionInfo">
-                    <span class="versionName" v-text="profile.appearance?.name"></span>
-                    <span class="versionVersion" v-text="profile.version"></span>
-                  </div>
-                </div>
-                <div v-if="!profile.latest" class="deleteAccount" @click="deleteProfile(profile.appearance?.name)"></div>
-              </div>
-            </transition-group>
-          </div>
-        </div>
-        <div class="subTab" :class="{ visibleSubTab: toggledSubmenu == 'otherSettings' }">
-          <div class="settingsInfos">
-            <div class="settingsInfo">
-              <span class="infoTitle">Launcher Version</span>
-              <span class="infoValue" v-text="this.meta.launcher?.version || 'unknown'"></span>
-            </div>
-          </div>
-          <div class="themes" id="themes">
-            <label for="themeSelect">This page is still work in progress</label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="settingTab tab" :class="{ tabLoading: this.loadingStates.accounts, visibleTab: this.activeTab == 'accounts' }"  id="accounts">
-      <div class="tabTop">
-        <span class="tabClose" @click="toggleTab('')">
-          <img src="assets/icons/arrow-left.png" alt="close" class="tabCloseIcon" />
-        </span>
-        <span class="tabTitle">Accounts</span>
-        <span class="tabExternal"></span>
-      </div>
-      <div class="accountList requiresConnection">
-
-        <div class="addAccount account" @click="login()">
-          <img class="addAccountIcon" src="assets/images/microsoft.png">
-          <span class="addAccountTitle">Login with Microsoft</span>
-        </div>
-        <transition-group name="list">
-          <div class="account requiresConnection" :class="{ selectedAccount: account.isSelected }" v-for="account in accounts" @click="!account.isSelected && selectAccount(account.uuid)" :key="account.uuid">
-            <div class="accountMain">
-              <img class="accountImage" :src="'https://visage.surgeplay.com/face/44/' + account.uuid">
-              <div class="accountInfo">
-                <span class="accountUsername" v-text="account.profile.name"></span>
-                <span class="accountMail" v-text="account.xbox.name + ' on Xbox'"></span>
-              </div>
-            </div>
-            <div class="deleteAccount" @click="logout(account.uuid)"></div>
-          </div>
-        </transition-group>
-        
-      </div>
-      <span class="noConnectionIndicator" style="display: none; font-family: 'Minecrafter'; text-shadow: none; opacity: .8; color: rgb(253, 68, 68);">No internet connection</span>
-    </div>
-    <div class="bottomBar" id="bbr">
-      <span class="username barContainer" v-text="accounts.find(acc => acc.isSelected)?.profile?.name || 'Not logged in'"></span>
-      <div class="buttons" id="btns">
-        <div class="button iconButton" :class="{ toggledButton: activeTab == 'accounts' }" @click="toggleTab('accounts')" id="accountsToggler">
-          <img class="icon" src="assets/icons/user.png" alt="user" />
-        </div>
-        <div class="button playButton" id="playBtn" @click="launch()">
-          <span class="playButtonTitle">Play</span>
-          <span class="playButtonSubtitle" v-text="(profiles.find(profile => profile.isSelected)?.appearance?.name) || 'Couldn\'t load versions'"></span>
-        </div>
-        <div class="button iconButton" :class="{ toggledButton: activeTab == 'settings' }" @click="toggleTab('settings')" id="settingsToggler">
-          <img class="icon" src="assets/icons/cog.png" alt="settings" />
-        </div>
-      </div>
-      <span class="info barContainer"></span>
+    <span class="progressText">{{ progress.state }}</span>
+    <div class="tooltip" ref="tooltip" :class="{ visibleTooltip: tooltip.visible }">
+      <span class="tooltipOption" v-for="(option, i) in tooltip.actions" :key="option.text + i" @click="option.action">{{ option.text }}</span>
     </div>
   </div>
 </body>

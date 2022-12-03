@@ -1,13 +1,13 @@
 {
   "name": "flexberry-launcher",
   "productName": "Flexberry Launcher",
-  "version": "1.0.0-pre.3",
+  "version": "1.0.0-pre.4",
   "description": "Lightweight and customizable launcher for Minecraft",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
     "package:windows": "node builder/packager.js --platform=win32",
-    "package:linux": "node builder/packager.js --platform=linux"
+    "package:linux": "node builder/packager.js --platform=linux",
   },
   "author": {
     "name": "Kuzey Kurtuluş",

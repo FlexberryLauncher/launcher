@@ -12,18 +12,7 @@ const berry = require("./logger")();
 module.exports = (win) => {
   class GameManager {
     constructor() {
-      // set minecraftDir depends on platform
-      if (process.platform == "win32") {
-        this.minecraftDir = path.join(app.getPath("appData"), ".minecraft");
-      } else if (process.platform == "darwin") {
-        this.minecraftDir = path.join(app.getPath("appData"), "minecraft");
-      } else if (process.platform == "linux") {
-        this.minecraftDir = path.join(app.getPath("home"), ".minecraft");
-      } else {
-        // TO-DO - add popup for error
-        throw new Error("Unsupported platform");
-      }
-
+      this.minecraftDir = process.platform == "win32" ? path.join(app.getPath("appData"), ".minecraft") : process.platform == "darwin" ? path.join(app.getPath("appData"), "minecraft") : process.platform == "linux" ? path.join(app.getPath("home"), ".minecraft") : null;
       this.alreadyLaunched = false;
     }
 
@@ -31,7 +20,7 @@ module.exports = (win) => {
       return new Promise(async (resolve, reject) => {
         const javaPath = path.join(this.minecraftDir, "flexberry-jre", javaVersionCode, "bin", "javaw.exe");
         if (fs.existsSync(javaPath)) {
-          win.webContents.send("progress", "Required Java is already installed, skipping installation");
+          win.webContents.send("progress", "Required Java is already installed");
           return resolve(javaPath);
         } else {
           require("./javaManager")(javaVersionCode)
@@ -55,15 +44,12 @@ module.exports = (win) => {
                   }
                 });
 
-                console.time("createDir");
                 directory.forEach((dir) => {
                   berry.log(`Creating directory ${dir.name}`, "gameManager");
                   win.webContents.send("progress", "Creating directory: " + dir.name);
                   fs.mkdirSync(path.join(this.minecraftDir, "flexberry-jre", javaVersionCode, dir.name));
                 });
-                console.timeEnd("createDir");
 
-                console.time("downloadFiles");
                 let downloadedFiles = 0;
                 for (let file of filesToDownload) {
                   win.webContents.send("progress", { type: "Java", task: downloadedFiles, total: filesToDownload.length });
@@ -75,7 +61,6 @@ module.exports = (win) => {
                     win.webContents.send("progress", { type: "Java", task: downloadedFiles, total: filesToDownload.length });
                     berry.log(downloadedFiles + " of " + filesToDownload.length + " files downloaded (" + file.name + ")", "gameManager");
                     if (downloadedFiles == filesToDownload.length) {
-                      console.timeEnd("downloadFiles");
                       return resolve(javaPath);
                     }
                   });
@@ -137,7 +122,7 @@ module.exports = (win) => {
             min: (+arg.profile.memory) - 512 + "M",
           },
           overrides: {
-            gameDirectory: arg.profile.dir || this.minecraftDir,
+            gameDirectory: arg.profile.directory || this.minecraftDir,
           }
         }
         javaPath && (launcherOptions.javaPath = javaPath);
@@ -145,6 +130,15 @@ module.exports = (win) => {
         launcher.on("progress", (e) => {
           win.webContents.send("progress", e);
         });
+
+        launcher.on("data", (e) => {
+          console.log(e);
+        });
+
+        launcher.on("debug", (e) => {
+          console.log(e);
+        });
+
         await wait(1000);
         launcher.launch(launcherOptions).then(() => {
           this.alreadyLaunched = true;

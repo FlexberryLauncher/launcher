@@ -7,8 +7,5 @@ build/
 # github
 .github/
 
-# shittyOS
+# macOS
 .DS_Store
-
-# dotenv
-.env

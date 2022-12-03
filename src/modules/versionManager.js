@@ -157,6 +157,13 @@ module.exports = (win) => {
       return this.profiles;
     }
 
+    async editProfile(profile) {
+      let dbProfile = await db.get("profiles").find({ acronym: profile.acronym });
+      profile.acronym = profile.appearance.name.replace(/\s/g, "").toLowerCase();
+      await dbProfile.assign(profile).write();
+      return this.profiles;
+    }
+
     async selectProfile(profileName) {
       let ifExists = await db.get("profiles").find({
         appearance: {
@@ -267,6 +274,10 @@ module.exports = (win) => {
 
     ipcMain.on("addProfile", async (event, arg) => {
       event.reply("profiles", (await versionManager.addProfile(arg)));
+    });
+
+    ipcMain.on("editProfile", async (event, arg) => {
+      event.reply("profiles", (await versionManager.editProfile(arg)));
     });
 
     ipcMain.on("selectProfile", async (event, arg) => {

@@ -1,7 +1,7 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { join } = require('path');
 const axios = require("axios");
-const { createWriteStream, existsSync, unlinkSync, copyFile, readFileSync } = require("fs");
+const { createWriteStream, existsSync, unlinkSync, copyFile } = require("fs");
 const tempDir = join(__dirname, "..", "..")
 
 const pkg = require("../package.json").version;
@@ -86,14 +86,15 @@ function update(url) {
 function createWindow() {
   berry.log("Launcher is running in production mode. Version: " + pkg);
   mainWindow = new BrowserWindow({
-    width: 830,
-    height: 520,
+    width: 900,
+    height: 510,
+    minWidth: 900,
+    minHeight: 510,
     titleBarStyle: "hidden",
     menuBarVisible: false,
     skipTaskbar: true,
     title: "Flexberry Launcher",
     fullscreenable: false,
-    resizable: false,
     icon: join(__dirname, "assets/images/flexberry-launcher-icon.png"),
     transparent: true,
     webPreferences: {
@@ -108,6 +109,19 @@ function createWindow() {
   require("./modules/versionManager")(mainWindow);
   require("./modules/accountManager")(mainWindow);
 };
+
+ipcMain.handle("openDirectory", async (event, path) => {
+  const defaultPath = process.platform == "win32" ? join(app.getPath("appData"), ".minecraft") : process.platform == "darwin" ? join(app.getPath("appData"), "minecraft") : process.platform == "linux" ? join(app.getPath("home"), ".minecraft") : null;
+  const { filePaths } = await dialog.showOpenDialog({
+    properties: ["openDirectory"],
+    defaultPath,
+    title: "Select your Minecraft directory",
+  });
+  if (filePaths[0])
+    return filePaths[0];
+  else
+    return false;
+});
 
 ipcMain.on("getMeta", async (event) => {
   event.returnValue = {
