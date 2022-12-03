@@ -7,7 +7,7 @@
   "scripts": {
     "start": "electron-forge start",
     "package:windows": "node builder/packager.js --platform=win32",
-    "package:linux": "node builder/packager.js --platform=linux",
+    "package:linux": "node builder/packager.js --platform=linux"
   },
   "author": {
     "name": "Kuzey Kurtuluş",
