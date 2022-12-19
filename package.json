@@ -1,8 +1,8 @@
 {
   "name": "flexberry-launcher",
   "productName": "Flexberry Launcher",
-  "version": "1.0.0-pre.4",
-  "description": "Lightweight and customizable launcher for Minecraft",
+  "version": "1.0.0-pre.5",
+  "description": "Lightweight and feature rich launcher for Minecraft",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -13,20 +13,18 @@
     "name": "Kuzey Kurtuluş",
     "email": "kuzeeeyk@gmail.com"
   },
-  "license": "MIT",
+  "license": "GPL-3.0",
   "dependencies": {
     "axios": "^0.27.2",
     "colors": "^1.4.0",
-    "discord-rpc": "^4.0.1",
     "lowdb": "^1.0.0",
     "minecraft-launcher-core": "^3.16.16",
-    "msmc": "^3.1.0",
-    "node-fetch": "^2.6.0"
+    "msmc": "^3.1.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.65",
     "asar": "^3.2.0",
-    "electron": "17.4.7",
-    "electron-packager": "^15.5.1"
+    "electron": "^22.0.0",
+    "electron-packager": "^17.1.1"
   }
 }

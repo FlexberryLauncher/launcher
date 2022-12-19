@@ -65,6 +65,12 @@ createApp({
       get() {
         return this.accounts.filter(account => account.username.toLowerCase().includes(this.accountsSearch?.toLowerCase()));
       }
+    },
+    skin: {
+      get() {
+        const account = this.accounts.find(account => account.isSelected)?.profile;
+        return (account && account.skins && account.skins.length && account.skins[0].url) || "http://assets.mojang.com/SkinTemplates/steve.png";
+      }
     }
   },
   methods: {

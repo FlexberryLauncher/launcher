@@ -3,4 +3,5 @@
 * {
   opacity: 0;
   animation: none!important;
+  pointer-events: none!important;
 }

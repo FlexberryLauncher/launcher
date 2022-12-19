@@ -9,12 +9,13 @@
   user-select: none;
   box-sizing: border-box;
   outline: none;
-  font-family: "Poppins";
+  font-family: "Satoshi-Variable", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 body {
   overflow: hidden;
   height: 100vh;
+  transition: opacity .4s ease-in-out;
 }
 
 *::-webkit-scrollbar {
@@ -78,14 +79,43 @@ body {
 .sidebarProfile {
   padding: 30px 30px 0 0;
   background: #00000080;
-  background-position: center;
-  background-size: cover;
+  background-image: url("http://assets.mojang.com/SkinTemplates/steve.png");
+  width: 28.16px;
+  height: 28.16px;
+  background-size: 233px;
+  background-position: -29px -28.2px;
+  background-repeat: none;
+  image-rendering: pixelated;
 }
+
+.sidebarProfile::after {
+  content: " ";
+  position: relative;
+  top: -30.72px;
+  left: -.4px;
+  width: 31px;
+  height: 31px;
+  filter: saturate(2);
+  background-size: 257px;
+  background-image: inherit;
+  background-position: -161.5px -33px;
+  display: inline-block;
+  transition: .2s;
+  image-rendering: pixelated;
+  transform: scale(1.08);
+  overflow: hidden;
+}
+
+/* ^ these calculations were so painful to do... */
 
 .sidebarIcon:hover {
   opacity: 1;
   transform: scale(1.05);
   box-shadow: 0 0 32px #00000090;
+}
+
+.sidebarProfile:hover::after {
+  transform: scale(1.1);
 }
 
 .activeIcon {

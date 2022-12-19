@@ -15,9 +15,15 @@ module.exports = (win) => {
     await db.defaults({ accounts: [] }).write()
     let selectedAccount = await db.get('accounts').find({ isSelected: true }).value();
     if (selectedAccount && !msmc.validate(selectedAccount.profile)) {
-      // TO-DO - Instead of deselecting the account, we should probably just revalidate it
-      berry.log("Deselecting selected account, because it's expired.", "accountManager");
-      db.get('accounts').find({ isSelected: true }).assign({ isSelected: false }).write();
+      berry.log("Attempting to refresh account " + selectedAccount.profile.name, "accountManager")
+      msmc.refresh(selectedAccount.profile).then(async result => {
+        let profile = result.profile;
+        db.get("accounts").find({ uuid: selectedAccount.uuid }).assign({ profile }).write();
+        berry.log("Refreshed account " + selectedAccount.profile.name, "accountManager");
+      }).catch(reason => {
+        db.get('accounts').find({ isSelected: true }).assign({ isSelected: false }).write();
+        berry.error("Error refreshing account Stack:\n" + reason?.stack, "accountManager");
+      })
     }
   }
 
